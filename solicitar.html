@@ -39,6 +39,11 @@
         senhasAntigas: [''], motivo: '', dataOcorrido: '', nomeCliente: '', whatsapp: ''
       });
 
+      // Controles de "Não sei"
+      const [naoLembra, setNaoLembra] = useState({
+        usuario: false, emailVinculado: false, ultimaSenha: false, telefone: false
+      });
+
       // Estados auxiliares para disparar os pontos apenas ao "sair" do campo (onBlur)
       const [pontosConfirmados, setPontosConfirmados] = useState({
         usuario: false, emailVinculado: false, emailRecuperar: false, 
@@ -54,11 +59,12 @@
         if (!formData.plataforma) return 0;
         let score = 0;
         
-        if (formData.plataforma !== 'google' && pontosConfirmados.usuario) score += 10;
-        if (formData.plataforma !== 'google' && pontosConfirmados.emailVinculado) score += 15;
+        // Se NÃO clicou em "não lembro" e o ponto foi validado, soma.
+        if (formData.plataforma !== 'google' && !naoLembra.usuario && pontosConfirmados.usuario) score += 10;
+        if (formData.plataforma !== 'google' && !naoLembra.emailVinculado && pontosConfirmados.emailVinculado) score += 15;
         if (formData.plataforma === 'google' && pontosConfirmados.emailRecuperar) score += 15;
-        if (pontosConfirmados.ultimaSenha) score += 20;
-        if (pontosConfirmados.telefone) score += 10;
+        if (!naoLembra.ultimaSenha && pontosConfirmados.ultimaSenha) score += 20;
+        if (!naoLembra.telefone && pontosConfirmados.telefone) score += 10;
 
         if (formData.dataNascimento.dia && formData.dataNascimento.ano) score += 10;
         
@@ -73,7 +79,7 @@
         else if (formData.motivo === 'banido') score += 2;
 
         return Math.min(score, 100);
-      }, [formData, pontosConfirmados]);
+      }, [formData, pontosConfirmados, naoLembra]);
 
       // Função que valida o campo quando o usuário tira o foco (onBlur)
       const handleBlur = (campo) => {
@@ -85,6 +91,18 @@
         if (campo === 'telefone' && formData.telefone.replace(/\D/g, '').length >= 10) valid = true;
         
         setPontosConfirmados(prev => ({ ...prev, [campo]: valid }));
+      };
+
+      // Função para alternar o "Não sei" e limpar o input
+      const toggleNaoLembra = (campo) => {
+        const isCurrentlyNaoLembra = naoLembra[campo];
+        setNaoLembra(prev => ({ ...prev, [campo]: !isCurrentlyNaoLembra }));
+        
+        // Se ativou o "não sei", limpa o campo e tira o ponto
+        if (!isCurrentlyNaoLembra) {
+          setFormData(prev => ({ ...prev, [campo]: '' }));
+          setPontosConfirmados(prev => ({ ...prev, [campo]: false }));
+        }
       };
 
       // --- Máscaras ---
@@ -116,7 +134,7 @@
         setLoading(true);
 
         // ⚠️ ATENÇÃO: COLOQUE AQUI A NOVA URL QUE O GOOGLE GEROU
-        const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbwLyepKi4eDmkPMVXUJp-2d5BKKDpxst2DbIbAPbYbG0nKFtQJAumLDh1Gi5mEHMl76Tw/exec";
+        const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbwZi81Hae2mgB27FYl1sKvfutNrMsxb9fLpc-1GXRDtxpILXNgPQObpwrURACuwVWryqg/exec";
 
         try {
           const payload = {
@@ -223,9 +241,14 @@
                         <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
                           <User className="w-5 h-5 text-pink-400" /> Usuário (@)
                         </h2>
-                        <div className="relative">
-                          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold">@</span>
-                          <input onBlur={() => handleBlur('usuario')} value={formData.usuario} onChange={(e) => setFormData({ ...formData, usuario: handleNoSpaces(e.target.value.toLowerCase()) })} type="text" placeholder="nomedeusuario" className="w-full bg-slate-800 border-none p-4 pl-8 rounded-xl focus:ring-2 ring-indigo-500" />
+                        <div className="space-y-2">
+                          <div className="relative">
+                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold">@</span>
+                            <input disabled={naoLembra.usuario} onBlur={() => handleBlur('usuario')} value={formData.usuario} onChange={(e) => setFormData({ ...formData, usuario: handleNoSpaces(e.target.value.toLowerCase()) })} type="text" placeholder="nomedeusuario" className="w-full bg-slate-800 border-none p-4 pl-8 rounded-xl focus:ring-2 ring-indigo-500 disabled:opacity-30 disabled:cursor-not-allowed" />
+                          </div>
+                          <button type="button" onClick={() => toggleNaoLembra('usuario')} className="text-xs text-slate-500 hover:text-slate-300 font-bold ml-2">
+                            {naoLembra.usuario ? 'Lembrei do usuário' : 'Não sei o usuário'}
+                          </button>
                         </div>
                       </section>
 
@@ -233,7 +256,12 @@
                         <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
                           <Mail className="w-5 h-5 text-indigo-400" /> E-mail vinculado
                         </h2>
-                        <input onBlur={() => handleBlur('emailVinculado')} value={formData.emailVinculado} onChange={(e) => setFormData({ ...formData, emailVinculado: handleNoSpaces(e.target.value) })} type="email" placeholder="seuemail@exemplo.com" className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500" />
+                        <div className="space-y-2">
+                          <input disabled={naoLembra.emailVinculado} onBlur={() => handleBlur('emailVinculado')} value={formData.emailVinculado} onChange={(e) => setFormData({ ...formData, emailVinculado: handleNoSpaces(e.target.value) })} type="email" placeholder="seuemail@exemplo.com" className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500 disabled:opacity-30 disabled:cursor-not-allowed" />
+                          <button type="button" onClick={() => toggleNaoLembra('emailVinculado')} className="text-xs text-slate-500 hover:text-slate-300 font-bold ml-2">
+                            {naoLembra.emailVinculado ? 'Lembrei do e-mail' : 'Não sei o e-mail'}
+                          </button>
+                        </div>
                       </section>
                     </>
                   )}
@@ -251,10 +279,15 @@
                     <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
                       <Lock className="w-5 h-5 text-indigo-400" /> Última Senha
                     </h2>
-                    <div className="relative">
-                      <input onBlur={() => handleBlur('ultimaSenha')} value={formData.ultimaSenha} onChange={(e) => setFormData({ ...formData, ultimaSenha: handleNoSpaces(e.target.value) })} type={showPass ? 'text' : 'password'} placeholder="••••••••" className="w-full bg-slate-800 border-none p-4 pr-12 rounded-xl focus:ring-2 ring-indigo-500" />
-                      <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500">
-                        {showPass ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    <div className="space-y-2">
+                      <div className="relative">
+                        <input disabled={naoLembra.ultimaSenha} onBlur={() => handleBlur('ultimaSenha')} value={formData.ultimaSenha} onChange={(e) => setFormData({ ...formData, ultimaSenha: handleNoSpaces(e.target.value) })} type={showPass ? 'text' : 'password'} placeholder="••••••••" className="w-full bg-slate-800 border-none p-4 pr-12 rounded-xl focus:ring-2 ring-indigo-500 disabled:opacity-30 disabled:cursor-not-allowed" />
+                        <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 disabled:opacity-30">
+                          {showPass ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                        </button>
+                      </div>
+                      <button type="button" onClick={() => toggleNaoLembra('ultimaSenha')} className="text-xs text-slate-500 hover:text-slate-300 font-bold ml-2">
+                        {naoLembra.ultimaSenha ? 'Lembrei da senha' : 'Não sei a senha'}
                       </button>
                     </div>
                   </section>
@@ -263,7 +296,12 @@
                     <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
                       <Smartphone className="w-5 h-5 text-indigo-400" /> Telemóvel/Celular
                     </h2>
-                    <input onBlur={() => handleBlur('telefone')} value={formData.telefone} onChange={(e) => setFormData({...formData, telefone: applyPhoneMask(e.target.value)})} type="text" placeholder="(xx) xxxxx-xxxx" className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500" />
+                    <div className="space-y-2">
+                      <input disabled={naoLembra.telefone} onBlur={() => handleBlur('telefone')} value={formData.telefone} onChange={(e) => setFormData({...formData, telefone: applyPhoneMask(e.target.value)})} type="text" placeholder="(xx) xxxxx-xxxx" className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500 disabled:opacity-30 disabled:cursor-not-allowed" />
+                      <button type="button" onClick={() => toggleNaoLembra('telefone')} className="text-xs text-slate-500 hover:text-slate-300 font-bold ml-2">
+                        {naoLembra.telefone ? 'Lembrei do telefone' : 'Não sei / Não tinha telefone'}
+                      </button>
+                    </div>
                   </section>
 
                   <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2rem]">
