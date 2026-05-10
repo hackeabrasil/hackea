@@ -102,13 +102,21 @@
         }
       };
 
-      const applyPhoneMask = (val) => {
-        let value = val.replace(/\D/g, '');
-        if (value.length > 11) value = value.slice(0, 11);
-        if (value.length > 10) value = value.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
-        else if (value.length > 2) value = value.replace(/^(\d{2})(\d{0,5}).*/, '($1) $2');
-        else if (value.length > 0) value = value.replace(/^(\d*)/, '($1');
-        return value;
+      // MÁSCARA CORRIGIDA (AGORA ACEITA O NÚMERO COMPLETO)
+      const applyPhoneMask = (v) => {
+        v = v.replace(/\D/g, ""); // Remove tudo o que não é número
+        if (v.length > 11) v = v.slice(0, 11); // Limita a 11 dígitos
+        
+        if (v.length > 10) {
+            v = v.replace(/^(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+        } else if (v.length > 5) {
+            v = v.replace(/^(\d{2})(\d{4})(\d{0,4})/, "($1) $2-$3");
+        } else if (v.length > 2) {
+            v = v.replace(/^(\d{2})(\d{0,5})/, "($1) $2");
+        } else if (v.length > 0) {
+            v = v.replace(/^(\d*)/, "($1");
+        }
+        return v;
       };
 
       const handleNoSpaces = (val) => val.replace(/\s/g, '');
@@ -122,8 +130,8 @@
       const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        // URL da sua API no Google Apps Script
-        const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbzWisURxDgy4l_o2qM-OzBXmBYwHoy86xje5qEUGZfPCoeUW1mzDasSf9n1Rs0j2UOedA/exec";
+        // NOVO LINK DA API ATUALIZADO
+        const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbxJytmginLvt5SvDq_8bm339K4ZZ2I6H7Bg13XRrU5BDYEncm7TE3OC56QyOIX8p1xfcA/exec";
 
         try {
           const payload = {
@@ -331,6 +339,8 @@
                     <div className="space-y-4">
                       <div className="grid md:grid-cols-2 gap-4">
                         <input required value={formData.nomeCliente} onChange={(e) => setFormData({ ...formData, nomeCliente: e.target.value })} type="text" placeholder="Nome Completo" className="bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500" />
+                        
+                        {/* INPUT WHATSAPP CORRIGIDO */}
                         <input required value={formData.whatsapp} onChange={(e) => setFormData({ ...formData, whatsapp: applyPhoneMask(e.target.value) })} type="text" placeholder="WhatsApp (xx) xxxxx-xxxx" className="bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500" />
                       </div>
 
