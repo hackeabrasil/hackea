@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RecoveryPro | Solicitar Recuperação</title>
+  <title>LFAssessoria | Recuperação de Conta</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
@@ -178,8 +178,8 @@
                 <ShieldCheck className="w-8 h-8 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold tracking-tight">Recovery<span className="text-indigo-400">Pro</span></h1>
-                <p className="text-xs text-slate-500 uppercase tracking-widest font-semibold">Profissionalismo & Segurança</p>
+                <h1 className="text-2xl font-bold tracking-tight">LF<span className="text-indigo-400">Acessoria</span></h1>
+                <p className="text-xs text-slate-500 uppercase tracking-widest font-semibold">Segurança Digital</p>
               </div>
             </div>
           </header>
@@ -194,7 +194,7 @@
                   </svg>
                   <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold">{probabilidade}%</span>
                 </div>
-                <p className="text-[10px] text-slate-500 uppercase font-bold">Chance de<br/>Recuperação</p>
+                <p className="text-[10px] text-slate-500 uppercase font-bold">Chance de<br/>Sucesso</p>
               </div>
             </div>
           )}
@@ -204,11 +204,11 @@
               
               <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2rem] shadow-xl">
                 <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-indigo-400" /> Selecione a plataforma
+                  <TrendingUp className="w-5 h-5 text-indigo-400" /> Qual conta você deseja recuperar?
                 </h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {[
-                    { id: 'google', icon: Mail, label: 'Google', color: 'hover:border-red-500' },
+                    { id: 'google', icon: Mail, label: 'E-mail', color: 'hover:border-red-500' },
                     { id: 'insta', icon: Instagram, label: 'Instagram', color: 'hover:border-pink-500' },
                     { id: 'face', icon: Facebook, label: 'Facebook', color: 'hover:border-blue-500' },
                     { id: 'outros', icon: ShieldCheck, label: 'Outros', color: 'hover:border-indigo-500' }
@@ -235,7 +235,7 @@
                     <>
                       <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2rem]">
                         <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                          <User className="w-5 h-5 text-pink-400" /> Usuário (@)
+                          <User className="w-5 h-5 text-pink-400" /> Nome de Usuário
                         </h2>
                         <div className="space-y-2">
                           <div className="relative">
@@ -250,7 +250,7 @@
 
                       <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2rem]">
                         <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                          <Mail className="w-5 h-5 text-indigo-400" /> E-mail vinculado
+                          <Mail className="w-5 h-5 text-indigo-400" /> E-mail que estava na conta
                         </h2>
                         <div className="space-y-2">
                           <input disabled={naoLembra.emailVinculado} onBlur={() => handleBlur('emailVinculado')} value={formData.emailVinculado} onChange={(e) => setFormData({ ...formData, emailVinculado: handleNoSpaces(e.target.value) })} type="email" placeholder="seuemail@exemplo.com" className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500 disabled:opacity-30 disabled:cursor-not-allowed" />
@@ -273,7 +273,7 @@
 
                   <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2rem]">
                     <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                      <Lock className="w-5 h-5 text-indigo-400" /> Última Senha
+                      <Lock className="w-5 h-5 text-indigo-400" /> Última senha que lembra
                     </h2>
                     <div className="space-y-2">
                       <div className="relative">
@@ -290,7 +290,7 @@
 
                   <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2rem]">
                     <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                      <Smartphone className="w-5 h-5 text-indigo-400" /> Telemóvel/Celular
+                      <Smartphone className="w-5 h-5 text-indigo-400" /> Telefone que estava na conta
                     </h2>
                     <div className="space-y-2">
                       <input disabled={naoLembra.telefone} onBlur={() => handleBlur('telefone')} value={formData.telefone} onChange={(e) => setFormData({...formData, telefone: applyPhoneMask(e.target.value)})} type="text" placeholder="(xx) xxxxx-xxxx" className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500 disabled:opacity-30 disabled:cursor-not-allowed" />
