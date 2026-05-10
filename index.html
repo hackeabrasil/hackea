@@ -1,1 +1,245 @@
-index
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LF Assessoria | Recuperação de Contas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #09090b;
+            color: #fafafa;
+        }
+
+        .glass-card {
+            background: rgba(24, 24, 27, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(63, 63, 70, 0.5);
+        }
+
+        .gradient-border {
+            position: relative;
+            border-radius: 1rem;
+            background: linear-gradient(to right, #6366f1, #a855f7);
+            padding: 2px;
+        }
+
+        .gradient-content {
+            background: #09090b;
+            border-radius: calc(1rem - 2px);
+        }
+
+        .btn-pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(168, 85, 247, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0); }
+        }
+
+        .cta-gradient {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+        }
+
+        input::placeholder {
+            color: #71717a;
+        }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+
+    <!-- Header / Nav -->
+    <nav class="fixed w-full z-50 glass-card border-b border-zinc-800 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="text-2xl font-extrabold tracking-tighter">
+                LF <span class="text-indigo-500">Assessoria</span>
+            </div>
+            <div class="flex items-center gap-6">
+                <a href="https://instagram.com/lfassessoria.br" target="_blank" class="text-2xl hover:text-indigo-400 transition-colors">
+                    <i class="fa-brands fa-instagram"></i>
+                </a>
+                <a href="contas.html" class="hidden md:block text-sm font-medium hover:text-indigo-400">Verificar Andamento</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-32 pb-20 px-6">
+        <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+                <h1 class="text-5xl md:text-7xl font-extrabold leading-tight mb-6">
+                    Recupere seu <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-500">patrimônio digital.</span>
+                </h1>
+                <p class="text-zinc-400 text-lg mb-10 max-w-lg">
+                    Especialistas em recuperação de contas invadidas, bloqueadas ou perdidas. Tecnologia avançada e suporte jurídico especializado.
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-4 mb-12">
+                    <a href="solicitar.html" class="px-8 py-4 cta-gradient rounded-full font-bold text-center hover:scale-105 transition-transform">
+                        Solicite Gratuitamente
+                    </a>
+                    <a href="contas.html" class="px-8 py-4 bg-zinc-800 rounded-full font-bold text-center border border-zinc-700 hover:bg-zinc-700 transition-colors">
+                        Verificar Andamento
+                    </a>
+                </div>
+
+                <!-- Estatísticas -->
+                <div class="flex items-center gap-4">
+                    <div class="flex -space-x-3">
+                        <div class="w-10 h-10 rounded-full bg-indigo-600 border-2 border-zinc-950 flex items-center justify-center text-xs">LF</div>
+                        <div class="w-10 h-10 rounded-full bg-purple-600 border-2 border-zinc-950 flex items-center justify-center text-xs">AS</div>
+                        <div class="w-10 h-10 rounded-full bg-zinc-700 border-2 border-zinc-950 flex items-center justify-center text-xs">+</div>
+                    </div>
+                    <div>
+                        <p class="text-2xl font-bold">308</p>
+                        <p class="text-xs text-zinc-500 uppercase tracking-widest font-semibold">Contas Recuperadas</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card Indique e Ganhe -->
+            <div class="relative">
+                <div class="absolute -inset-4 bg-indigo-500/20 blur-3xl rounded-full"></div>
+                <div class="gradient-border btn-pulse">
+                    <div class="gradient-content p-8 text-center">
+                        <div class="text-4xl mb-4">🎁</div>
+                        <h3 class="text-2xl font-bold mb-2">Indique e Ganhe!</h3>
+                        <p class="text-zinc-400 mb-6">Conhece alguém que perdeu o acesso? Indique nosso serviço e receba uma comissão assim que a conta for recuperada.</p>
+                        <button onclick="copyLink()" class="w-full py-3 bg-white text-black rounded-lg font-bold hover:bg-zinc-200 transition-colors">
+                            Quero Indicar Agora
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Checker Section -->
+    <section class="py-20 px-6 bg-zinc-900/50">
+        <div class="max-w-3xl mx-auto glass-card p-8 md:p-12 rounded-3xl relative overflow-hidden">
+            <div class="absolute top-0 right-0 p-4 opacity-10">
+                <i class="fa-solid fa-shield-virus text-8xl"></i>
+            </div>
+            
+            <h2 class="text-3xl font-bold mb-4">Verificar Senhas Vazadas</h2>
+            <p class="text-zinc-400 mb-8">Descubra se seus dados estão em risco na Dark Web. Informe os dados abaixo para uma análise técnica.</p>
+            
+            <form id="checkerForm" class="space-y-4">
+                <div class="grid md:grid-cols-2 gap-4">
+                    <input type="email" id="checkEmail" placeholder="Seu melhor e-mail" required
+                        class="w-full bg-zinc-800 border border-zinc-700 p-4 rounded-xl focus:outline-none focus:border-indigo-500 transition-colors">
+                    <input type="text" id="checkWhatsapp" placeholder="Seu WhatsApp (XX) XXXXX-XXXX" required
+                        class="w-full bg-zinc-800 border border-zinc-700 p-4 rounded-xl focus:outline-none focus:border-indigo-500 transition-colors">
+                </div>
+                <button type="submit" class="w-full py-4 bg-indigo-600 rounded-xl font-bold hover:bg-indigo-500 transition-colors">
+                    Iniciar Verificação Gratuita
+                </button>
+            </form>
+
+            <div id="successMessage" class="hidden mt-8 p-6 bg-emerald-500/10 border border-emerald-500/50 rounded-2xl text-center">
+                <i class="fa-solid fa-circle-check text-emerald-500 text-3xl mb-3"></i>
+                <h4 class="font-bold text-emerald-400">Dados registrados!</h4>
+                <p class="text-sm text-zinc-300">Nossa equipe técnica está analisando seu caso. Em breve você receberá um relatório detalhado no seu WhatsApp.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="py-24 px-6 max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-bold mb-4">Como Funciona</h2>
+            <div class="h-1 w-20 bg-indigo-500 mx-auto rounded-full"></div>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="glass-card p-8 rounded-2xl border-t-4 border-t-indigo-500">
+                <div class="text-3xl mb-4 font-bold text-indigo-500">01</div>
+                <h4 class="text-xl font-bold mb-3">Análise Grátis</h4>
+                <p class="text-zinc-400 text-sm">Avaliamos a viabilidade da recuperação sem custo inicial. Você só paga quando estiver logado na sua conta.</p>
+            </div>
+            <div class="glass-card p-8 rounded-2xl border-t-4 border-t-purple-500">
+                <div class="text-3xl mb-4 font-bold text-purple-500">02</div>
+                <h4 class="text-xl font-bold mb-3">Recuperação</h4>
+                <p class="text-zinc-400 text-sm">Utilizamos técnicas de segurança avançadas. <span class="text-zinc-200">Se necessário e com sua autorização</span>, podemos acionar métodos jurídicos para garantir seu direito.</p>
+            </div>
+            <div class="glass-card p-8 rounded-2xl border-t-4 border-t-white">
+                <div class="text-3xl mb-4 font-bold text-white">03</div>
+                <h4 class="text-xl font-bold mb-3">Sucesso Garantido</h4>
+                <p class="text-zinc-400 text-sm">Pagamento via Pix ou Cartão somente <span class="font-bold text-zinc-200">APÓS</span> o acesso ser reestabelecido integralmente.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 border-t border-zinc-800 text-center px-6">
+        <div class="text-xl font-bold mb-6">LF Assessoria</div>
+        <div class="flex justify-center gap-8 mb-8 text-zinc-500">
+            <a href="#" class="hover:text-white transition-colors">Privacidade</a>
+            <a href="#" class="hover:text-white transition-colors">Termos</a>
+            <a href="https://instagram.com/lfassessoria.br" class="hover:text-white transition-colors">Instagram</a>
+        </div>
+        <p class="text-zinc-600 text-xs">© 2024 LF Assessoria - CNPJ: 00.000.000/0001-00. Especialistas em Cyber Security.</p>
+    </footer>
+
+    <!-- Custom Modal para Mensagens (Substituto do Alert) -->
+    <div id="customModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 hidden px-6">
+        <div class="bg-zinc-900 border border-zinc-800 p-8 rounded-3xl max-w-sm w-full text-center">
+            <p id="modalText" class="mb-6"></p>
+            <button onclick="closeModal()" class="px-6 py-2 bg-indigo-600 rounded-lg font-bold">Entendido</button>
+        </div>
+    </div>
+
+    <script>
+        // Máscara para WhatsApp
+        const whatsappInput = document.getElementById('checkWhatsapp');
+        whatsappInput.addEventListener('input', (e) => {
+            let x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,5})(\d{0,4})/);
+            e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
+        });
+
+        // Simulação de Form de Verificação
+        const checkerForm = document.getElementById('checkerForm');
+        const successMessage = document.getElementById('successMessage');
+
+        checkerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            checkerForm.classList.add('hidden');
+            successMessage.classList.remove('hidden');
+            
+            // Aqui enviaria os dados via API
+            console.log("Dados enviados:", {
+                email: document.getElementById('checkEmail').value,
+                whatsapp: document.getElementById('checkWhatsapp').value
+            });
+        });
+
+        // Função para simular indicação
+        function copyLink() {
+            const dummy = document.createElement('input');
+            const text = "https://lfassessoria.com.br/indique";
+            document.body.appendChild(dummy);
+            dummy.value = text;
+            dummy.select();
+            document.execCommand('copy');
+            document.body.removeChild(dummy);
+            
+            showModal("Link de indicação copiado! Compartilhe com seus amigos e ganhe por cada recuperação concluída.");
+        }
+
+        function showModal(text) {
+            document.getElementById('modalText').innerText = text;
+            document.getElementById('customModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('customModal').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
