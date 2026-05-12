@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acompanhamento de Pedidos</title>
+    <title>Acompanhamento de Pedidos | LF Assessoria</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
@@ -63,7 +63,7 @@
             left: 0;
             height: 100%;
             border-radius: 10px;
-            background-color: var(--color-success);
+            background-color: var(--color-primary);
             transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .progress-step { position: relative; width: var(--progress-dot-size); display: flex; flex-direction: column; }
@@ -98,21 +98,20 @@
         .progress-step:not(:first-child):not(:last-child) .step-label { left: 50%; transform: translateX(-50%); text-align: center; }
 
         .dot-passed { background-color: var(--color-success); color: white; }
-        .label-passed { color: var(--color-success); font-weight: 700; }
         .dot-current { 
-            background-color: var(--color-success); 
+            background-color: var(--color-primary); 
             color: white; 
-            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.4);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.4);
             animation: pulse-ring 2s infinite;
         }
-        .label-current { color: var(--color-success); font-weight: 800; }
+        .label-current { color: var(--color-primary); font-weight: 800; }
         .dot-pending { background-color: #334155; color: #94a3b8; }
         .dot-error { background-color: var(--color-error); color: white; }
         
         @keyframes pulse-ring {
-            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-            70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+            0% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.7); }
+            70% { box-shadow: 0 0 0 6px rgba(79, 70, 229, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0); }
         }
     </style>
 </head>
@@ -123,7 +122,7 @@
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center space-x-2">
                     <i data-lucide="activity" class="w-6 h-6 text-indigo-500"></i>
-                    <span class="text-white font-bold tracking-tight">STATUS DO SISTEMA</span>
+                    <span class="text-white font-bold tracking-tight uppercase">Status do Sistema</span>
                 </div>
                 <div class="text-xs font-medium text-slate-400 bg-slate-800 px-3 py-1 rounded-full border border-slate-700">
                     Sincronizado: <span id="current-time">--:--</span>
@@ -178,12 +177,10 @@
     </footer>
 
     <script>
-        // COLOQUE AQUI SUA URL GERADA NO APPS SCRIPT
-        const API_URL = 'https://script.google.com/macros/s/AKfycbxJytmginLvt5SvDq_8bm339K4ZZ2I6H7Bg13XRrU5BDYEncm7TE3OC56QyOIX8p1xfcA/exec';
+        const API_URL = 'https://script.google.com/macros/s/AKfycbydcswYJt4azZlrCuPf4j-_KmJ98UiyOKisjWVXGfS7duq4rS2DIQh6NKBSn05VENOaVA/exec';
         
         let recoveryRequests = [];
 
-        // Mapeamento de texto para número de etapas
         const stageMap = {
             "solicitado": 1,
             "analise": 2,
@@ -212,7 +209,7 @@
             const isError = statusText === 'erro';
             
             const fillWidth = isError ? 100 : ((Math.max(1, stageNum) - 1) / 3) * 100;
-            const fillColor = isError ? 'bg-red-500' : 'bg-emerald-500';
+            const fillColor = isError ? 'bg-red-500' : (stageNum === 4 ? 'bg-emerald-500' : 'bg-indigo-500');
 
             let steps = progressStages.map((s, i) => {
                 const stepIdx = i + 1;
@@ -235,7 +232,7 @@
                 return `
                     <div class="progress-step">
                         <div class="progress-dot ${dotClass}">${icon}</div>
-                        <span class="step-label ${isCurrent ? 'label-current' : ''}">${s.label}</span>
+                        <span class="step-label ${isCurrent ? 'label-current' : (isPassed ? 'text-emerald-500' : '')}">${s.label}</span>
                     </div>`;
             }).join('');
 
@@ -250,16 +247,24 @@
             const statusText = request.stage.toLowerCase();
             const isFinished = statusText === 'finalizado';
             const isError = statusText === 'erro';
+            const isSolicitado = statusText === 'solicitado';
 
             let borderColor = 'border-slate-800';
             let shadow = 'card-shadow';
+            let badgeClass = 'bg-slate-800 text-slate-400';
             
             if (isFinished) {
                 borderColor = 'border-emerald-500/50';
                 shadow = 'status-success-shadow';
+                badgeClass = 'bg-emerald-900/30 text-emerald-400 border-emerald-500/30';
             } else if (isError) {
                 borderColor = 'border-red-500/50';
                 shadow = 'status-error-shadow';
+                badgeClass = 'bg-red-900/30 text-red-400 border-red-500/30';
+            } else {
+                // Para Solicitado, Análise e Recuperando (Status Ativos)
+                borderColor = 'border-indigo-500/30';
+                badgeClass = 'bg-indigo-900/30 text-indigo-400 border-indigo-500/30';
             }
 
             const actionBtn = isFinished 
@@ -275,12 +280,12 @@
                             <p class="text-[10px] font-black text-slate-500 tracking-tighter">PROTOCOLO</p>
                             <h3 class="text-white font-bold">#${request.id}</h3>
                         </div>
-                        <span class="text-[9px] font-bold px-2 py-1 rounded ${isError ? 'bg-red-900/30 text-red-400' : 'bg-slate-800 text-slate-400'} border border-slate-700 uppercase">${request.stage}</span>
+                        <span class="text-[9px] font-bold px-2 py-1 rounded border uppercase ${badgeClass}">${request.stage}</span>
                     </div>
 
                     <div class="flex items-center space-x-4 mb-6">
-                        <div class="w-12 h-12 rounded-full bg-indigo-900/30 border border-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold">
-                            ${request.name.substring(0, 2).toUpperCase()}
+                        <div class="w-12 h-12 rounded-full bg-indigo-900/30 border border-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold uppercase">
+                            ${request.name.substring(0, 2)}
                         </div>
                         <div class="flex-1 overflow-hidden">
                             <p class="text-white font-semibold truncate">${request.name}</p>
@@ -342,7 +347,7 @@
             const name = document.getElementById('filter-name').value.toLowerCase();
             const status = document.getElementById('filter-status').value.toLowerCase();
             const filtered = recoveryRequests.filter(r => {
-                const matchName = r.name.toLowerCase().includes(name) || r.username.toLowerCase().includes(name);
+                const matchName = (r.name && r.name.toLowerCase().includes(name)) || (r.username && r.username.toLowerCase().includes(name));
                 let matchStatus = status === "" || r.stage.toLowerCase() === status;
                 return matchName && matchStatus;
             });
