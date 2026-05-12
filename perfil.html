@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Painel | LF Assessoria</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #070e17;
+            background-image: radial-gradient(circle at 1px 1px, rgba(79, 70, 229, 0.1) 1px, transparent 0);
+            background-size: 25px 25px;
+        }
+        .glass {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div class="max-w-md w-full">
+        <!-- ÁREA DE LOGIN -->
+        <div id="loginArea" class="bg-slate-900 p-8 rounded-[2.5rem] border border-slate-800 shadow-2xl text-center">
+            <div class="w-20 h-20 bg-indigo-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-indigo-600/30">
+                <i data-lucide="shield-check" class="text-white w-10 h-10"></i>
+            </div>
+            <h2 class="text-2xl font-bold mb-2">Acessar Painel</h2>
+            <p class="text-slate-400 text-sm mb-8">Entre com seu WhatsApp cadastrado para gerenciar suas indicações.</p>
+            
+            <div class="space-y-4">
+                <input type="text" id="loginTel" placeholder="(00) 00000-0000" 
+                       class="w-full bg-slate-800 border border-slate-700 p-5 rounded-2xl text-center text-lg font-medium focus:ring-2 ring-indigo-500 outline-none transition-all placeholder:text-slate-600">
+                
+                <button onclick="carregarPerfil()" id="btnEntrar" class="w-full py-5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-bold text-lg shadow-xl transition-all flex items-center justify-center gap-2 active:scale-95">
+                    ACESSAR AGORA <i data-lucide="log-in" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ÁREA DO DASHBOARD (Oculta por padrão) -->
+        <div id="dashArea" class="hidden space-y-4 animate-in fade-in zoom-in duration-500">
+            <!-- Card de Saldo Principal -->
+            <div class="bg-gradient-to-br from-indigo-600 to-violet-700 p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden">
+                <div class="relative z-10">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-indigo-100 text-xs font-bold uppercase tracking-widest opacity-80" id="boasVindas">Olá, Indicador!</p>
+                            <h2 class="text-4xl font-black mt-2 text-white" id="valSaldo">R$ 0,00</h2>
+                            <p class="text-indigo-200 text-[10px] font-bold mt-1 uppercase">Saldo Disponível (Finalizados)</p>
+                        </div>
+                        <div class="p-3 bg-white/10 rounded-2xl backdrop-blur-md">
+                            <i data-lucide="wallet" class="text-white w-6 h-6"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- Círculos decorativos -->
+                <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+            </div>
+
+            <!-- Grid de Status -->
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-slate-900/50 glass p-6 rounded-[2rem]">
+                    <p class="text-slate-500 text-[10px] font-bold uppercase mb-1">Pendente</p>
+                    <h3 class="text-xl font-bold text-orange-400" id="valPendente">R$ 0,00</h3>
+                    <p class="text-[9px] text-slate-600 mt-1">Em processo...</p>
+                </div>
+                <div class="bg-slate-900/50 glass p-6 rounded-[2rem]">
+                    <p class="text-slate-500 text-[10px] font-bold uppercase mb-1">Indicações</p>
+                    <h3 class="text-xl font-bold text-white" id="valTotal">0</h3>
+                    <p class="text-[9px] text-slate-600 mt-1">Total de leads</p>
+                </div>
+            </div>
+
+            <!-- Ações -->
+            <div class="space-y-3">
+                <button onclick="window.location.href='indica.html'" class="w-full py-5 bg-slate-800 hover:bg-slate-700 text-white rounded-[1.5rem] font-bold border border-slate-700 transition-all flex items-center justify-center gap-2">
+                    <i data-lucide="plus-circle" class="w-5 h-5 text-indigo-400"></i> NOVO LINK DE INDICAÇÃO
+                </button>
+                
+                <button onclick="window.location.reload()" class="w-full py-3 text-slate-500 text-xs font-bold hover:text-white transition-all uppercase tracking-widest">
+                    Sair do Painel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // NOVA URL FORNECIDA
+        const API_URL = 'https://script.google.com/macros/s/AKfycbwrjV4LszsFCgu4xjj0gNKUT-PmqtJHyNZtiLS2qWSssCTuzLxohmygd7Yu4D3rZ1TNgA/exec';
+
+        async function carregarPerfil() {
+            const tel = document.getElementById('loginTel').value.replace(/\D/g, "");
+            const btn = document.getElementById('btnEntrar');
+            
+            if(tel.length < 10) {
+                alert("Por favor, digite seu WhatsApp completo.");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = `<div class="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>`;
+
+            try {
+                const res = await fetch(`${API_URL}?action=getPerfil&tel=${tel}`);
+                const data = await res.json();
+
+                if(data.error) {
+                    alert("Ops! Não encontramos nenhum indicador com esse WhatsApp.");
+                    btn.disabled = false;
+                    btn.innerHTML = `ACESSAR AGORA <i data-lucide="log-in" class="w-5 h-5"></i>`;
+                    return;
+                }
+
+                // Preencher Dashboard
+                document.getElementById('boasVindas').innerText = `Olá, ${data.nome}!`;
+                document.getElementById('valSaldo').innerText = `R$ ${data.saldo.toFixed(2)}`;
+                document.getElementById('valPendente').innerText = `R$ ${data.pendente.toFixed(2)}`;
+                document.getElementById('valTotal').innerText = data.totalIndicados;
+
+                // Trocar telas
+                document.getElementById('loginArea').classList.add('hidden');
+                document.getElementById('dashArea').classList.remove('hidden');
+                lucide.createIcons();
+
+            } catch (e) {
+                alert("Erro ao conectar com o servidor. Tente novamente.");
+                btn.disabled = false;
+                btn.innerHTML = `ACESSAR AGORA <i data-lucide="log-in" class="w-5 h-5"></i>`;
+            }
+        }
+
+        // Máscara de Telefone para o Login
+        document.getElementById('loginTel').addEventListener('input', (e) => {
+            let v = e.target.value.replace(/\D/g, "");
+            if (v.length > 11) v = v.slice(0, 11);
+            if (v.length > 10) v = v.replace(/^(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+            else if (v.length > 5) v = v.replace(/^(\d{2})(\d{4})(\d{0,4})/, "($1) $2-$3");
+            else if (v.length > 2) v = v.replace(/^(\d{2})(\d{0,5})/, "($1) $2");
+            else if (v.length > 0) v = v.replace(/^(\d*)/, "($1");
+            e.target.value = v;
+        });
+
+        // Inicializar ícones
+        lucide.createIcons();
+    </script>
+</body>
+</html>
