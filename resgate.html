@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resgate de Acesso | LF Assessoria</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #070e17;
+            background-image: radial-gradient(circle at 1px 1px, rgba(79, 70, 229, 0.15) 1px, transparent 0);
+            background-size: 30px 30px;
+        }
+        .glass-effect {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col items-center justify-center p-4">
+
+    <!-- Header / Logo -->
+    <header class="mb-8 text-center animate-in fade-in duration-700">
+        <div class="flex items-center justify-center gap-3 mb-2">
+            <div class="p-3 bg-indigo-600 rounded-2xl shadow-lg shadow-indigo-600/20">
+                <i data-lucide="key-round" class="w-8 h-8 text-white"></i>
+            </div>
+            <div class="text-left">
+                <h1 class="text-2xl font-bold tracking-tight">LF<span class="text-indigo-400">Acessoria</span></h1>
+                <p class="text-[10px] text-slate-500 uppercase font-bold tracking-widest text-center">Segurança Digital</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-md w-full">
+        <div class="glass-effect p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden">
+            <!-- Decoração -->
+            <div class="absolute -top-12 -left-12 w-24 h-24 bg-indigo-500/10 rounded-full blur-2xl"></div>
+
+            <div class="relative z-10">
+                <div class="mb-6 text-center">
+                    <h2 class="text-2xl font-bold mb-2">Resgate de Conta</h2>
+                    <p class="text-slate-400 text-sm">Insira o token de 20 dígitos para liberar o seu acesso.</p>
+                </div>
+
+                <div class="space-y-5">
+                    <!-- Campo de Token -->
+                    <div class="relative">
+                        <label class="block text-[10px] font-black text-slate-500 uppercase tracking-tighter mb-2 ml-1">Token de Segurança</label>
+                        <div class="relative">
+                            <!-- maxlength="20" impede que o usuário digite mais que o necessário -->
+                            <input type="password" id="tokenInput" maxlength="20" placeholder="••••••••••••••••••••" 
+                                   class="w-full bg-slate-900 border border-slate-700 p-5 rounded-2xl focus:ring-2 ring-indigo-500 outline-none transition-all text-white tracking-widest placeholder:text-slate-700 text-center">
+                            <i data-lucide="lock" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-600 w-5 h-5"></i>
+                        </div>
+                        <div class="flex justify-between mt-2 px-1">
+                            <p id="charCount" class="text-[9px] text-slate-500 uppercase font-bold">0 / 20 caracteres</p>
+                            <p class="text-[9px] text-slate-600 uppercase font-black italic">Apenas dígitos autorizados</p>
+                        </div>
+                    </div>
+
+                    <!-- Botão de Validar -->
+                    <button onclick="validarToken()" id="validarBtn" class="w-full py-5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-bold text-lg shadow-xl shadow-indigo-600/20 transition-all flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50">
+                        VALIDAR TOKEN <i data-lucide="shield-check" class="w-5 h-5"></i>
+                    </button>
+
+                    <!-- Estado de Carregamento (Oculto) -->
+                    <div id="loadingState" class="hidden flex flex-col items-center py-4">
+                        <div class="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-3"></div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Consultando Banco de Dados...</p>
+                    </div>
+
+                    <!-- Mensagem de Erro (Oculta) -->
+                    <div id="errorMessage" class="hidden animate-in fade-in zoom-in duration-300">
+                        <div class="bg-red-500/10 border border-red-500/30 p-4 rounded-2xl flex items-center gap-4">
+                            <div class="bg-red-500/20 p-2 rounded-full">
+                                <i data-lucide="shield-alert" class="text-red-500 w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold text-red-400">Token Inválido</p>
+                                <p class="text-[10px] text-red-500/80 uppercase font-black">Código não localizado no sistema.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-8 text-center">
+            <a href="contas.html" class="text-slate-500 hover:text-indigo-400 transition-colors text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar ao Acompanhamento
+            </a>
+        </div>
+    </main>
+
+    <script>
+        function validarToken() {
+            const input = document.getElementById('tokenInput');
+            const btn = document.getElementById('validarBtn');
+            const loading = document.getElementById('loadingState');
+            const error = document.getElementById('errorMessage');
+            
+            // Valida se tem exatamente 20 caracteres
+            if (input.value.length < 20) {
+                alert("O token deve ter exatamente 20 caracteres.");
+                return;
+            }
+
+            // Inicia simulação
+            btn.classList.add('hidden');
+            error.classList.add('hidden');
+            loading.classList.remove('hidden');
+
+            // Simula delay do servidor
+            setTimeout(() => {
+                loading.classList.add('hidden');
+                btn.classList.remove('hidden');
+                error.classList.remove('hidden');
+                
+                // Feedback visual de erro no input
+                input.value = "";
+                document.getElementById('charCount').innerText = "0 / 20 caracteres";
+                document.getElementById('charCount').classList.replace('text-emerald-500', 'text-slate-500');
+                
+                input.classList.add('border-red-500/50');
+                setTimeout(() => {
+                    input.classList.remove('border-red-500/50');
+                }, 3000);
+
+            }, 2500);
+        }
+
+        // Monitoramento de caracteres
+        document.getElementById('tokenInput').addEventListener('input', function(e) {
+            const count = e.target.value.length;
+            const msg = document.getElementById('charCount');
+            msg.innerText = count + " / 20 caracteres";
+            
+            if (count === 20) {
+                msg.classList.replace('text-slate-500', 'text-emerald-500');
+            } else {
+                msg.classList.add('text-slate-500');
+                msg.classList.remove('text-emerald-500');
+            }
+        });
+
+        lucide.createIcons();
+    </script>
+</body>
+</html>
