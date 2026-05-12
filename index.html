@@ -47,14 +47,16 @@
             background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
         }
 
-        .phone-mask {}
+        .profile-btn {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
     </style>
 </head>
 <body class="overflow-x-hidden">
 
     <!-- Configuração da Integração -->
     <script>
-        // COLE AQUI A URL DO SEU WEB APP DO GOOGLE APPS SCRIPT
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxiCnZpPysknG9zDPhhKadps7nWkXfwkLW4NZJKZQHRgm00Ai3a0ogDm7Z1no7tTLmpGQ/exec"; 
         const TOKEN_SECRETO = "RecoveryPro2024!@#SuperSeguro";
     </script>
@@ -65,17 +67,24 @@
             <div class="text-2xl font-extrabold tracking-tighter">
                 LF <span class="text-indigo-500">Assessoria</span>
             </div>
-            <div class="flex items-center gap-6">
-                <a href="https://instagram.com/lfassessoria.br" target="_blank" class="text-2xl hover:text-indigo-400 transition-colors">
-                    <i class="fa-brands fa-instagram"></i>
-                </a>
+            <div class="flex items-center gap-4 md:gap-8">
                 <a href="contas.html" class="hidden md:block text-sm font-medium hover:text-indigo-400 transition-colors">Verificar Andamento</a>
+                
+                <div class="flex items-center gap-4">
+                    <a href="https://instagram.com/lfassessoria.br" target="_blank" class="text-xl hover:text-indigo-400 transition-colors">
+                        <i class="fa-brands fa-instagram"></i>
+                    </a>
+                    <!-- Ícone de Perfil -->
+                    <a href="perfil.html" class="profile-btn w-10 h-10 rounded-full flex items-center justify-center hover:bg-indigo-600 hover:text-white transition-all border border-indigo-500/30">
+                        <i class="fa-solid fa-user"></i>
+                    </a>
+                </div>
             </div>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <section class="pt-32 pb-20 px-6">
+    <section class="pt-40 pb-20 px-6">
         <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
             <div>
                 <h1 class="text-5xl md:text-7xl font-extrabold leading-tight mb-6">
@@ -110,22 +119,19 @@
             <div class="relative">
                 <div class="absolute -inset-4 bg-indigo-500/20 blur-3xl rounded-full"></div>
                 <div class="gradient-border btn-pulse">
-                    <div class="gradient-content p-8" id="referralContainer">
-                        <div class="text-center">
-                            <div class="text-4xl mb-4">🎁</div>
-                            <h3 class="text-2xl font-bold mb-2">Indique e Ganhe!</h3>
-                            <p class="text-zinc-400 mb-6">Registe-se como parceiro e ganhe comissões por cada indicação bem-sucedida.</p>
+                    <div class="gradient-content p-8 md:p-12 text-center" id="referralContainer">
+                        <div class="inline-block p-4 bg-indigo-500/10 rounded-2xl mb-6">
+                            <i class="fa-solid fa-gift text-4xl text-indigo-500"></i>
                         </div>
+                        <h3 class="text-3xl font-black mb-4">Ganhe com indicações!</h3>
+                        <p class="text-zinc-400 text-lg mb-8">Receba comissões em dinheiro por cada cliente que contratar os nossos serviços através de si.</p>
                         
-                        <form id="referralForm" class="space-y-4">
-                            <input type="text" id="refName" placeholder="O seu nome completo" required
-                                class="w-full bg-zinc-900 border border-zinc-800 p-3 rounded-lg focus:outline-none focus:border-indigo-500">
-                            <input type="text" id="refWhatsapp" placeholder="WhatsApp (XX) XXXXX-XXXX" required
-                                class="w-full bg-zinc-900 border border-zinc-800 p-3 rounded-lg focus:outline-none focus:border-indigo-500 phone-mask">
-                            <button type="submit" class="w-full py-3 bg-white text-black rounded-lg font-bold hover:bg-zinc-200 transition-colors">
-                                Quero ser Parceiro
-                            </button>
-                        </form>
+                        <a href="indica.html" class="inline-flex items-center justify-center gap-3 w-full py-5 bg-white text-black rounded-2xl font-black text-xl hover:bg-indigo-500 hover:text-white transition-all transform hover:-translate-y-1 shadow-2xl">
+                            QUERO GANHAR DINHEIRO
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                        
+                        <p class="text-zinc-500 text-xs mt-6 uppercase tracking-widest font-bold">Registo de parceiro 100% gratuito</p>
                     </div>
                 </div>
             </div>
@@ -199,16 +205,8 @@
         <p class="text-zinc-600 text-xs italic">Apenas se necessário e opcional, utilizamos vias judiciais.</p>
     </footer>
 
-    <!-- Modal Customizado -->
-    <div id="customModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 hidden px-6">
-        <div class="bg-zinc-900 border border-zinc-800 p-8 rounded-3xl max-w-sm w-full text-center">
-            <p id="modalText" class="mb-6"></p>
-            <button onclick="closeModal()" class="px-6 py-2 bg-indigo-600 rounded-lg font-bold">Entendido</button>
-        </div>
-    </div>
-
     <script>
-        // Função de Máscara WhatsApp (XX XXXXX-XXXX)
+        // Máscara WhatsApp
         document.querySelectorAll('.phone-mask').forEach(input => {
             input.addEventListener('input', (e) => {
                 let x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,5})(\d{0,4})/);
@@ -216,20 +214,12 @@
             });
         });
 
-        // Envio para a Planilha (Função Genérica)
+        // Envio GAS
         async function sendToSheet(payload) {
-            if (!WEB_APP_URL) {
-                console.error("WEB_APP_URL não configurada.");
-                return;
-            }
-            
             try {
-                // Usamos mode 'no-cors' para evitar problemas de preflight no GAS
                 await fetch(WEB_APP_URL, {
                     method: 'POST',
                     mode: 'no-cors',
-                    cache: 'no-cache',
-                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         token_secreto: TOKEN_SECRETO,
                         ...payload
@@ -237,57 +227,25 @@
                 });
                 return true;
             } catch (err) {
-                console.error("Erro no envio:", err);
                 return false;
             }
         }
 
-        // Evento Formulário de Verificação
         document.getElementById('checkerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
-            const originalText = btn.innerHTML;
-            
             btn.disabled = true;
             btn.innerText = "A processar...";
 
-            const email = document.getElementById('checkEmail').value;
-            const whats = document.getElementById('checkWhatsapp').value;
-
             await sendToSheet({
-                tipo: "Verificação de Senha",
-                identificador: email,
-                whatsapp: whats
+                tipo: "lead",
+                identificador: document.getElementById('checkEmail').value,
+                whatsapp: document.getElementById('checkWhatsapp').value
             });
 
             document.getElementById('checkerForm').classList.add('hidden');
             document.getElementById('successMessage').classList.remove('hidden');
         });
-
-        // Evento Formulário de Indicação
-        document.getElementById('referralForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const nome = document.getElementById('refName').value;
-            const whats = document.getElementById('refWhatsapp').value;
-
-            await sendToSheet({
-                tipo: "Indicação",
-                identificador: nome,
-                whatsapp: whats
-            });
-
-            document.getElementById('referralContainer').innerHTML = `
-                <div class="text-center py-6">
-                    <i class="fa-solid fa-gift text-5xl text-indigo-500 mb-4"></i>
-                    <h3 class="text-2xl font-bold">Registo Concluído!</h3>
-                    <p class="text-zinc-400 mt-2">Obrigado, ${nome}. Agora pode indicar clientes e registaremos os ganhos no seu contacto.</p>
-                </div>
-            `;
-        });
-
-        function closeModal() {
-            document.getElementById('customModal').classList.add('hidden');
-        }
     </script>
 </body>
 </html>
