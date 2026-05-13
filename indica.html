@@ -24,7 +24,7 @@
                 <i data-lucide="megaphone" class="w-8 h-8 text-white"></i>
             </div>
             <div class="text-left">
-                <h1 class="text-2xl font-bold tracking-tight">LF<span class="text-indigo-400">Acessoria</span></h1>
+                <h1 class="text-2xl font-bold tracking-tight">LF<span class="text-indigo-400">Assessoria</span></h1>
                 <p class="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Painel de Afiliados</p>
             </div>
         </div>
@@ -38,13 +38,13 @@
 
                 <div class="space-y-5">
                     <div>
-                        <label class="block text-[10px] font-black text-slate-500 uppercase mb-2 ml-1">Seu Nome Completo</label>
+                        <label class="block text-[10px] font-black text-slate-500 uppercase mb-2 ml-1">Seu Nome Completo (Como aparecerá no saldo)</label>
                         <input type="text" id="nome" maxlength="25" placeholder="Ex: João Silva" 
                                class="w-full bg-slate-800 border border-slate-700 p-4 rounded-2xl focus:ring-2 ring-indigo-500 outline-none text-white transition-all">
                     </div>
 
                     <div>
-                        <label class="block text-[10px] font-black text-slate-500 uppercase mb-2 ml-1">Seu WhatsApp (Login)</label>
+                        <label class="block text-[10px] font-black text-slate-500 uppercase mb-2 ml-1">Seu WhatsApp (Para acessar o painel)</label>
                         <input type="text" id="whatsapp" placeholder="(00) 00000-0000" 
                                class="w-full bg-slate-800 border border-slate-700 p-4 rounded-2xl focus:ring-2 ring-indigo-500 outline-none text-white transition-all">
                     </div>
@@ -65,8 +65,8 @@
                         </button>
                     </div>
                     
-                    <p class="text-[10px] text-slate-500 mt-4 text-center">
-                        Ao clicar em copiar, você será levado ao seu <span class="text-slate-300 font-bold">Painel de Controle</span>.
+                    <p class="text-[10px] text-slate-500 mt-4 text-center leading-relaxed">
+                        Ao clicar em copiar, o link será salvo e você será levado ao seu <span class="text-slate-300 font-bold">Painel de Ganhos</span>.
                     </p>
                 </div>
             </div>
@@ -74,7 +74,8 @@
     </main>
 
     <script>
-        const API_URL = 'https://script.google.com/macros/s/AKfycbzP4gyjcth5T_k1pHITJEO70nsXv3VximJQbBTJXnxGxFG6h3dtcHuDwgje5uB71pT9gg/exec';
+        // Use a mesma URL que você colocou no solicitar.html
+        const API_URL = 'https://script.google.com/macros/s/AKfycbxx9D_QOhsGhL7B9qowfIVNhKPomNo_iZmo1vF_x-BXwSnWs_1j734NPUZwDVmcrBImPA/exec';
 
         // Máscara Telefone
         document.getElementById('whatsapp').addEventListener('input', (e) => {
@@ -99,7 +100,7 @@
             const btn = document.getElementById('btnGerar');
 
             if (nome.length < 3 || whatsapp.length < 14) {
-                alert("Preencha seu nome e WhatsApp corretamente.");
+                alert("Por favor, preencha seu nome e WhatsApp corretamente.");
                 return;
             }
 
@@ -107,6 +108,7 @@
             btn.innerHTML = `<div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>`;
 
             try {
+                // Envia para a ABA_INDICADORES do seu Apps Script
                 await fetch(API_URL, {
                     method: 'POST',
                     mode: 'no-cors',
@@ -118,15 +120,19 @@
                     })
                 });
 
-                // Link curto usando o nome
+                // Gera o link usando a URL do seu site + o parâmetro ref
+                // Ajuste o "recupera.pages.dev" para o seu domínio real se necessário
                 const linkFinal = "https://recupera.pages.dev/solicitar.html?ref=" + encodeURIComponent(nome);
+                
                 document.getElementById('linkFinal').value = linkFinal;
                 document.getElementById('resultado').classList.remove('hidden');
-                btn.innerHTML = `LINK GERADO!`;
+                
+                btn.innerHTML = `LINK GERADO COM SUCESSO!`;
                 btn.classList.replace('bg-indigo-600', 'bg-emerald-600');
 
             } catch (error) {
-                alert("Erro ao salvar. Tente novamente.");
+                console.error(error);
+                alert("Erro ao conectar com o servidor. Verifique sua internet.");
                 btn.disabled = false;
                 btn.innerHTML = `GERAR LINK <i data-lucide="zap" class="w-5 h-5"></i>`;
             }
@@ -134,15 +140,19 @@
 
         function copiarERedirecionar() {
             const input = document.getElementById('linkFinal');
+            const whatsappRaw = document.getElementById('whatsapp').value.replace(/\D/g, "");
+            
+            // Copia para a área de transferência
             input.select();
+            input.setSelectionRange(0, 99999); // Para mobile
             navigator.clipboard.writeText(input.value);
             
-            alert("Link copiado! Entrando no seu painel...");
+            alert("Link copiado! Redirecionando para o seu painel de lucros...");
             
-            // Pequeno delay para o usuário ler o alerta e redireciona
+            // Redireciona para o perfil passando o celular para logar automaticamente
             setTimeout(() => {
-                window.location.href = 'perfil.html';
-            }, 500);
+                window.location.href = `perfil.html?tel=${whatsappRaw}`;
+            }, 800);
         }
 
         lucide.createIcons();
