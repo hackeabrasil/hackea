@@ -15,7 +15,7 @@
 <body class="text-slate-100 min-h-screen flex flex-col items-center justify-center p-4">
 
     <div class="max-w-md w-full">
-        <!-- LOGIN AREA -->
+        <!-- ÁREA DE LOGIN (Aparece se não houver login automático) -->
         <div id="loginArea" class="bg-slate-900 p-8 rounded-[2.5rem] border border-slate-800 shadow-2xl text-center">
             <div class="w-20 h-20 bg-indigo-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-indigo-600/30">
                 <i data-lucide="shield-check" class="text-white w-10 h-10"></i>
@@ -33,11 +33,11 @@
             </div>
         </div>
 
-        <!-- DASHBOARD AREA -->
+        <!-- DASHBOARD (Aparece após o login) -->
         <div id="dashArea" class="hidden space-y-4 animate-in fade-in zoom-in duration-500">
             <div class="bg-gradient-to-br from-indigo-600 to-violet-700 p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden">
                 <div class="relative z-10">
-                    <p class="text-indigo-100 text-xs font-bold uppercase tracking-widest opacity-80" id="boasVindas">Olá!</p>
+                    <p class="text-indigo-100 text-xs font-bold uppercase tracking-widest opacity-80" id="boasVindas">Carregando...</p>
                     <h2 class="text-4xl font-black mt-2 text-white" id="valSaldo">R$ 0,00</h2>
                     <p class="text-indigo-200 text-[10px] font-bold mt-1 uppercase">Saldo Disponível para Saque</p>
                 </div>
@@ -46,7 +46,7 @@
 
             <div class="grid grid-cols-2 gap-4">
                 <div class="bg-slate-900/50 glass p-6 rounded-[2rem]">
-                    <p class="text-slate-500 text-[10px] font-bold uppercase mb-1">Pendente</p>
+                    <p class="text-slate-500 text-[10px] font-bold uppercase mb-1">A Receber</p>
                     <h3 class="text-xl font-bold text-orange-400" id="valPendente">R$ 0,00</h3>
                 </div>
                 <div class="bg-slate-900/50 glass p-6 rounded-[2rem]">
@@ -71,31 +71,34 @@
                 <i data-lucide="arrow-up-right" class="w-5 h-5"></i> SOLICITAR SAQUE (PIX)
             </button>
             
-            <button onclick="window.location.reload()" class="w-full py-3 text-slate-500 text-xs font-bold hover:text-white transition-all uppercase tracking-widest text-center">Sair do Painel</button>
+            <button onclick="fazerLogout()" class="w-full py-3 text-slate-500 text-xs font-bold hover:text-white transition-all uppercase tracking-widest text-center">Sair do Painel</button>
         </div>
 
         <!-- MODAL DE SAQUE -->
         <div id="saqueArea" class="hidden animate-in slide-in-from-bottom-10 duration-300">
             <div class="bg-slate-900 border border-slate-800 p-8 rounded-[2.5rem] shadow-2xl text-center">
+                <div class="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i data-lucide="banknote" class="text-emerald-500 w-8 h-8"></i>
+                </div>
                 <h3 class="text-xl font-bold mb-2">Solicitar Saque</h3>
-                <p class="text-slate-400 text-xs mb-6">O valor mínimo para saque é de R$ 25,00.</p>
+                <p class="text-slate-400 text-xs mb-6">Mínimo para saque: R$ 25,00.<br>O valor será transferido integralmente.</p>
                 
-                <input type="text" id="chavePix" placeholder="Sua Chave PIX" 
+                <input type="text" id="chavePix" placeholder="Digite sua Chave PIX" 
                        class="w-full bg-slate-800 border border-slate-700 p-5 rounded-2xl text-center mb-4 focus:ring-2 ring-emerald-500 outline-none transition-all">
                 
                 <div class="flex gap-3">
-                    <button onclick="fecharSaque()" class="w-1/3 py-4 bg-slate-800 text-slate-400 rounded-2xl font-bold text-sm">CANCELAR</button>
-                    <button onclick="confirmarSaque()" id="btnConfirmar" class="w-2/3 py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl font-bold text-sm">CONFIRMAR PIX</button>
+                    <button onclick="fecharSaque()" class="w-1/3 py-4 bg-slate-800 text-slate-400 rounded-2xl font-bold text-sm">VOLTAR</button>
+                    <button onclick="confirmarSaque()" id="btnConfirmar" class="w-2/3 py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl font-bold text-sm">CONFIRMAR</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        const API_URL = 'https://script.google.com/macros/s/AKfycbzP4gyjcth5T_k1pHITJEO70nsXv3VximJQbBTJXnxGxFG6h3dtcHuDwgje5uB71pT9gg/exec';
+        const API_URL = 'https://script.google.com/macros/s/AKfycbxx9D_QOhsGhL7B9qowfIVNhKPomNo_iZmo1vF_x-BXwSnWs_1j734NPUZwDVmcrBImPA/exec';
         let dadosUser = null;
 
-        // Máscara de Telefone (Global)
+        // Máscara de Telefone
         const maskPhone = (v) => {
             v = v.replace(/\D/g, "");
             if (v.length > 11) v = v.slice(0, 11);
@@ -107,8 +110,20 @@
 
         document.getElementById('loginTel').addEventListener('input', (e) => e.target.value = maskPhone(e.target.value));
 
+        // Tenta login automático ao abrir a página
+        window.onload = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const telParam = urlParams.get('tel');
+            if(telParam) {
+                document.getElementById('loginTel').value = maskPhone(telParam);
+                carregarPerfil();
+            }
+            lucide.createIcons();
+        };
+
         async function carregarPerfil() {
-            const tel = document.getElementById('loginTel').value.replace(/\D/g, "");
+            const inputTel = document.getElementById('loginTel').value;
+            const tel = inputTel.replace(/\D/g, "");
             const btn = document.getElementById('btnEntrar');
             
             if(tel.length < 10) return alert("Digite o WhatsApp completo.");
@@ -117,32 +132,47 @@
             btn.innerHTML = `<div class="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>`;
 
             try {
+                // Chama o doGet do Apps Script com action=getPerfil
                 const res = await fetch(`${API_URL}?action=getPerfil&tel=${tel}`);
                 dadosUser = await res.json();
 
                 if(dadosUser.error) {
-                    alert("WhatsApp não encontrado na base de indicadores.");
+                    alert("Afiliado não encontrado. Verifique o número ou gere seu link primeiro.");
                     btn.disabled = false;
                     btn.innerHTML = `ACESSAR AGORA <i data-lucide="log-in" class="w-5 h-5"></i>`;
                     return;
                 }
 
+                // Preenche os dados no Painel
                 document.getElementById('boasVindas').innerText = `Olá, ${dadosUser.nome}!`;
                 document.getElementById('valSaldo').innerText = `R$ ${dadosUser.saldo.toFixed(2)}`;
                 document.getElementById('valPendente').innerText = `R$ ${dadosUser.pendente.toFixed(2)}`;
                 document.getElementById('valTotal').innerText = dadosUser.totalIndicados;
+                
+                // Gera o link de ref dinâmico
+                const baseUrl = window.location.origin; // Pega o domínio atual
                 document.getElementById('linkRef').value = `https://recupera.pages.dev/solicitar.html?ref=${encodeURIComponent(dadosUser.nome)}`;
 
+                // Alterna as telas
                 document.getElementById('loginArea').classList.add('hidden');
                 document.getElementById('dashArea').classList.remove('hidden');
                 lucide.createIcons();
-            } catch (e) { alert("Erro de conexão."); btn.disabled = false; }
+            } catch (e) { 
+                console.error(e);
+                alert("Erro ao conectar com a base de dados."); 
+                btn.disabled = false; 
+                btn.innerHTML = `ACESSAR AGORA <i data-lucide="log-in" class="w-5 h-5"></i>`;
+            }
         }
 
         function abrirSaque() {
-            if(dadosUser.saldo < 25) return alert("Saldo insuficiente. O mínimo para saque é R$ 25,00.");
+            if(dadosUser.saldo < 25) {
+                alert(`Saldo insuficiente. Você tem R$ ${dadosUser.saldo.toFixed(2)} e o mínimo é R$ 25,00.`);
+                return;
+            }
             document.getElementById('dashArea').classList.add('hidden');
             document.getElementById('saqueArea').classList.remove('hidden');
+            lucide.createIcons();
         }
 
         function fecharSaque() {
@@ -152,13 +182,14 @@
 
         async function confirmarSaque() {
             const pix = document.getElementById('chavePix').value.trim();
-            if(!pix) return alert("Por favor, informe sua chave PIX.");
+            if(!pix) return alert("Por favor, informe sua chave PIX para receber.");
 
             const btn = document.getElementById('btnConfirmar');
             btn.disabled = true;
-            btn.innerText = "ENVIANDO SOLICITAÇÃO...";
+            btn.innerText = "PROCESSANDO...";
 
             try {
+                // Envia para o doPost com tipo: "saque"
                 await fetch(API_URL, {
                     method: 'POST',
                     mode: 'no-cors',
@@ -172,16 +203,27 @@
                     })
                 });
 
-                alert("SOLICITAÇÃO ENVIADA! O valor será processado em até 24h.");
+                alert("SOLICITAÇÃO DE SAQUE ENVIADA!\nO pagamento será realizado na sua chave PIX em breve.");
                 window.location.reload();
-            } catch (e) { alert("Erro ao processar saque."); btn.disabled = false; }
+            } catch (e) { 
+                alert("Erro ao processar sua solicitação de saque."); 
+                btn.disabled = false; 
+                btn.innerText = "CONFIRMAR PIX";
+            }
         }
 
         function copiarLink() {
             const el = document.getElementById('linkRef');
             el.select();
+            el.setSelectionRange(0, 99999);
             document.execCommand('copy');
-            alert("Link de indicação copiado com sucesso!");
+            
+            // Feedback visual moderno
+            alert("Link de indicação copiado!");
+        }
+
+        function fazerLogout() {
+            window.location.href = window.location.pathname; // Limpa parâmetros da URL e recarrega
         }
 
         lucide.createIcons();
