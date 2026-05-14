@@ -1,92 +1,124 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LF Assessoria | Teste de Design</title>
+    <title>Teste Avançado | LF Assessoria</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+
     <style>
-        /* DESIGN PREMIUM SEM LINKS EXTERNOS */
+        /* CSS AVANÇADO E SEGURO */
+        :root {
+            --indigo: #6366f1;
+            --purple: #a855f7;
+            --bg: #09090b;
+        }
+
         body {
-            background-color: #09090b;
+            background-color: var(--bg);
             color: #fafafa;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: 'Inter', sans-serif;
             margin: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        .nav {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            padding: 20px;
-            background: rgba(24, 24, 27, 0.8);
-            border-bottom: 1px solid #27272a;
-            text-align: center;
-            backdrop-filter: blur(10px);
-        }
-
-        .logo {
-            font-weight: 800;
-            font-size: 1.2rem;
-            letter-spacing: -1px;
-        }
-
-        .logo span { color: #6366f1; }
-
-        .card {
-            background-color: #18181b;
-            border: 1px solid #27272a;
+        /* Efeito de Vidro Refinado */
+        .glass-card {
+            background: rgba(24, 24, 27, 0.7);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             padding: 40px;
-            border-radius: 32px;
-            max-width: 350px;
+            border-radius: 40px;
+            max-width: 380px;
             width: 85%;
             text-align: center;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            position: relative;
         }
 
+        /* Título com Brilho */
         h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            letter-spacing: -2px;
+            line-height: 0.9;
             background: linear-gradient(to right, #818cf8, #a855f7);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            font-weight: 800;
         }
 
         p {
             color: #a1a1aa;
-            margin-bottom: 30px;
-            font-size: 1.1rem;
+            margin-bottom: 35px;
+            font-size: 1rem;
+            line-height: 1.5;
         }
 
-        .btn {
-            background: linear-gradient(135deg, #6366f1, #a855f7);
+        /* Botão com Pulso e Ícone */
+        .btn-premium {
+            background: linear-gradient(135deg, var(--indigo), var(--purple));
             color: white;
             border: none;
-            padding: 16px 32px;
+            padding: 18px 36px;
             border-radius: 100px;
             font-weight: 700;
             width: 100%;
-            font-size: 1rem;
+            font-size: 1.1rem;
             cursor: pointer;
-            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4);
+            animation: pulse 2s infinite;
+            transition: transform 0.2s;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.5); }
+            70% { box-shadow: 0 0 0 15px rgba(168, 85, 247, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0); }
+        }
+
+        .btn-premium:active { transform: scale(0.96); }
+
+        /* Decoração de fundo (o "brilho" atrás do card) */
+        .glow {
+            position: absolute;
+            top: -20%;
+            right: -20%;
+            width: 200px;
+            height: 200px;
+            background: var(--indigo);
+            filter: blur(100px);
+            opacity: 0.2;
+            z-index: -1;
         }
     </style>
 </head>
 <body>
 
-    <div class="nav">
-        <div class="logo">LF <span>Assessoria</span></div>
-    </div>
-
-    <div class="card">
-        <h1>Teste de <br>Design</h1>
-        <p>esse é um teste</p>
-        <button class="btn">BOTÃO BONITO</button>
+    <div class="glass-card">
+        <div class="glow"></div>
+        
+        <i class="fa-solid fa-shield-check" style="font-size: 3rem; color: #6366f1; margin-bottom: 20px;"></i>
+        
+        <h1>Design <br>Avançado</h1>
+        <p>Se o botão abaixo estiver piscando e você vir o ícone de escudo, seu celular passou no teste de design máximo.</p>
+        
+        <button class="btn-premium">
+            <i class="fa-solid fa-bolt"></i>
+            ATIVAR AGORA
+        </button>
     </div>
 
 </body>
