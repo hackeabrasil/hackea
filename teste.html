@@ -3,70 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teste de Estilo - Passo 1</title>
+    <title>Teste de Estilo - Passo 2</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+
     <style>
-        /* Tudo o que é visual está aqui dentro */
         body {
             background-color: #09090b;
-            color: #ffffff;
-            font-family: sans-serif; /* Usa a fonte padrão do sistema */
+            color: #fafafa;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             min-height: 100vh;
-            margin: 0;
-            text-align: center;
         }
 
-        .container {
+        /* Nav Simples */
+        nav {
+            width: 100%;
             padding: 20px;
-            max-width: 400px;
+            text-align: center;
+            border-bottom: 1px solid #27272a;
+            margin-bottom: 50px;
         }
 
-        .card {
-            background-color: #18181b;
-            border: 1px solid #27272a;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+        .logo {
+            font-weight: 800;
+            font-size: 1.2rem;
+            letter-spacing: -1px;
+        }
+
+        .logo span { color: #6366f1; }
+
+        /* Card com efeito de vidro */
+        .glass-card {
+            background: rgba(24, 24, 27, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px); /* Para iPhone */
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 30px;
+            max-width: 350px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
 
         h1 {
-            font-size: 24px;
-            margin-bottom: 10px;
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            line-height: 1;
+        }
+
+        /* Gradiente no texto */
+        .text-gradient {
+            background: linear-gradient(to right, #818cf8, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         p {
             color: #a1a1aa;
-            margin-bottom: 25px;
+            line-height: 1.6;
+            margin-bottom: 30px;
         }
 
         button {
-            background: linear-gradient(to right, #6366f1, #a855f7);
+            background: linear-gradient(135deg, #6366f1, #a855f7);
             color: white;
             border: none;
-            padding: 12px 24px;
-            border-radius: 9999px;
-            font-weight: bold;
-            cursor: pointer;
+            padding: 16px 32px;
+            border-radius: 100px;
+            font-weight: 700;
             width: 100%;
-            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 1rem;
+            transition: 0.3s;
         }
 
-        button:active {
-            transform: scale(0.95);
-        }
+        button i { font-size: 1.2rem; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="card">
-            <h1>LF Assessoria</h1>
-            <p>esse é um teste</p>
-            <button type="button">Botão de Teste</button>
-        </div>
+    <nav>
+        <div class="logo">LF <span>Assessoria</span></div>
+    </nav>
+
+    <div class="glass-card">
+        <h1>Teste <span class="text-gradient">Personalizado</span></h1>
+        <p>Se você está vendo o ícone de foguete abaixo e o fundo do card está embaçado, o Passo 2 foi um sucesso.</p>
+        
+        <button type="button">
+            <i class="fa-solid fa-rocket"></i>
+            Iniciar Teste
+        </button>
     </div>
 
 </body>
