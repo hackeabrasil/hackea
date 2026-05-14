@@ -14,60 +14,56 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 
     <style>
-        /* CSS CRÍTICO: Carrega ANTES de qualquer script */
+        /* CSS DE SEGURANÇA - Mantém o visual bonito enquanto o script carrega */
+        :root {
+            --zinc-950: #09090b;
+            --zinc-900: #18181b;
+            --zinc-800: #27272a;
+            --zinc-400: #a1a1aa;
+            --indigo-500: #6366f1;
+            --purple-500: #a855f7;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #09090b !important; /* Força o fundo escuro imediatamente */
+            background-color: var(--zinc-950) !important;
             color: #fafafa;
             margin: 0;
         }
 
         .glass-card {
             background: rgba(24, 24, 27, 0.8) !important;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px); /* Essencial para iOS/iPhone */
-            border: 1px solid rgba(63, 63, 70, 0.5);
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+            border: 1px solid rgba(63, 63, 70, 0.5) !important;
         }
 
-        .gradient-border {
-            position: relative;
-            border-radius: 1rem;
-            background: linear-gradient(to right, #6366f1, #a855f7);
-            padding: 2px;
+        .cta-gradient {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #6366f1 100%) !important;
+            background-size: 200% auto !important;
+            transition: 0.5s !important;
         }
 
-        .btn-pulse {
-            animation: pulse 2s infinite;
-        }
+        .cta-gradient:hover { background-position: right center !important; }
+
+        .text-transparent { color: transparent !important; }
+        .bg-clip-text { -webkit-background-clip: text !important; background-clip: text !important; }
 
         @keyframes pulse {
             0% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.4); }
             70% { box-shadow: 0 0 0 15px rgba(168, 85, 247, 0); }
             100% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0); }
         }
-
-        .cta-gradient {
-            background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #6366f1 100%);
-            background-size: 200% auto;
-            transition: 0.5s;
-        }
-
-        .cta-gradient:hover {
-            background-position: right center;
-        }
-
-        .profile-btn {
-            background: rgba(99, 102, 241, 0.1);
-            border: 1px solid rgba(99, 102, 241, 0.2);
-        }
-
+        .btn-pulse { animation: pulse 2s infinite; }
         html { scroll-behavior: smooth; }
 
-        /* Evita que elementos fiquem invisíveis se o script falhar */
-        section { min-height: 100px; }
+        /* Correção de cores para mobile */
+        .bg-zinc-950 { background-color: var(--zinc-950) !important; }
+        .bg-zinc-900 { background-color: var(--zinc-900) !important; }
+        .text-zinc-400 { color: var(--zinc-400) !important; }
     </style>
 </head>
-<body class="overflow-x-hidden bg-[#09090b]">
+<body class="overflow-x-hidden">
 
     <script>
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxiCnZpPysknG9zDPhhKadps7nWkXfwkLW4NZJKZQHRgm00Ai3a0ogDm7Z1no7tTLmpGQ/exec"; 
@@ -81,7 +77,6 @@
             </div>
             <div class="flex items-center gap-4 md:gap-8">
                 <a href="contas.html" class="hidden md:block text-sm font-medium hover:text-indigo-400 transition-colors">Verificar Andamento</a>
-                
                 <div class="flex items-center gap-4">
                     <a href="https://instagram.com/lfassessoria.br" target="_blank" class="text-xl hover:text-indigo-400 transition-colors">
                         <i class="fa-brands fa-instagram"></i>
@@ -225,7 +220,7 @@
         </div>
 
         <div class="grid md:grid-cols-3 gap-8">
-            <div class="glass-card p-8 rounded-2xl border-t-4 border-t-indigo-500">
+            <div class="glass-card p-8 rounded-2xl border-t-4 border-t-indigo-500 hover:-translate-y-2 transition-transform">
                 <div class="w-12 h-12 bg-indigo-500/20 rounded-full flex items-center justify-center mb-6 text-indigo-400 text-xl">
                     <i class="fa-solid fa-shield-halved"></i>
                 </div>
@@ -233,7 +228,7 @@
                 <p class="text-zinc-400 text-sm leading-relaxed">O pagamento só é realizado após você confirmar que recuperou o acesso total à sua conta.</p>
             </div>
             
-            <div class="glass-card p-8 rounded-2xl border-t-4 border-t-purple-500">
+            <div class="glass-card p-8 rounded-2xl border-t-4 border-t-purple-500 hover:-translate-y-2 transition-transform">
                 <div class="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center mb-6 text-purple-400 text-xl">
                     <i class="fa-solid fa-gavel"></i>
                 </div>
@@ -241,7 +236,7 @@
                 <p class="text-zinc-400 text-sm leading-relaxed">Trabalhamos com conformidade técnica e suporte jurídico especializado.</p>
             </div>
 
-            <div class="glass-card p-8 rounded-2xl border-t-4 border-t-white">
+            <div class="glass-card p-8 rounded-2xl border-t-4 border-t-white hover:-translate-y-2 transition-transform">
                 <div class="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center mb-6 text-white text-xl">
                     <i class="fa-solid fa-bolt"></i>
                 </div>
@@ -259,6 +254,7 @@
     </footer>
 
     <script>
+        // Máscara WhatsApp
         document.querySelectorAll('.phone-mask').forEach(input => {
             input.addEventListener('input', (e) => {
                 let x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,5})(\d{0,4})/);
@@ -266,6 +262,7 @@
             });
         });
 
+        // Envio para Google Sheets
         async function sendToSheet(payload) {
             try {
                 await fetch(WEB_APP_URL, {
