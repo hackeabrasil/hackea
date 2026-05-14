@@ -14,16 +14,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 
     <style>
+        /* CSS CRÍTICO: Carrega ANTES de qualquer script */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #09090b; /* Garante fundo preto antes de carregar o script */
+            background-color: #09090b !important; /* Força o fundo escuro imediatamente */
             color: #fafafa;
+            margin: 0;
         }
 
         .glass-card {
-            background: rgba(24, 24, 27, 0.8);
+            background: rgba(24, 24, 27, 0.8) !important;
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px); /* Essencial para iOS/iPhone */
             border: 1px solid rgba(63, 63, 70, 0.5);
         }
 
@@ -60,9 +62,12 @@
         }
 
         html { scroll-behavior: smooth; }
+
+        /* Evita que elementos fiquem invisíveis se o script falhar */
+        section { min-height: 100px; }
     </style>
 </head>
-<body class="overflow-x-hidden">
+<body class="overflow-x-hidden bg-[#09090b]">
 
     <script>
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxiCnZpPysknG9zDPhhKadps7nWkXfwkLW4NZJKZQHRgm00Ai3a0ogDm7Z1no7tTLmpGQ/exec"; 
@@ -220,7 +225,7 @@
         </div>
 
         <div class="grid md:grid-cols-3 gap-8">
-            <div class="glass-card p-8 rounded-2xl border-t-4 border-t-indigo-500 hover:-translate-y-2 transition-transform">
+            <div class="glass-card p-8 rounded-2xl border-t-4 border-t-indigo-500">
                 <div class="w-12 h-12 bg-indigo-500/20 rounded-full flex items-center justify-center mb-6 text-indigo-400 text-xl">
                     <i class="fa-solid fa-shield-halved"></i>
                 </div>
@@ -228,20 +233,20 @@
                 <p class="text-zinc-400 text-sm leading-relaxed">O pagamento só é realizado após você confirmar que recuperou o acesso total à sua conta.</p>
             </div>
             
-            <div class="glass-card p-8 rounded-2xl border-t-4 border-t-purple-500 hover:-translate-y-2 transition-transform">
+            <div class="glass-card p-8 rounded-2xl border-t-4 border-t-purple-500">
                 <div class="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center mb-6 text-purple-400 text-xl">
                     <i class="fa-solid fa-gavel"></i>
                 </div>
                 <h4 class="text-xl font-bold mb-3">2. Base Legal</h4>
-                <p class="text-zinc-400 text-sm leading-relaxed">Trabalhamos com conformidade técnica e, quando necessário, suporte jurídico especializado.</p>
+                <p class="text-zinc-400 text-sm leading-relaxed">Trabalhamos com conformidade técnica e suporte jurídico especializado.</p>
             </div>
 
-            <div class="glass-card p-8 rounded-2xl border-t-4 border-t-white hover:-translate-y-2 transition-transform">
+            <div class="glass-card p-8 rounded-2xl border-t-4 border-t-white">
                 <div class="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center mb-6 text-white text-xl">
                     <i class="fa-solid fa-bolt"></i>
                 </div>
                 <h4 class="text-xl font-bold mb-3">3. Agilidade</h4>
-                <p class="text-zinc-400 text-sm leading-relaxed">Entendemos a urgência. 85% dos nossos casos são resolvidos num prazo de até 48 horas.</p>
+                <p class="text-zinc-400 text-sm leading-relaxed">85% dos nossos casos são resolvidos num prazo de até 48 horas.</p>
             </div>
         </div>
     </section>
@@ -250,22 +255,10 @@
         <div class="text-2xl font-black mb-6 tracking-tighter">
             LF <span class="text-indigo-500">Assessoria</span>
         </div>
-        <div class="flex justify-center gap-6 mb-8">
-            <a href="https://instagram.com/lfassessoria.br" class="w-12 h-12 rounded-full glass-card flex items-center justify-center text-zinc-400 hover:text-white hover:border-indigo-500 transition-all">
-                <i class="fa-brands fa-instagram text-xl"></i>
-            </a>
-            <a href="#" class="w-12 h-12 rounded-full glass-card flex items-center justify-center text-zinc-400 hover:text-white hover:border-indigo-500 transition-all">
-                <i class="fa-solid fa-envelope text-xl"></i>
-            </a>
-        </div>
-        <p class="text-zinc-500 text-xs max-w-sm mx-auto leading-relaxed">
-            LF Assessoria Técnica e Digital. <br>
-            <span class="italic text-zinc-600 text-[10px]">A utilização de vias judiciais é opcional e avaliada caso a caso.</span>
-        </p>
+        <p class="text-zinc-500 text-xs">LF Assessoria Técnica e Digital &copy; 2024</p>
     </footer>
 
     <script>
-        // Máscara WhatsApp
         document.querySelectorAll('.phone-mask').forEach(input => {
             input.addEventListener('input', (e) => {
                 let x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,5})(\d{0,4})/);
@@ -273,29 +266,22 @@
             });
         });
 
-        // Envio para Google Sheets (GAS)
         async function sendToSheet(payload) {
             try {
                 await fetch(WEB_APP_URL, {
                     method: 'POST',
                     mode: 'no-cors',
-                    body: JSON.stringify({
-                        token_secreto: TOKEN_SECRETO,
-                        ...payload
-                    })
+                    body: JSON.stringify({ token_secreto: TOKEN_SECRETO, ...payload })
                 });
                 return true;
-            } catch (err) {
-                console.error("Erro no envio:", err);
-                return false;
-            }
+            } catch (err) { return false; }
         }
 
         document.getElementById('checkerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin"></i> ANALISANDO...`;
+            btn.innerHTML = `ANALISANDO...`;
 
             await sendToSheet({
                 tipo: "lead",
@@ -306,10 +292,6 @@
             setTimeout(() => {
                 document.getElementById('checkerForm').classList.add('hidden');
                 document.getElementById('successMessage').classList.remove('hidden');
-                window.scrollTo({
-                    top: document.getElementById('successMessage').offsetTop - 100,
-                    behavior: 'smooth'
-                });
             }, 1500);
         });
     </script>
