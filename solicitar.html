@@ -40,7 +40,7 @@
 
     const App = () => {
       const [formData, setFormData] = useState({
-        plataforma: '', usuario: '', emailVinculado: '', emailRecuperar: '', 
+        plataforma: '', usuario: '', emailVinculado: '', 
         ultimaSenha: '', telefone: '', temAcessoTelefone: null,
         dataNascimento: { dia: '', mes: '', ano: '' },
         senhasAntigas: [''], nomeCliente: '', whatsapp: '',
@@ -93,7 +93,6 @@
         if (!formData.plataforma) return 0;
         let score = 0;
 
-        // --- SOBE POUCO (+5) ---
         if (formData.motivoQueda === 'ERRO AO ENTRAR') score += 5;
         if (formData.suspendedReason === 'Não segue nossas diretrizes') score += 5;
         if (formData.suspendedReason === 'Propriedade Intelectual / Direitos Autorais') score += 5;
@@ -102,13 +101,12 @@
           const dataMilli = new Date(formData.dataPerda).getTime();
           const hojeMilli = new Date().getTime();
           const diffDias = (hojeMilli - dataMilli) / (1000 * 60 * 60 * 24);
-          if (diffDias <= 7) score += 5; // Perdeu essa semana
+          if (diffDias <= 7) score += 5;
         }
 
         const senhasAntigasPreenchidas = formData.senhasAntigas.filter(s => s.length >= 4);
         if (senhasAntigasPreenchidas.includes(formData.ultimaSenha) && formData.ultimaSenha.length > 0) score += 5;
 
-        // --- SOBE MUITO (+10 a +15) ---
         if (formData.suspendedReason === 'Detectamos atividade suspeita em sua conta') score += 15;
         if (formData.suspendedReason === 'Ajude-nos a confirmar que esta conta é sua') score += 15;
         if (formData.suspendedReason === 'Suspensão por 180 dias') score += 15;
@@ -119,12 +117,12 @@
           const dataMilli = new Date(formData.dataPerda).getTime();
           const hojeMilli = new Date().getTime();
           const diffDias = (hojeMilli - dataMilli) / (1000 * 60 * 60 * 24);
-          if (diffDias <= 2) score += 15; // Perdeu hoje ou ontem
+          if (diffDias <= 2) score += 15;
         }
 
-        const email = (formData.plataforma === 'google' ? formData.emailRecuperar : formData.emailVinculado).toLowerCase();
+        const email = formData.emailVinculado.toLowerCase();
         if (email.length > 5) {
-          score += 10; // Preencheu email
+          score += 10;
           if (email.includes('@gmail.com') || email.includes('@hotmail.com')) score += 5;
         }
 
@@ -133,14 +131,11 @@
         if (formData.temAcessoTelefone === 'sim') score += 15;
         if (formData.juridicoChecked) score += 10;
 
-        // Senhas antigas (2 ou 3 diferentes)
         const senhasUnicas = [...new Set(senhasAntigasPreenchidas)];
         if (senhasUnicas.length === 2 || senhasUnicas.length === 3) score += 10;
 
-        // Lógica de Rosto
         if (formData.fotoRostoPerfil === 'sim' || formData.fotoRostoFeed === 'sim') score += 10;
 
-        // --- DESCE POUCO/MEDIO (-10 a -20) ---
         if (naoLembra.usuario) score -= 15;
         if (formData.hackedEmailAlterado === 'sim') score -= 15;
         
@@ -160,27 +155,20 @@
 
         if (formData.fotoRostoPerfil === 'nao' && formData.fotoRostoFeed === 'nao') score -= 15;
 
-        // Ajustes Finais
         let total = Math.max(0, score);
-        return Math.min(total, 90); // Máximo 90%
+        return Math.min(total, 90);
       }, [formData, naoLembra]);
 
-      // Cor dinâmica baseada na probabilidade
       const colorClass = useMemo(() => {
         if (probabilidade < 30) return 'text-red-500';
         if (probabilidade < 60) return 'text-yellow-500';
         return 'text-emerald-500';
       }, [probabilidade]);
 
-      const discount = useMemo(() => {
-        const count = parseInt(formData.payFollowersCount.replace(/\D/g, '') || 0);
-        return Math.floor(count / 1000) * 10;
-      }, [formData.payFollowersCount]);
-
       const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        const API_URL = "https://script.google.com/macros/s/AKfycbxZENMKRAnzTXw4msRK1oPJ-HH67ZNbMoDupx2m2mEAtheQ1kjY9Nk5UXKLJR50Fhw0cA/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbymCWpizHtUDIJk6yu8LRUO8ydwK_30hfvAnpbmlpI773tS6HkpbRX9GOfxDYIkhWmaIw/exec";
         
         try {
           const payload = { ...formData, probabilidade, dataEnvio: new Date().toLocaleString() };
@@ -303,14 +291,12 @@
                 <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
                   <h2 className="text-xl font-semibold mb-6">{formData.plataforma === 'google' ? 'Gmail a recuperar' : 'E-mail da Conta'}</h2>
                   <input 
-                    required={formData.plataforma === 'google'}
+                    required
                     disabled={naoLembra.emailVinculado}
-                    value={formData.plataforma === 'google' ? formData.emailRecuperar : formData.emailVinculado} 
+                    value={formData.emailVinculado} 
                     onChange={(e) => {
                       const val = e.target.value.replace(/\s/g, '');
-                      formData.plataforma === 'google' 
-                        ? setFormData({...formData, emailRecuperar: val}) 
-                        : setFormData({...formData, emailVinculado: val});
+                      setFormData({...formData, emailVinculado: val});
                     }}
                     type="email" placeholder="email@exemplo.com" 
                     className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500 disabled:opacity-30" 
@@ -388,7 +374,6 @@
                   </section>
                 )}
 
-                {/* --- SEÇÃO DE FOTOS (NOVA) --- */}
                 <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
                   <h2 className="text-xl font-semibold mb-6">Identificação Visual</h2>
                   <div className="space-y-6">
