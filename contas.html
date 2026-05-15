@@ -141,12 +141,11 @@
                 <p class="text-slate-400 mt-1">Monitore o progresso da sua recuperação em tempo real.</p>
             </div>
 
-            <!-- Filtros -->
             <div class="bg-[var(--color-bg-card)] p-5 rounded-2xl shadow-2xl mb-8 border border-slate-800/50">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div class="md:col-span-2 relative">
                         <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500"></i>
-                        <input type="text" id="filter-name" placeholder="Buscar por nome ou @usuário..." 
+                        <input type="text" id="filter-name" placeholder="Buscar por nome, @usuário ou #ID..." 
                                class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900 text-white border border-slate-700 focus:border-indigo-500 outline-none transition" 
                                oninput="applyFilters()">
                     </div>
@@ -174,8 +173,8 @@
     </main>
 
     <script>
-        // ATENÇÃO: Verifique se esta URL é a mesma do seu último Deploy
-        const API_URL = 'https://script.google.com/macros/s/AKfycbxx9D_QOhsGhL7B9qowfIVNhKPomNo_iZmo1vF_x-BXwSnWs_1j734NPUZwDVmcrBImPA/exec';
+        // Link atualizado da sua API
+        const API_URL = 'https://script.google.com/macros/s/AKfycbxkNBUdkpLVYjG5sr5T5zv0nkqI17RUawTN8weMDUC9JGaEYpE4HimuGwDfQycFm2Fprw/exec';
         
         let recoveryRequests = [];
 
@@ -202,7 +201,7 @@
         }
 
         function renderProgressBar(request) {
-            const statusText = request.stage.toLowerCase().trim();
+            const statusText = (request.stage || "solicitado").toLowerCase().trim();
             const stageNum = stageMap[statusText] || 1;
             const isError = statusText === 'erro';
             const isFinished = statusText === 'finalizado';
@@ -232,6 +231,7 @@
                 } else if (isCurrent) {
                     dotClass = 'dot-current';
                     labelClass = 'label-active';
+                    icon = stepIdx;
                 }
 
                 return `
@@ -249,7 +249,7 @@
         }
 
         function renderRequestCard(request) {
-            const statusText = request.stage.toLowerCase().trim();
+            const statusText = (request.stage || "solicitado").toLowerCase().trim();
             const isFinished = statusText === 'finalizado';
             const isError = statusText === 'erro';
 
@@ -270,7 +270,6 @@
                 badgeClass = 'bg-indigo-900/30 text-indigo-400 border-indigo-500/30';
             }
 
-            // Botão Resgatar só aparece se finalizado
             const actionBtn = isFinished 
                 ? `<button onclick="window.location.href='resgate.html?id=${request.id}'" class="mt-8 w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-xl transition flex items-center justify-center tracking-wide shadow-lg shadow-emerald-900/20">
                     <i data-lucide="key" class="w-4 h-4 mr-2"></i> RESGATAR CONTA AGORA
@@ -284,7 +283,7 @@
                             <p class="text-[10px] font-black text-slate-500 tracking-tighter">PROTOCOLO</p>
                             <h3 class="text-white font-bold">#${request.id}</h3>
                         </div>
-                        <span class="text-[9px] font-bold px-2 py-1 rounded border uppercase ${badgeClass}">${request.stage}</span>
+                        <span class="text-[9px] font-bold px-2 py-1 rounded border uppercase ${badgeClass}">${statusText}</span>
                     </div>
 
                     <div class="flex items-center space-x-4 mb-6">
@@ -319,7 +318,6 @@
         }
 
         async function initTracker() {
-            // Atualiza hora
             const now = new Date();
             document.getElementById('current-time').innerText = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
 
@@ -327,7 +325,6 @@
             container.innerHTML = '<div class="col-span-full text-center py-20"><div class="animate-spin inline-block w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full mb-4"></div><p class="text-slate-400 animate-pulse">Consultando base de dados segura...</p></div>';
 
             try {
-                // Chama o doGet() padrão do Apps Script
                 const response = await fetch(API_URL);
                 if (!response.ok) throw new Error('Erro na rede');
                 
@@ -359,7 +356,6 @@
                 container.innerHTML += renderRequestCard(r);
             });
             
-            // Inicializa ícones do Lucide
             lucide.createIcons();
         }
 
@@ -384,7 +380,7 @@
         function clearFilters() {
             document.getElementById('filter-name').value = '';
             document.getElementById('filter-status').value = '';
-            initTracker(); // Recarrega do zero
+            initTracker(); 
         }
     </script>
 </body>
