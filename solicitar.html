@@ -14,6 +14,13 @@
       50% { opacity: 0.7; transform: scale(0.95); }
     }
     .animate-slow-pulse { animation: slow-pulse 2s infinite ease-in-out; }
+    input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+    select { 
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); 
+      background-repeat: no-repeat; 
+      background-position: right 1rem center; 
+      background-size: 1.5em; 
+    }
   </style>
 </head>
 <body class="bg-slate-950">
@@ -37,10 +44,11 @@
         ultimaSenha: '', telefone: '', temAcessoTelefone: null,
         dataNascimento: { dia: '', mes: '', ano: '' },
         senhasAntigas: [''], nomeCliente: '', whatsapp: '',
-        qtdSeguidores: '', motivoQueda: '', dataPerda: '',
+        instaReserva: '', qtdSeguidores: '', motivoQueda: '', dataPerda: '',
         hackedEmailAlterado: null, suspendedReason: '',
         juridicoChecked: false, juridicoOption: '',
-        payWithFollowers: false, payFollowersCount: ''
+        payWithFollowers: false, payFollowersCount: '',
+        fotoRostoPerfil: null, fotoRostoFeed: null
       });
 
       const [naoLembra, setNaoLembra] = useState({
@@ -51,12 +59,11 @@
       const [loading, setLoading] = useState(false);
       const [isSubmitted, setIsSubmitted] = useState(false);
 
-      // --- Lógica de Redirecionamento Automático ---
       useEffect(() => {
         if (isSubmitted) {
           const timer = setTimeout(() => {
             window.location.href = 'contas.html';
-          }, 4000); // Redireciona após 4 segundos
+          }, 4000);
           return () => clearTimeout(timer);
         }
       }, [isSubmitted]);
@@ -84,19 +91,86 @@
 
       const probabilidade = useMemo(() => {
         if (!formData.plataforma) return 0;
-        let score = 20; 
-        if (formData.usuario && !naoLembra.usuario) score += 10;
-        if (formData.ultimaSenha && !naoLembra.ultimaSenha) score += 20;
-        if (formData.telefone && !naoLembra.telefone) score += 10;
-        if (formData.temAcessoTelefone === 'sim') score += 15;
-        if (formData.plataforma === 'insta') {
-          if (formData.suspendedReason === 'Suspensão por 180 dias') score += 25;
-          if (formData.motivoQueda === 'PERDEU A SENHA') score += 15;
-          if (formData.hackedEmailAlterado === 'nao') score += 10;
+        let score = 0;
+
+        // --- SOBE POUCO (+5) ---
+        if (formData.motivoQueda === 'ERRO AO ENTRAR') score += 5;
+        if (formData.suspendedReason === 'Não segue nossas diretrizes') score += 5;
+        if (formData.suspendedReason === 'Propriedade Intelectual / Direitos Autorais') score += 5;
+        
+        if (formData.dataPerda) {
+          const dataMilli = new Date(formData.dataPerda).getTime();
+          const hojeMilli = new Date().getTime();
+          const diffDias = (hojeMilli - dataMilli) / (1000 * 60 * 60 * 24);
+          if (diffDias <= 7) score += 5; // Perdeu essa semana
         }
-        if (formData.senhasAntigas.filter(p => p.length > 3).length > 0) score += 15;
-        return Math.min(score, 100);
+
+        const senhasAntigasPreenchidas = formData.senhasAntigas.filter(s => s.length >= 4);
+        if (senhasAntigasPreenchidas.includes(formData.ultimaSenha) && formData.ultimaSenha.length > 0) score += 5;
+
+        // --- SOBE MUITO (+10 a +15) ---
+        if (formData.suspendedReason === 'Detectamos atividade suspeita em sua conta') score += 15;
+        if (formData.suspendedReason === 'Ajude-nos a confirmar que esta conta é sua') score += 15;
+        if (formData.suspendedReason === 'Suspensão por 180 dias') score += 15;
+        if (formData.motivoQueda === 'PERDEU A SENHA') score += 10;
+        if (formData.hackedEmailAlterado === 'nao') score += 10;
+        
+        if (formData.dataPerda) {
+          const dataMilli = new Date(formData.dataPerda).getTime();
+          const hojeMilli = new Date().getTime();
+          const diffDias = (hojeMilli - dataMilli) / (1000 * 60 * 60 * 24);
+          if (diffDias <= 2) score += 15; // Perdeu hoje ou ontem
+        }
+
+        const email = (formData.plataforma === 'google' ? formData.emailRecuperar : formData.emailVinculado).toLowerCase();
+        if (email.length > 5) {
+          score += 10; // Preencheu email
+          if (email.includes('@gmail.com') || email.includes('@hotmail.com')) score += 5;
+        }
+
+        if (formData.ultimaSenha.length >= 4 && !naoLembra.ultimaSenha) score += 10;
+        if (formData.telefone.replace(/\D/g, '').length === 11) score += 10;
+        if (formData.temAcessoTelefone === 'sim') score += 15;
+        if (formData.juridicoChecked) score += 10;
+
+        // Senhas antigas (2 ou 3 diferentes)
+        const senhasUnicas = [...new Set(senhasAntigasPreenchidas)];
+        if (senhasUnicas.length === 2 || senhasUnicas.length === 3) score += 10;
+
+        // Lógica de Rosto
+        if (formData.fotoRostoPerfil === 'sim' || formData.fotoRostoFeed === 'sim') score += 10;
+
+        // --- DESCE POUCO/MEDIO (-10 a -20) ---
+        if (naoLembra.usuario) score -= 15;
+        if (formData.hackedEmailAlterado === 'sim') score -= 15;
+        
+        const motivosGraves = [
+          'Exploração Infantil (CSE / NCMEC)',
+          'Organizações Perigosas ou Terrorismo',
+          'Uso de Automação ou Compra de Seguidores',
+          'Nudez ou Atividade Sexual',
+          'Decisão Final - Esta conta não pode ser revisada'
+        ];
+        if (motivosGraves.includes(formData.suspendedReason)) score -= 20;
+
+        if (formData.dataPerda) {
+          const anosAtras = new Date().getFullYear() - new Date(formData.dataPerda).getFullYear();
+          if (anosAtras >= 2) score -= 20;
+        }
+
+        if (formData.fotoRostoPerfil === 'nao' && formData.fotoRostoFeed === 'nao') score -= 15;
+
+        // Ajustes Finais
+        let total = Math.max(0, score);
+        return Math.min(total, 90); // Máximo 90%
       }, [formData, naoLembra]);
+
+      // Cor dinâmica baseada na probabilidade
+      const colorClass = useMemo(() => {
+        if (probabilidade < 30) return 'text-red-500';
+        if (probabilidade < 60) return 'text-yellow-500';
+        return 'text-emerald-500';
+      }, [probabilidade]);
 
       const discount = useMemo(() => {
         const count = parseInt(formData.payFollowersCount.replace(/\D/g, '') || 0);
@@ -106,35 +180,19 @@
       const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        const urlParams = new URLSearchParams(window.location.search);
-        const indicadoPor = urlParams.get('ref') || "";
-        const API_URL = "https://script.google.com/macros/s/AKfycbxx9D_QOhsGhL7B9qowfIVNhKPomNo_iZmo1vF_x-BXwSnWs_1j734NPUZwDVmcrBImPA/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbxZENMKRAnzTXw4msRK1oPJ-HH67ZNbMoDupx2m2mEAtheQ1kjY9Nk5UXKLJR50Fhw0cA/exec";
         
         try {
-          const payload = { 
-            ...formData, 
-            probabilidade, 
-            descontoAplicado: discount,
-            indicadoPor: indicadoPor,
-            token_secreto: "RecoveryPro2024!@#SuperSeguro",
-            dataEnvio: new Date().toLocaleString() 
-          };
-
-          await fetch(API_URL, { 
-            method: 'POST', 
-            mode: 'no-cors', 
-            body: JSON.stringify(payload) 
-          });
-
+          const payload = { ...formData, probabilidade, dataEnvio: new Date().toLocaleString() };
+          await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
           setLoading(false);
           setIsSubmitted(true);
         } catch (error) {
-          alert("Erro ao enviar solicitação. Verifique sua conexão.");
+          alert("Erro ao enviar. Verifique sua conexão.");
           setLoading(false);
         }
       };
 
-      // --- TELA DE SUCESSO E REDIRECIONAMENTO ---
       if (isSubmitted) {
         return (
           <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6 text-slate-100 text-center">
@@ -145,18 +203,11 @@
                   <Check className="w-12 h-12 text-emerald-400" />
                 </div>
               </div>
-              
-              <div className="space-y-2">
-                <h2 className="text-3xl font-bold">Concluido!</h2>
-                <p className="text-slate-400">Recebemos os dados da sua conta.</p>
-              </div>
-
+              <h2 className="text-3xl font-bold">Concluido!</h2>
               <div className="bg-slate-800/50 p-4 rounded-2xl flex items-center justify-center gap-3 border border-slate-700">
                 <div className="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-                <p className="text-sm font-medium text-indigo-300">Redirecionando para 'Etapa das Contas'...</p>
+                <p className="text-sm font-medium text-indigo-300">Redirecionando...</p>
               </div>
-
-              <p className="text-[10px] text-slate-600 uppercase tracking-widest animate-pulse">Aguarde um instante</p>
             </div>
           </div>
         );
@@ -178,22 +229,21 @@
 
           {formData.plataforma && (
             <div className="fixed bottom-6 right-6 z-50">
-              <div className="bg-slate-900/90 border border-indigo-500/30 p-4 rounded-2xl shadow-2xl backdrop-blur-md flex items-center gap-4">
+              <div className="bg-slate-900/90 border border-slate-800 p-4 rounded-2xl shadow-2xl backdrop-blur-md flex items-center gap-4">
                 <div className="relative w-12 h-12">
                   <svg className="w-full h-full transform -rotate-90">
                     <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="4" fill="transparent" className="text-slate-800" />
-                    <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="4" fill="transparent" strokeDasharray={125.6} strokeDashoffset={125.6 - (125.6 * probabilidade) / 100} className="text-indigo-500 transition-all duration-700" />
+                    <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="4" fill="transparent" strokeDasharray={125.6} strokeDashoffset={125.6 - (125.6 * probabilidade) / 100} className={`${colorClass} transition-all duration-700`} />
                   </svg>
-                  <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold">{probabilidade}%</span>
+                  <span className={`absolute inset-0 flex items-center justify-center text-[10px] font-bold ${colorClass}`}>{probabilidade}%</span>
                 </div>
-                <p className="text-[10px] text-slate-500 uppercase font-bold text-left">Chance de<br/>Sucesso</p>
+                <p className="text-[10px] text-slate-500 uppercase font-bold">Chance de<br/>Sucesso</p>
               </div>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-8 pb-32">
             
-            {/* SELEÇÃO DE PLATAFORMA */}
             <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
               <h2 className="text-xl font-semibold mb-6">Selecione a plataforma:</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -214,7 +264,6 @@
             {formData.plataforma && (
               <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 
-                {/* CAMPOS ESPECÍFICOS INSTAGRAM */}
                 {formData.plataforma === 'insta' && (
                   <>
                     <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
@@ -251,7 +300,6 @@
                   </>
                 )}
 
-                {/* E-MAIL */}
                 <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
                   <h2 className="text-xl font-semibold mb-6">{formData.plataforma === 'google' ? 'Gmail a recuperar' : 'E-mail da Conta'}</h2>
                   <input 
@@ -274,18 +322,11 @@
                   )}
                 </section>
 
-                {/* MOTIVO QUEDA */}
                 {formData.plataforma === 'insta' && (
                   <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
                     <h2 className="text-xl font-semibold mb-6">O que aconteceu com a conta?</h2>
                     <div className="grid grid-cols-2 gap-3 mb-6">
-                      {[
-                        'PERDEU A SENHA', 
-                        'CONTA SUSPENSA', 
-                        'CONTA HACKEADA', 
-                        'ERRO AO ENTRAR', 
-                        'NAO CHEGA CODIGOS'
-                      ].map((motivo, idx) => (
+                      {['PERDEU A SENHA', 'CONTA SUSPENSA', 'CONTA HACKEADA', 'ERRO AO ENTRAR', 'NAO CHEGA CODIGOS'].map((motivo, idx) => (
                         <button 
                           key={motivo} type="button" 
                           onClick={() => setFormData({...formData, motivoQueda: motivo})}
@@ -347,7 +388,32 @@
                   </section>
                 )}
 
-                {/* SEGURANÇA */}
+                {/* --- SEÇÃO DE FOTOS (NOVA) --- */}
+                <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
+                  <h2 className="text-xl font-semibold mb-6">Identificação Visual</h2>
+                  <div className="space-y-6">
+                    <div>
+                      <p className="text-sm font-bold mb-3">Sua foto de perfil mostrava o seu rosto?</p>
+                      <div className="flex gap-4">
+                        {['sim', 'nao'].map(opt => (
+                          <button key={opt} type="button" onClick={() => setFormData({...formData, fotoRostoPerfil: opt})} className={`flex-1 py-2 rounded-xl font-bold uppercase ${formData.fotoRostoPerfil === opt ? 'bg-indigo-600' : 'bg-slate-800'}`}>{opt}</button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {formData.fotoRostoPerfil === 'nao' && (
+                      <div className="animate-in slide-in-from-top-2">
+                        <p className="text-sm font-bold mb-3">No seu feed (postagens), havia fotos mostrando seu rosto?</p>
+                        <div className="flex gap-4">
+                          {['sim', 'nao'].map(opt => (
+                            <button key={opt} type="button" onClick={() => setFormData({...formData, fotoRostoFeed: opt})} className={`flex-1 py-2 rounded-xl font-bold uppercase ${formData.fotoRostoFeed === opt ? 'bg-indigo-600' : 'bg-slate-800'}`}>{opt}</button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </section>
+
                 <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
                   <h2 className="text-xl font-semibold mb-6">Segurança</h2>
                   <div className="mb-6 relative">
@@ -381,7 +447,7 @@
                     </button>
 
                     {formData.telefone.replace(/\D/g, '').length === 11 && (
-                      <div className="mt-4 p-4 bg-slate-800/80 rounded-2xl animate-in zoom-in-95 duration-300">
+                      <div className="mt-4 p-4 bg-slate-800/80 rounded-2xl animate-in zoom-in-95">
                         <p className="text-sm font-bold mb-3">Você ainda tem acesso a este número?</p>
                         <div className="flex gap-4">
                           <button type="button" onClick={() => setFormData({...formData, temAcessoTelefone: 'sim'})} className={`flex-1 py-2 rounded-xl font-bold ${formData.temAcessoTelefone === 'sim' ? 'bg-emerald-600' : 'bg-slate-700'}`}>SIM</button>
@@ -392,7 +458,6 @@
                   </div>
                 </section>
 
-                {/* SENHAS ANTIGAS */}
                 <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
                   <h2 className="text-xl font-semibold mb-4 text-indigo-400">Senhas Antigas</h2>
                   <div className="space-y-3">
@@ -412,100 +477,60 @@
                   </div>
                 </section>
 
-          {/* MEIO JURÍDICO */}
-                {formData.plataforma === 'insta' && (
-                  <section className="bg-indigo-900/20 border-2 border-indigo-500/50 p-6 md:p-8 rounded-[2.5rem]">
-                    <div className="flex items-start gap-4 mb-6">
-                      <input 
-                        type="checkbox" id="juridico"
-                        checked={formData.juridicoChecked}
-                        onChange={(e) => setFormData({...formData, juridicoChecked: e.target.checked})}
-                        className="mt-1 w-6 h-6 rounded border-slate-700 text-indigo-600 focus:ring-indigo-500"
-                      />
-                      <label htmlFor="juridico" className="text-sm font-medium cursor-pointer leading-relaxed">
-                        Caso não seja possível de forma tradicional, permito de meios jurídicos recuperar a conta <span className="text-indigo-400 font-semibold">@{formData.usuario || "usuario"}</span>. Entendo que <span className="text-emerald-400">só pagarei quando a conta estiver 100% recuperada</span>.
-                      </label>
-                    </div>
-
-                    {formData.juridicoChecked && (
-                      <div className="space-y-3 animate-in slide-in-from-left-4">
-                        {[
-                          { val: '150', text: 'R$ 150,00 - Tempo previsto até 28 dias' },
-                          { val: '200', text: 'R$ 200,00 - Tempo previsto até 14 dias' },
-                          { val: '250', text: 'R$ 250,00 - Tempo previsto até 7 dias' }
-                        ].map(opt => (
-                          <button 
-                            key={opt.val} type="button"
-                            onClick={() => setFormData({...formData, juridicoOption: opt.val})}
-                            className={`w-full p-4 text-left rounded-xl border-2 font-bold text-xs transition-all ${formData.juridicoOption === opt.val ? 'border-emerald-500 bg-emerald-500/10' : 'border-slate-700'}`}
-                          >
-                            {opt.text}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </section>
-                )}
-
-                {/* PAGAR COM SEGUIDORES */}
-                <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
-                  <div className="flex items-start gap-4 mb-4">
+                <section className="bg-indigo-900/20 border-2 border-indigo-500/50 p-6 md:p-8 rounded-[2.5rem]">
+                  <div className="flex items-start gap-4 mb-6">
                     <input 
-                      type="checkbox" id="payFollow"
-                      checked={formData.payWithFollowers}
-                      onChange={(e) => setFormData({...formData, payWithFollowers: e.target.checked})}
-                      className="mt-1 w-6 h-6 rounded border-slate-700 text-indigo-600 focus:ring-indigo-500"
+                      type="checkbox" id="juridico"
+                      checked={formData.juridicoChecked}
+                      onChange={(e) => setFormData({...formData, juridicoChecked: e.target.checked})}
+                      className="mt-1 w-6 h-6 rounded border-slate-700 text-indigo-600"
                     />
-                    <div>
-                      <label htmlFor="payFollow" className="text-sm font-medium block">Permito pagar uma parte com seguidores</label>
-                      <p className="text-[10px] text-slate-500 mt-1">A cada 1.000 seguidores da sua conta, economize R$ 10,00 nos divulgando.</p>
-                    </div>
+                    <label htmlFor="juridico" className="text-sm font-medium cursor-pointer">
+                      Caso não seja possível de forma tradicional, permito meios jurídicos. <span className="text-emerald-400">Só pago se recuperar</span>.
+                    </label>
                   </div>
-
-                  {formData.payWithFollowers && (
-                    <div className="mt-4 p-4 bg-slate-800 rounded-2xl animate-in zoom-in-95">
-                      <label className="text-xs font-bold text-slate-400 mb-2 block">Quantidade de seguidores da sua antiga conta:</label>
-                      <input 
-                        type="text" 
-                        value={formData.payFollowersCount}
-                        onChange={(e) => setFormData({...formData, payFollowersCount: formatNumber(e.target.value)})}
-                        placeholder="Ex: 2.800"
-                        className="w-full bg-slate-900 border-none p-4 rounded-xl text-xl font-bold text-emerald-400"
-                      />
-                      {discount > 0 && (
-                        <p className="mt-2 text-sm font-bold text-emerald-500">Economia calculada: - R$ {discount},00</p>
-                      )}
+                  {formData.juridicoChecked && (
+                    <div className="space-y-3 animate-in slide-in-from-left-4">
+                      {['150', '200', '250'].map(val => (
+                        <button key={val} type="button" onClick={() => setFormData({...formData, juridicoOption: val})} className={`w-full p-4 text-left rounded-xl border-2 font-bold text-xs ${formData.juridicoOption === val ? 'border-emerald-500 bg-emerald-500/10' : 'border-slate-700'}`}>
+                          R$ {val},00 - Tempo previsto reduzido
+                        </button>
+                      ))}
                     </div>
                   )}
                 </section>
 
-                {/* AVISO SEGURANÇA */}
-                <div className="bg-blue-900/20 border border-blue-500/30 p-4 rounded-2xl">
-                  <p className="text-[10px] font-bold text-blue-400 text-center uppercase tracking-widest leading-tight">
-                    A LFAssessoria nunca solicita pagamentos antecipados via Pix para funcionários individuais. Todo o processo é documentado.
-                  </p>
-                </div>
-
-                {/* FINALIZAÇÃO */}
-                <section className="bg-slate-900 border-2 border-indigo-500/50 p-6 md:p-8 rounded-[2.5rem] shadow-2xl">
-                  <h2 className="text-xl font-semibold mb-6">Finalizar Solicitação</h2>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <input required value={formData.nomeCliente} onChange={(e) => setFormData({ ...formData, nomeCliente: e.target.value.slice(0, 40) })} type="text" placeholder="Nome Completo" className="bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500" />
-                    <input required value={formData.whatsapp} onChange={(e) => setFormData({ ...formData, whatsapp: applyPhoneMask(e.target.value) })} type="text" placeholder="WhatsApp (XX) XXXXX-XXXX" className="bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500" />
+                <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
+                  <div className="flex items-start gap-4 mb-4">
+                    <input type="checkbox" id="payFollow" checked={formData.payWithFollowers} onChange={(e) => setFormData({...formData, payWithFollowers: e.target.checked})} className="mt-1 w-6 h-6 rounded border-slate-700 text-indigo-600" />
+                    <div>
+                      <label htmlFor="payFollow" className="text-sm font-medium block">Pagar com divulgação (da conta afetada)</label>
+                      <p className="text-[10px] text-slate-500">A cada 1.000 seguidores, vale R$ 10,00.</p>
+                    </div>
                   </div>
-                  <button disabled={loading} type="submit" className="w-full py-5 mt-6 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-2xl font-bold text-lg shadow-xl flex items-center justify-center gap-3 disabled:opacity-50">
-                    {loading ? <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : "ENVIAR SOLICITAÇÃO"}
+                  {formData.payWithFollowers && (
+                    <input type="text" value={formData.payFollowersCount} onChange={(e) => setFormData({...formData, payFollowersCount: formatNumber(e.target.value)})} placeholder="Qtd. de Seguidores" className="w-full bg-slate-800 border-none p-4 rounded-xl text-xl font-bold text-emerald-400" />
+                  )}
+                </section>
+
+                <section className="bg-slate-900 border-2 border-indigo-500/50 p-6 md:p-8 rounded-[2.5rem]">
+                  <h2 className="text-xl font-semibold mb-6">Dados de Contato</h2>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <input required value={formData.nomeCliente} onChange={(e) => setFormData({ ...formData, nomeCliente: e.target.value })} type="text" placeholder="Nome Completo" className="bg-slate-800 border-none p-4 rounded-xl" />
+                    <input required value={formData.whatsapp} onChange={(e) => setFormData({ ...formData, whatsapp: applyPhoneMask(e.target.value) })} type="text" placeholder="WhatsApp" className="bg-slate-800 border-none p-4 rounded-xl" />
+                    <div className="relative md:col-span-2">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-400 font-bold">@</span>
+                      <input required value={formData.instaReserva} onChange={(e) => setFormData({ ...formData, instaReserva: handleInstaUser(e.target.value) })} type="text" placeholder="instagram_reserva" className="w-full bg-slate-800 border-none p-4 pl-10 rounded-xl" />
+                    </div>
+                  </div>
+                  <button disabled={loading} type="submit" className="w-full py-5 mt-6 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-2xl font-bold text-lg disabled:opacity-50">
+                    {loading ? "ENVIANDO..." : "ENVIAR SOLICITAÇÃO"}
                   </button>
                 </section>
 
               </div>
             )}
           </form>
-
-          <style dangerouslySetInnerHTML={{ __html: `
-            select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1.5em; }
-            input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
-          `}} />
         </div>
       );
     };
