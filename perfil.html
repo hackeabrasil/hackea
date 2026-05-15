@@ -15,7 +15,6 @@
 <body class="text-slate-100 min-h-screen flex flex-col items-center justify-center p-4">
 
     <div class="max-w-md w-full">
-        <!-- ÁREA DE LOGIN (Aparece se não houver login automático) -->
         <div id="loginArea" class="bg-slate-900 p-8 rounded-[2.5rem] border border-slate-800 shadow-2xl text-center">
             <div class="w-20 h-20 bg-indigo-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-indigo-600/30">
                 <i data-lucide="shield-check" class="text-white w-10 h-10"></i>
@@ -33,7 +32,6 @@
             </div>
         </div>
 
-        <!-- DASHBOARD (Aparece após o login) -->
         <div id="dashArea" class="hidden space-y-4 animate-in fade-in zoom-in duration-500">
             <div class="bg-gradient-to-br from-indigo-600 to-violet-700 p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden">
                 <div class="relative z-10">
@@ -55,7 +53,6 @@
                 </div>
             </div>
 
-            <!-- LINK DE INDICAÇÃO -->
             <div class="bg-slate-900 border border-slate-800 p-6 rounded-[2rem] space-y-3">
                 <p class="text-[10px] font-bold text-slate-500 uppercase ml-1">Seu Link de Indicação</p>
                 <div class="flex items-center gap-2 bg-slate-950 p-2 rounded-2xl border border-indigo-500/20">
@@ -66,7 +63,6 @@
                 </div>
             </div>
 
-            <!-- BOTÃO SACAR -->
             <button onclick="abrirSaque()" class="w-full py-5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl font-bold text-lg shadow-xl transition-all flex items-center justify-center gap-2">
                 <i data-lucide="arrow-up-right" class="w-5 h-5"></i> SOLICITAR SAQUE (PIX)
             </button>
@@ -74,7 +70,6 @@
             <button onclick="fazerLogout()" class="w-full py-3 text-slate-500 text-xs font-bold hover:text-white transition-all uppercase tracking-widest text-center">Sair do Painel</button>
         </div>
 
-        <!-- MODAL DE SAQUE -->
         <div id="saqueArea" class="hidden animate-in slide-in-from-bottom-10 duration-300">
             <div class="bg-slate-900 border border-slate-800 p-8 rounded-[2.5rem] shadow-2xl text-center">
                 <div class="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -95,10 +90,9 @@
     </div>
 
     <script>
-        const API_URL = 'https://script.google.com/macros/s/AKfycbxx9D_QOhsGhL7B9qowfIVNhKPomNo_iZmo1vF_x-BXwSnWs_1j734NPUZwDVmcrBImPA/exec';
+        const API_URL = 'https://script.google.com/macros/s/AKfycbxkNBUdkpLVYjG5sr5T5zv0nkqI17RUawTN8weMDUC9JGaEYpE4HimuGwDfQycFm2Fprw/exec';
         let dadosUser = null;
 
-        // Máscara de Telefone
         const maskPhone = (v) => {
             v = v.replace(/\D/g, "");
             if (v.length > 11) v = v.slice(0, 11);
@@ -110,7 +104,6 @@
 
         document.getElementById('loginTel').addEventListener('input', (e) => e.target.value = maskPhone(e.target.value));
 
-        // Tenta login automático ao abrir a página
         window.onload = () => {
             const urlParams = new URLSearchParams(window.location.search);
             const telParam = urlParams.get('tel');
@@ -132,34 +125,28 @@
             btn.innerHTML = `<div class="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>`;
 
             try {
-                // Chama o doGet do Apps Script com action=getPerfil
                 const res = await fetch(`${API_URL}?action=getPerfil&tel=${tel}`);
                 dadosUser = await res.json();
 
                 if(dadosUser.error) {
-                    alert("Afiliado não encontrado. Verifique o número ou gere seu link primeiro.");
+                    alert("Afiliado não encontrado.");
                     btn.disabled = false;
                     btn.innerHTML = `ACESSAR AGORA <i data-lucide="log-in" class="w-5 h-5"></i>`;
                     return;
                 }
 
-                // Preenche os dados no Painel
                 document.getElementById('boasVindas').innerText = `Olá, ${dadosUser.nome}!`;
                 document.getElementById('valSaldo').innerText = `R$ ${dadosUser.saldo.toFixed(2)}`;
                 document.getElementById('valPendente').innerText = `R$ ${dadosUser.pendente.toFixed(2)}`;
                 document.getElementById('valTotal').innerText = dadosUser.totalIndicados;
                 
-                // Gera o link de ref dinâmico
-                const baseUrl = window.location.origin; // Pega o domínio atual
                 document.getElementById('linkRef').value = `https://recupera.pages.dev/solicitar.html?ref=${encodeURIComponent(dadosUser.nome)}`;
 
-                // Alterna as telas
                 document.getElementById('loginArea').classList.add('hidden');
                 document.getElementById('dashArea').classList.remove('hidden');
                 lucide.createIcons();
             } catch (e) { 
-                console.error(e);
-                alert("Erro ao conectar com a base de dados."); 
+                alert("Erro ao conectar com o servidor."); 
                 btn.disabled = false; 
                 btn.innerHTML = `ACESSAR AGORA <i data-lucide="log-in" class="w-5 h-5"></i>`;
             }
@@ -167,7 +154,7 @@
 
         function abrirSaque() {
             if(dadosUser.saldo < 25) {
-                alert(`Saldo insuficiente. Você tem R$ ${dadosUser.saldo.toFixed(2)} e o mínimo é R$ 25,00.`);
+                alert(`Saldo insuficiente (Mínimo R$ 25,00).`);
                 return;
             }
             document.getElementById('dashArea').classList.add('hidden');
@@ -182,19 +169,17 @@
 
         async function confirmarSaque() {
             const pix = document.getElementById('chavePix').value.trim();
-            if(!pix) return alert("Por favor, informe sua chave PIX para receber.");
+            if(!pix) return alert("Informe sua chave PIX.");
 
             const btn = document.getElementById('btnConfirmar');
             btn.disabled = true;
             btn.innerText = "PROCESSANDO...";
 
             try {
-                // Envia para o doPost com tipo: "saque"
                 await fetch(API_URL, {
                     method: 'POST',
                     mode: 'no-cors',
                     body: JSON.stringify({
-                        token_secreto: "RecoveryPro2024!@#SuperSeguro",
                         tipo: "saque",
                         nome: dadosUser.nome,
                         whatsapp: dadosUser.tel,
@@ -203,28 +188,23 @@
                     })
                 });
 
-                alert("SOLICITAÇÃO DE SAQUE ENVIADA!\nO pagamento será realizado na sua chave PIX em breve.");
+                alert("SAQUE SOLICITADO!");
                 window.location.reload();
             } catch (e) { 
-                alert("Erro ao processar sua solicitação de saque."); 
+                alert("Erro ao solicitar saque."); 
                 btn.disabled = false; 
-                btn.innerText = "CONFIRMAR PIX";
+                btn.innerText = "CONFIRMAR";
             }
         }
 
         function copiarLink() {
             const el = document.getElementById('linkRef');
             el.select();
-            el.setSelectionRange(0, 99999);
             document.execCommand('copy');
-            
-            // Feedback visual moderno
-            alert("Link de indicação copiado!");
+            alert("Link copiado!");
         }
 
-        function fazerLogout() {
-            window.location.href = window.location.pathname; // Limpa parâmetros da URL e recarrega
-        }
+        function fazerLogout() { window.location.href = window.location.pathname; }
 
         lucide.createIcons();
     </script>
