@@ -141,12 +141,11 @@
                 <p class="text-slate-400 mt-1">Monitore o progresso da sua recuperação em tempo real.</p>
             </div>
 
-            <!-- Filtros -->
             <div class="bg-[var(--color-bg-card)] p-5 rounded-2xl shadow-2xl mb-8 border border-slate-800/50">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div class="md:col-span-2 relative">
                         <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500"></i>
-                        <input type="text" id="filter-name" placeholder="Buscar por nome ou @usuário..." 
+                        <input type="text" id="filter-name" placeholder="Buscar por nome, @usuário ou #ID..." 
                                class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900 text-white border border-slate-700 focus:border-indigo-500 outline-none transition" 
                                oninput="applyFilters()">
                     </div>
@@ -174,11 +173,11 @@
     </main>
 
     <script>
-        const API_URL = 'https://script.google.com/macros/s/AKfycbxQWM9zqJA-r0Z9dG79qCTTsieB01X-elEu7ZKg0gM5n_ccBTpGTM9MC6XaV1H1BiZlgg/exec';
+        // COLOQUE AQUI O SEU LINK DA NOVA IMPLANTAÇÃO
+        const API_URL = 'https://script.google.com/macros/s/AKfycbymCWpizHtUDIJk6yu8LRUO8ydwK_30hfvAnpbmlpI773tS6HkpbRX9GOfxDYIkhWmaIw/exec';
         
         let recoveryRequests = [];
 
-        // MAPEAMENTO DOS STATUS PARA AS BOLINHAS
         const stageMap = {
             "solicitado": 1,
             "analise": 2,
@@ -202,8 +201,7 @@
         }
 
         function renderProgressBar(request) {
-            // Garante que o status seja lido corretamente ignorando espaços e letras maiúsculas
-            const statusText = request.stage ? request.stage.toLowerCase().trim() : "solicitado";
+            const statusText = (request.stage || "solicitado").toLowerCase().trim();
             const stageNum = stageMap[statusText] || 1;
             const isError = statusText === 'erro';
             const isFinished = statusText === 'finalizado';
@@ -233,6 +231,7 @@
                 } else if (isCurrent) {
                     dotClass = 'dot-current';
                     labelClass = 'label-active';
+                    icon = stepIdx;
                 }
 
                 return `
@@ -250,7 +249,7 @@
         }
 
         function renderRequestCard(request) {
-            const statusText = request.stage ? request.stage.toLowerCase().trim() : "solicitado";
+            const statusText = (request.stage || "solicitado").toLowerCase().trim();
             const isFinished = statusText === 'finalizado';
             const isError = statusText === 'erro';
 
@@ -327,6 +326,8 @@
 
             try {
                 const response = await fetch(API_URL);
+                if (!response.ok) throw new Error('Erro na rede');
+                
                 recoveryRequests = await response.json();
                 
                 if(recoveryRequests.error) {
@@ -335,7 +336,8 @@
                     renderRequests(recoveryRequests);
                 }
             } catch (error) {
-                container.innerHTML = '<div class="col-span-full text-center p-10 bg-red-900/10 rounded-2xl border border-red-500/20"><p class="text-red-400">Falha ao carregar as contas.</p></div>';
+                console.error(error);
+                container.innerHTML = '<div class="col-span-full text-center p-10 bg-red-900/10 rounded-2xl border border-red-500/20"><p class="text-red-400">Falha ao carregar as contas. Verifique se o Script foi implantado como "App da Web" e se o acesso está para "Qualquer pessoa".</p></div>';
             }
         }
 
@@ -351,7 +353,7 @@
             
             noRes.classList.add('hidden');
             list.forEach(r => {
-                if(r.id) container.innerHTML += renderRequestCard(r);
+                container.innerHTML += renderRequestCard(r);
             });
             
             lucide.createIcons();
@@ -366,7 +368,7 @@
                                  (r.username && r.username.toLowerCase().includes(name)) ||
                                  (r.id && r.id.toString().includes(name));
                 
-                const rStatus = r.stage ? r.stage.toString().toLowerCase().trim() : "";
+                const rStatus = r.stage ? r.stage.toLowerCase().trim() : "";
                 let matchStatus = status === "" || rStatus === status;
                 
                 return matchName && matchStatus;
@@ -378,7 +380,7 @@
         function clearFilters() {
             document.getElementById('filter-name').value = '';
             document.getElementById('filter-status').value = '';
-            initTracker();
+            initTracker(); 
         }
     </script>
 </body>
