@@ -173,7 +173,7 @@
     </main>
 
     <!-- Modal de Confirmação de Exclusão -->
-    <div id="delete-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in">
+    <div id="delete-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-md w-full shadow-2xl card-shadow">
             <div class="flex items-center space-x-3 text-red-400 mb-4">
                 <i data-lucide="alert-triangle" class="w-6 h-6"></i>
@@ -451,37 +451,51 @@
             const errorMsg = document.getElementById('modal-error-msg');
             const confirmBtn = document.getElementById('confirm-delete-btn');
 
-            // Localiza o objeto correspondente na base de dados carregada
+            // 1. Localiza o registro atual
             const targetRequest = recoveryRequests.find(r => r.id.toString() === currentDeleteId.toString());
             
-            // Remove caracteres especiais para comparar apenas os dígitos numéricos brutos
-            const cleanInput = inputPhone.replace(/\D/g, '');
-            const cleanTarget = targetRequest && targetRequest.phone ? targetRequest.phone.toString().replace(/\D/g, '') : '';
+            // Log de segurança para debugar o que está vindo no console do navegador (F12)
+            console.log("Dados do registro selecionado:", targetRequest);
 
-            // Valida se o input possui os 11 dígitos padrão e se coincide com o telefone do banco de dados
-            if (cleanInput.length !== 11 || cleanInput !== cleanTarget) {
+            // 2. Captura o telefone testando chaves em Inglês e Português vindas da planilha
+            const serverPhone = targetRequest ? (targetRequest.phone || targetRequest.telefone || targetRequest.Telefone) : null;
+
+            if (!serverPhone) {
+                alert(`Erro crítico: O campo de telefone não foi encontrado nos dados vindos da planilha para o protocolo #${currentDeleteId}. Verifique se a sua API retorna a coluna de telefone.`);
+                closeDeleteModal();
+                return;
+            }
+
+            // 3. Limpa caracteres especiais para comparar apenas os números limpos
+            const cleanInput = inputPhone.replace(/\D/g, '');
+            const cleanTarget = serverPhone.toString().replace(/\D/g, '');
+
+            // 4. Validação direta dos valores puros
+            if (cleanInput !== cleanTarget) {
+                errorMsg.innerText = `Telefone incorreto. Verifique o número digitado.`;
                 errorMsg.classList.remove('hidden');
                 return;
             }
 
+            // Se passou na validação, prossegue com o envio do POST
             errorMsg.classList.add('hidden');
             confirmBtn.disabled = true;
             confirmBtn.innerHTML = '<div class="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>';
 
             try {
-                // Envia comando de exclusão para a API da Google Sheets passando a ação por parâmetro POST
+                // Envia comando de exclusão para o Google Apps Script
                 const response = await fetch(`${API_URL}?action=delete&id=${currentDeleteId}`, {
                     method: 'POST'
                 });
 
-                // Atualiza a visualização filtrando localmente para feedback instantâneo
+                // Filtra localmente os registros da tela para dar feedback instantâneo
                 recoveryRequests = recoveryRequests.filter(r => r.id.toString() !== currentDeleteId.toString());
                 applyFilters();
                 closeDeleteModal();
                 alert('Registro removido com sucesso!');
             } catch (error) {
                 console.error(error);
-                alert('Erro ao processar exclusão no servidor.');
+                alert('O telefone está correto, mas houve um erro de comunicação com o servidor Apps Script ao tentar apagar.');
             } finally {
                 confirmBtn.disabled = false;
                 confirmBtn.innerHTML = '<i data-lucide="trash-2" class="w-4 h-4 mr-1.5"></i> Confirmar Exclusão';
