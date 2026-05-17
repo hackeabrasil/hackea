@@ -172,11 +172,36 @@
         </div>
     </main>
 
+    <!-- Modal de Confirmação de Exclusão -->
+    <div id="delete-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-md w-full shadow-2xl card-shadow">
+            <div class="flex items-center space-x-3 text-red-400 mb-4">
+                <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+                <h3 class="text-lg font-bold text-white">Confirmar Exclusão</h3>
+            </div>
+            <p class="text-slate-400 text-sm mb-4">Para confirmar a exclusão do protocolo <span id="modal-protocol-id" class="font-bold text-white"></span>, digite seu telefone completo cadastrado para validação.</p>
+            
+            <input type="text" id="modal-phone-input" placeholder="(XX) XXXXX-XXXX" maxlength="15"
+                   class="w-full px-4 py-3 rounded-xl bg-slate-950 text-white border border-slate-700 focus:border-red-500 outline-none transition font-mono text-center text-xl tracking-wider mb-4">
+            
+            <p id="modal-error-msg" class="text-red-400 text-xs hidden mb-4">Telefone incorreto. Verifique o número digitado.</p>
+            
+            <div class="flex space-x-3">
+                <button onclick="closeDeleteModal()" class="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-medium transition text-sm">
+                    Cancelar
+                </button>
+                <button id="confirm-delete-btn" onclick="confirmDeletion()" class="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold transition text-sm flex items-center justify-center">
+                    <i data-lucide="trash-2" class="w-4 h-4 mr-1.5"></i> Confirmar Exclusão
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // COLOQUE AQUI O SEU LINK DA NOVA IMPLANTAÇÃO
-        const API_URL = 'https://script.google.com/macros/s/AKfycbymCWpizHtUDIJk6yu8LRUO8ydwK_30hfvAnpbmlpI773tS6HkpbRX9GOfxDYIkhWmaIw/exec';
+        const API_URL = 'https://script.google.com/macros/s/AKfycbxkNBUdkpLVYjG5sr5T5zv0nkqI17RUawTN8weMDUC9JGaEYpE4HimuGwDfQycFm2Fprw/exec';
         
         let recoveryRequests = [];
+        let currentDeleteId = null;
 
         const stageMap = {
             "solicitado": 1,
@@ -283,7 +308,12 @@
                             <p class="text-[10px] font-black text-slate-500 tracking-tighter">PROTOCOLO</p>
                             <h3 class="text-white font-bold">#${request.id}</h3>
                         </div>
-                        <span class="text-[9px] font-bold px-2 py-1 rounded border uppercase ${badgeClass}">${statusText}</span>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-[9px] font-bold px-2 py-1 rounded border uppercase ${badgeClass}">${statusText}</span>
+                            <button onclick="openDeleteModal('${request.id}')" class="p-1.5 text-slate-500 hover:text-red-400 hover:bg-slate-800/50 rounded-lg transition" title="Apagar Registro">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="flex items-center space-x-4 mb-6">
@@ -381,6 +411,82 @@
             document.getElementById('filter-name').value = '';
             document.getElementById('filter-status').value = '';
             initTracker(); 
+        }
+
+        /* --- Funções de Exclusão com Validação de Telefone --- */
+
+        function openDeleteModal(id) {
+            currentDeleteId = id;
+            document.getElementById('modal-protocol-id').innerText = '#' + id;
+            document.getElementById('modal-phone-input').value = '';
+            document.getElementById('modal-error-msg').classList.add('hidden');
+            document.getElementById('delete-modal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('delete-modal').classList.add('hidden');
+            currentDeleteId = null;
+        }
+
+        // Aplica a máscara (XX) XXXXX-XXXX em tempo real enquanto digita
+        document.getElementById('modal-phone-input').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            let masked = '';
+
+            if (value.length > 0) {
+                masked += '(' + value.substring(0, 2);
+                if (value.length > 2) {
+                    masked += ') ' + value.substring(2, 7);
+                    if (value.length > 7) {
+                        masked += '-' + value.substring(7, 11);
+                    }
+                }
+            }
+            e.target.value = masked;
+        });
+
+        async function confirmDeletion() {
+            const inputPhone = document.getElementById('modal-phone-input').value;
+            const errorMsg = document.getElementById('modal-error-msg');
+            const confirmBtn = document.getElementById('confirm-delete-btn');
+
+            // Localiza o objeto correspondente na base de dados carregada
+            const targetRequest = recoveryRequests.find(r => r.id.toString() === currentDeleteId.toString());
+            
+            // Remove caracteres especiais para comparar apenas os dígitos numéricos brutos
+            const cleanInput = inputPhone.replace(/\D/g, '');
+            const cleanTarget = targetRequest && targetRequest.phone ? targetRequest.phone.toString().replace(/\D/g, '') : '';
+
+            // Valida se o input possui os 11 dígitos padrão e se coincide com o telefone do banco de dados
+            if (cleanInput.length !== 11 || cleanInput !== cleanTarget) {
+                errorMsg.classList.remove('hidden');
+                return;
+            }
+
+            errorMsg.classList.add('hidden');
+            confirmBtn.disabled = true;
+            confirmBtn.innerHTML = '<div class="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>';
+
+            try {
+                // Envia comando de exclusão para a API da Google Sheets passando a ação por parâmetro POST
+                const response = await fetch(`${API_URL}?action=delete&id=${currentDeleteId}`, {
+                    method: 'POST'
+                });
+
+                // Atualiza a visualização filtrando localmente para feedback instantâneo
+                recoveryRequests = recoveryRequests.filter(r => r.id.toString() !== currentDeleteId.toString());
+                applyFilters();
+                closeDeleteModal();
+                alert('Registro removido com sucesso!');
+            } catch (error) {
+                console.error(error);
+                alert('Erro ao processar exclusão no servidor.');
+            } finally {
+                confirmBtn.disabled = false;
+                confirmBtn.innerHTML = '<i data-lucide="trash-2" class="w-4 h-4 mr-1.5"></i> Confirmar Exclusão';
+                lucide.createIcons();
+            }
         }
     </script>
 </body>
