@@ -198,7 +198,7 @@
     </div>
 
     <script>
-        const API_URL = 'https://script.google.com/macros/s/AKfycbzgeN6ujkof6OEbsnYSC1eg2knnduKk43V7LUYuOQZ8PAlRvC2z7vPwPQv4ywvWoz8vQg/exec';
+        const API_URL = 'https://script.google.com/macros/s/AKfycbwVhek-QNwJE5yxTiF3D8NOmNvRugQbtRPMcsojjBJPH97LTXbJ8fqZYkWunvNSGDOW0g/exec';
         
         let recoveryRequests = [];
         let currentDeleteId = null;
@@ -429,7 +429,6 @@
             currentDeleteId = null;
         }
 
-        // Aplica a máscara (XX) XXXXX-XXXX em tempo real enquanto digita
         document.getElementById('modal-phone-input').addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
             let masked = '';
@@ -451,51 +450,47 @@
             const errorMsg = document.getElementById('modal-error-msg');
             const confirmBtn = document.getElementById('confirm-delete-btn');
 
-            // 1. Localiza o registro atual
             const targetRequest = recoveryRequests.find(r => r.id.toString() === currentDeleteId.toString());
-            
-            // Log de segurança para debugar o que está vindo no console do navegador (F12)
-            console.log("Dados do registro selecionado:", targetRequest);
-
-            // 2. Captura o telefone testando chaves em Inglês e Português vindas da planilha
-            const serverPhone = targetRequest ? (targetRequest.phone || targetRequest.telefone || targetRequest.Telefone) : null;
+            const serverPhone = targetRequest ? targetRequest.phone : null;
 
             if (!serverPhone) {
-                alert(`Erro crítico: O campo de telefone não foi encontrado nos dados vindos da planilha para o protocolo #${currentDeleteId}. Verifique se a sua API retorna a coluna de telefone.`);
+                alert(`Erro: O campo de telefone não foi mapeado no card local.`);
                 closeDeleteModal();
                 return;
             }
 
-            // 3. Limpa caracteres especiais para comparar apenas os números limpos
             const cleanInput = inputPhone.replace(/\D/g, '');
             const cleanTarget = serverPhone.toString().replace(/\D/g, '');
 
-            // 4. Validação direta dos valores puros
             if (cleanInput !== cleanTarget) {
                 errorMsg.innerText = `Telefone incorreto. Verifique o número digitado.`;
                 errorMsg.classList.remove('hidden');
                 return;
             }
 
-            // Se passou na validação, prossegue com o envio do POST
             errorMsg.classList.add('hidden');
             confirmBtn.disabled = true;
             confirmBtn.innerHTML = '<div class="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>';
 
             try {
-                // Envia comando de exclusão para o Google Apps Script
-                const response = await fetch(`${API_URL}?action=delete&id=${currentDeleteId}`, {
+                // ALTERAÇÃO DE SEGURANÇA: Passando ID e o Telefone limpo por parâmetro de URL
+                const response = await fetch(`${API_URL}?action=delete&id=${currentDeleteId}&phone=${cleanInput}`, {
                     method: 'POST'
                 });
 
-                // Filtra localmente os registros da tela para dar feedback instantâneo
-                recoveryRequests = recoveryRequests.filter(r => r.id.toString() !== currentDeleteId.toString());
-                applyFilters();
-                closeDeleteModal();
-                alert('Registro removido com sucesso!');
+                const resData = await response.json();
+
+                if (resData.result === "success") {
+                    recoveryRequests = recoveryRequests.filter(r => r.id.toString() !== currentDeleteId.toString());
+                    applyFilters();
+                    closeDeleteModal();
+                    alert('Registro removido com sucesso!');
+                } else {
+                    alert('Erro retornado do servidor: ' + resData.message);
+                }
             } catch (error) {
                 console.error(error);
-                alert('O telefone está correto, mas houve um erro de comunicação com o servidor Apps Script ao tentar apagar.');
+                alert('Erro na comunicação ao processar exclusão.');
             } finally {
                 confirmBtn.disabled = false;
                 confirmBtn.innerHTML = '<i data-lucide="trash-2" class="w-4 h-4 mr-1.5"></i> Confirmar Exclusão';
