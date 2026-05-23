@@ -203,7 +203,7 @@
                 </div>
                 
                 <div class="mt-4 flex justify-end">
-                    <button onclick="copyToClipboard('textContact', this)" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold rounded-xl flex items-center gap-2 transition-all duration-200 cursor-pointer shadow-md">
+                    <button onclick="copyToClipboard('textContact', this)" class="glow-button px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold rounded-xl flex items-center gap-2 transition-all duration-200 cursor-pointer shadow-md">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path>
                         </svg>
@@ -227,7 +227,7 @@
                 </div>
                 
                 <div class="mt-4 flex justify-end">
-                    <button onclick="copyToClipboard('textComplaint', this)" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold rounded-xl flex items-center gap-2 transition-all duration-200 cursor-pointer shadow-md">
+                    <button onclick="copyToClipboard('textComplaint', this)" class="glow-button px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold rounded-xl flex items-center gap-2 transition-all duration-200 cursor-pointer shadow-md">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path>
                         </svg>
@@ -251,7 +251,7 @@
                 </div>
                 
                 <div class="mt-4 flex justify-end">
-                    <button onclick="copyToClipboard('textOrder', this)" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold rounded-xl flex items-center gap-2 transition-all duration-200 cursor-pointer shadow-md">
+                    <button onclick="copyToClipboard('textOrder', this)" class="glow-button px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold rounded-xl flex items-center gap-2 transition-all duration-200 cursor-pointer shadow-md">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path>
                         </svg>
@@ -385,7 +385,7 @@ Diante do erro tecnológico evidente da plataforma e da total falta de suporte n
 
 REVISÃO HUMANA: Que a Meta retire este caso do sistema automatizado e encaminhe para análise manual de um analista real da equipe de engenharia e compliance.
 DEVOLUÇÃO DO ACESSO: O desbloqueio total e imediato do usuário @${username} com a restituição de todos os meus dados.
-PROVA TÉCNICA (C.D.C): Caso a Meta recuse a devolução, exijo que anexe neste protocolo o relatório detalhado provando a suposta infração. Se eu precisar acionar o Juizado Especial Cível (JEC), utilizarei este protocolo como prova de que a empresa se recusou a resolver o problema amigavelmente.`;
+PROVA TÉCNICA (C.D.C): Caso a Meta recuse a devolução, exijo que anexe neste protocolo o relatório detalhado provando a suposta infração. Se eu precisar acionar o Juizado Especial Cível (JEC), utilizarei este protocolo como prova de que a empresa se recusou a resolver o problem amigavelmente.`;
 
             // Atribuindo aos elementos HTML
             document.getElementById('textComplaint').textContent = complaintText;
