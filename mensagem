@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Reclamação - Consumidor.gov.br (Insta/Meta)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0b0f19;
+        }
+        .glow-button {
+            transition: all 0.3s ease;
+        }
+        .glow-button:hover {
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+            transform: translateY(-1px);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white antialiased">
+
+    <header class="border-b border-slate-800/80 bg-slate-900/50 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-gradient-to-tr from-pink-500 via-red-500 to-yellow-500 p-2 rounded-xl shadow-lg">
+                    <!-- Ícone de Instagram simplificado em SVG -->
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <rect x="2" y="2" width="20" height="20" rx="5" ry="5" stroke-width="2"></rect>
+                        <path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" stroke-width="2"></path>
+                        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" stroke-width="2" stroke-linecap="round"></line>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                        RecuperaInsta
+                    </h1>
+                    <p class="text-xs text-slate-400">Auxiliar de Reclamações contra a Meta</p>
+                </div>
+            </div>
+            
+            <a href="https://www.consumidor.gov.br" target="_blank" rel="noopener noreferrer" 
+               class="flex items-center gap-2 px-4 py-2 bg-indigo-600/10 border border-indigo-500/30 text-indigo-400 hover:bg-indigo-600/20 rounded-xl text-sm font-semibold transition-all duration-200">
+                <span>Ir para Consumidor.gov.br</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                </svg>
+            </a>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-4xl w-full mx-auto px-4 py-8">
+        <section class="mb-8 text-center sm:text-left">
+            <span class="px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-full text-xs font-semibold uppercase tracking-wider">
+                Recuperação de Contas
+            </span>
+            <h2 class="text-3xl font-extrabold text-white mt-3 tracking-tight">Sua conta foi suspensa injustamente?</h2>
+            <p class="text-slate-400 mt-2 text-base leading-relaxed">
+                O suporte automático do Instagram costuma travar em um ciclo repetitivo de selfies de vídeo. Use este gerador para formatar sua contestação jurídica de acordo com o <strong>Código de Defesa do Consumidor (C.D.C)</strong> e publique diretamente no site ou aplicativo oficial do <strong class="text-indigo-400">Consumidor.gov.br</strong>.
+            </p>
+        </section>
+
+        <!-- Toast/Mensagem de Alerta (substituto perfeito para o 'alert') -->
+        <div id="toast" class="hidden fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-slate-900 border border-emerald-500/50 text-emerald-400 px-5 py-4 rounded-xl shadow-2xl transition-all duration-300 transform translate-y-2 opacity-0">
+            <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <div>
+                <p class="font-bold text-sm text-white">Texto Copiado!</p>
+                <p class="text-xs text-slate-400">Pronto para colar no formulário do Consumidor.gov.</p>
+            </div>
+        </div>
+
+        <div id="errorToast" class="hidden fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-slate-900 border border-red-500/50 text-red-400 px-5 py-4 rounded-xl shadow-2xl transition-all duration-300 transform translate-y-2 opacity-0">
+            <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            </svg>
+            <div>
+                <p id="errorToastTitle" class="font-bold text-sm text-white">Campos em branco!</p>
+                <p id="errorToastDesc" class="text-xs text-slate-400">Por favor, preencha todas as informações obrigatórias.</p>
+            </div>
+        </div>
+
+        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 sm:p-8 backdrop-blur-md shadow-xl mb-8">
+            <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
+                1. Preencha seus Dados Oficiais do Instagram
+            </h3>
+
+            <form id="userDataForm" class="grid grid-cols-1 md:grid-cols-3 gap-6" onsubmit="event.preventDefault();">
+                <!-- Campo Username (@) -->
+                <div class="space-y-2">
+                    <label for="username" class="block text-sm font-semibold text-slate-300">
+                        Username da Conta <span class="text-pink-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 font-semibold">@</span>
+                        <input type="text" id="username" placeholder="ex: seu_perfil" required
+                               class="w-full pl-8 pr-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all duration-200">
+                    </div>
+                    <p class="text-xs text-slate-500">O arroba exato da conta bloqueada.</p>
+                </div>
+
+                <!-- Campo E-mail -->
+                <div class="space-y-2">
+                    <label for="email" class="block text-sm font-semibold text-slate-300">
+                        E-mail Cadastrado <span class="text-pink-500">*</span>
+                    </label>
+                    <input type="email" id="email" placeholder="ex: seuemail@dominio.com" required
+                           class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all duration-200">
+                    <p class="text-xs text-slate-500">O endereço de e-mail vinculado ao perfil.</p>
+                </div>
+
+                <!-- Campo Telefone -->
+                <div class="space-y-2">
+                    <label for="phone" class="block text-sm font-semibold text-slate-300">
+                        Telefone de Contato <span class="text-pink-500">*</span>
+                    </label>
+                    <input type="tel" id="phone" placeholder="(99) 99999-9999" required
+                           class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all duration-200">
+                    <p class="text-xs text-slate-500">Telefone com o código de DDD.</p>
+                </div>
+            </form>
+
+            <div class="mt-8 pt-6 border-t border-slate-800/80 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <span class="text-xs text-slate-400 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-pink-500 animate-pulse"></span>
+                    Todos os campos são de preenchimento obrigatório.
+                </span>
+                <button type="button" onclick="generateTexts()" 
+                        class="glow-button w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold rounded-xl flex items-center justify-center gap-2 shadow-lg cursor-pointer">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                    </svg>
+                    Gerar Textos Prontos
+                </button>
+            </div>
+        </div>
+
+        <div id="resultsSection" class="hidden space-y-8 scroll-mt-24">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="h-px bg-slate-800 flex-grow"></div>
+                <span class="text-xs font-bold tracking-widest text-indigo-400 uppercase">Textos Gerados</span>
+                <div class="h-px bg-slate-800 flex-grow"></div>
+            </div>
+
+            <!-- INSTRUÇÕES DE PASSO A PASSO -->
+            <div class="bg-blue-950/20 border border-blue-800/30 rounded-xl p-4 flex gap-3 items-start">
+                <svg class="w-5 h-5 text-blue-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <div class="text-sm text-slate-300">
+                    <strong class="text-white">Instruções Importantes:</strong> Copie cada caixa individualmente usando os botões verdes abaixo e cole nos campos correspondentes da plataforma <strong class="text-indigo-300">Consumidor.gov.br</strong> ou em seu aplicativo oficial. Ao abrir a reclamação por lá, pesquise pela empresa <strong class="text-indigo-300">"Meta"</strong> ou <strong class="text-indigo-300">"Facebook"</strong>.
+                </div>
+            </div>
+
+            <!-- CARD 1: CONTATO COM A EMPRESA -->
+            <div class="bg-slate-900/40 border border-slate-800 rounded-2xl p-6 relative hover:border-slate-700 transition-colors">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+                    <div>
+                        <span class="text-[10px] font-bold tracking-wider text-pink-400 uppercase bg-pink-500/10 px-2 py-0.5 rounded-md">Passo 1</span>
+                        <h4 class="text-md font-bold text-white mt-1">Como foi o contato com a empresa?</h4>
+                    </div>
+                    <span class="text-xs text-slate-400 font-medium">Cole no campo: <strong class="text-slate-200">"Informe como foi o seu contato..."</strong></span>
+                </div>
+                
+                <div class="relative bg-slate-950 rounded-xl border border-slate-800/80 p-4">
+                    <pre id="textContact" class="text-sm text-slate-300 whitespace-pre-wrap font-sans break-words selection:bg-indigo-500">Suporte automático do aplicativo travou em looping técnico sem retorno humano.</pre>
+                </div>
+                
+                <div class="mt-4 flex justify-end">
+                    <button onclick="copyToClipboard('textContact', this)" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold rounded-xl flex items-center gap-2 transition-all duration-200 cursor-pointer shadow-md">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path>
+                        </svg>
+                        <span>Copiar Texto 1</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- CARD 2: RECLAMAÇÃO -->
+            <div class="bg-slate-900/40 border border-slate-800 rounded-2xl p-6 relative hover:border-slate-700 transition-colors">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+                    <div>
+                        <span class="text-[10px] font-bold tracking-wider text-pink-400 uppercase bg-pink-500/10 px-2 py-0.5 rounded-md">Passo 2</span>
+                        <h4 class="text-md font-bold text-white mt-1">Descreva sua Reclamação</h4>
+                    </div>
+                    <span class="text-xs text-slate-400 font-medium">Cole no campo: <strong class="text-slate-200">"Descreva sua Reclamação"</strong></span>
+                </div>
+                
+                <div class="relative bg-slate-950 rounded-xl border border-slate-800/80 p-4 max-h-96 overflow-y-auto custom-scrollbar">
+                    <pre id="textComplaint" class="text-sm text-slate-300 whitespace-pre-wrap font-sans break-words leading-relaxed selection:bg-indigo-500"></pre>
+                </div>
+                
+                <div class="mt-4 flex justify-end">
+                    <button onclick="copyToClipboard('textComplaint', this)" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold rounded-xl flex items-center gap-2 transition-all duration-200 cursor-pointer shadow-md">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path>
+                        </svg>
+                        <span>Copiar Texto 2</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- CARD 3: PEDIDO -->
+            <div class="bg-slate-900/40 border border-slate-800 rounded-2xl p-6 relative hover:border-slate-700 transition-colors">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+                    <div>
+                        <span class="text-[10px] font-bold tracking-wider text-pink-400 uppercase bg-pink-500/10 px-2 py-0.5 rounded-md">Passo 3</span>
+                        <h4 class="text-md font-bold text-white mt-1">Descreva seu Pedido</h4>
+                    </div>
+                    <span class="text-xs text-slate-400 font-medium">Cole no campo: <strong class="text-slate-200">"Descreva seu Pedido à Empresa"</strong></span>
+                </div>
+                
+                <div class="relative bg-slate-950 rounded-xl border border-slate-800/80 p-4 max-h-96 overflow-y-auto custom-scrollbar">
+                    <pre id="textOrder" class="text-sm text-slate-300 whitespace-pre-wrap font-sans break-words leading-relaxed selection:bg-indigo-500"></pre>
+                </div>
+                
+                <div class="mt-4 flex justify-end">
+                    <button onclick="copyToClipboard('textOrder', this)" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold rounded-xl flex items-center gap-2 transition-all duration-200 cursor-pointer shadow-md">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path>
+                        </svg>
+                        <span>Copiar Texto 3</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- BOTÃO DE DIRECIONAMENTO RÁPIDO -->
+            <div class="text-center py-4 bg-slate-900/30 border border-slate-800 rounded-2xl p-6">
+                <h5 class="font-bold text-white text-base">Tudo pronto para abrir o protocolo!</h5>
+                <p class="text-sm text-slate-400 mt-1 mb-4">Clique abaixo para acessar o site oficial do Consumidor.gov.br e prosseguir com a colagem.</p>
+                <a href="https://www.consumidor.gov.br" target="_blank" rel="noopener noreferrer" 
+                   class="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-bold rounded-xl shadow-lg transition-all duration-200 cursor-pointer transform hover:-translate-y-0.5">
+                    <span>Acessar Consumidor.gov.br</span>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                    </svg>
+                </a>
+            </div>
+        </div>
+
+        <!-- SEÇÃO DE OBSERVAÇÃO (Destaque visual amarelo/laranja) -->
+        <section class="mt-8 bg-amber-500/10 border border-amber-500/20 rounded-2xl p-6">
+            <div class="flex gap-4 items-start">
+                <div class="p-2 bg-amber-500/10 text-amber-500 rounded-lg shrink-0">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h4 class="font-bold text-amber-400 text-base">⚠️ OBSERVAÇÃO IMPORTANTÍSSIMA:</h4>
+                    <p class="text-slate-300 text-sm mt-1 leading-relaxed">
+                        Ao finalizar a sua reclamação no site ou aplicativo do <strong class="text-amber-300">Consumidor.gov.br</strong>, lembre-se de tirar print (captura de tela) do seu aplicativo do Instagram mostrando a <strong>mensagem de suspensão/tela bloqueada</strong> e também o <strong>erro do looping na selfie de vídeo</strong>. 
+                        Acesse a opção de <strong class="text-amber-300">"Adicionar Arquivo"</strong> na plataforma e anexe essas fotos! Elas servem como prova técnica irrefutável do erro do sistema deles.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="border-t border-slate-800/80 bg-slate-950/80 py-6 mt-12 text-center text-xs text-slate-500">
+        <p>&copy; 2026 RecuperaInsta. Direitos Reservados. Desenvolvido para auxílio de defesa ao consumidor.</p>
+    </footer>
+
+    <script>
+        // Formata dinamicamente o campo de telefone com máscara (XX) XXXXX-XXXX
+        const phoneInput = document.getElementById('phone');
+        phoneInput.addEventListener('input', (e) => {
+            let value = e.target.value.replace(/\D/g, "");
+            
+            if (value.length > 11) value = value.slice(0, 11);
+            
+            if (value.length > 6) {
+                value = `(${value.slice(0, 2)}) ${value.slice(2, 7)}-${value.slice(7)}`;
+            } else if (value.length > 2) {
+                value = `(${value.slice(0, 2)}) ${value.slice(2)}`;
+            } else if (value.length > 0) {
+                value = `(${value}`;
+            }
+            e.target.value = value;
+        });
+
+        // Garante que o username seja digitado sem espaços, minúsculo e apenas com caracteres válidos do Instagram
+        const usernameInput = document.getElementById('username');
+        usernameInput.addEventListener('input', (e) => {
+            let val = e.target.value.toLowerCase();
+            // Remove o @ caso o usuário digite manualmente (já existe o @ fixo na interface)
+            if (val.startsWith('@')) {
+                val = val.substring(1);
+            }
+            // Permite apenas letras minúsculas (a-z), números (0-9), ponto (.) e underline (_)
+            val = val.replace(/[^a-z0-9._]/g, '');
+            e.target.value = val;
+        });
+
+        // Garante que o e-mail seja digitado em minúsculas e sem espaços vazios
+        const emailInput = document.getElementById('email');
+        emailInput.addEventListener('input', (e) => {
+            let val = e.target.value.toLowerCase().replace(/\s+/g, '');
+            e.target.value = val;
+        });
+
+        // Função de validação e geração dos textos
+        function generateTexts() {
+            const username = usernameInput.value.trim();
+            const email = emailInput.value.trim();
+            const phone = phoneInput.value.trim();
+
+            // Expressão regular para validação oficial de e-mail padrão
+            const emailPattern = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
+
+            if (!username || !email || !phone) {
+                document.getElementById('errorToastTitle').textContent = 'Campos em branco!';
+                document.getElementById('errorToastDesc').textContent = 'Por favor, preencha todas as informações obrigatórias.';
+                showToast('errorToast');
+                return;
+            }
+
+            if (!emailPattern.test(email)) {
+                document.getElementById('errorToastTitle').textContent = 'E-mail inválido!';
+                document.getElementById('errorToastDesc').textContent = 'Insira um formato válido de e-mail (ex: nome@provedor.com).';
+                showToast('errorToast');
+                return;
+            }
+
+            // Gerando o texto da Reclamação
+            const complaintText = `URGENTE: SUSPENSÃO INDEVIDA POR FALHA NO SISTEMA DA META (FALSO POSITIVO)
+
+Minha conta do Instagram foi desativada repentinamente por um erro grosseiro da Inteligência Artificial da empresa Meta. Sou um usuário comum, o perfil quase não tem atividade e foi arrastado injustamente em um bloqueio automático em lote.
+
+PONTOS CRÍTICOS DA RECLAMAÇÃO CONTRA A META:
+
+CONTA SEM USO: Perfil pessoal/comercial de baixíssima movimentação. Não utilizo automação, não comento em massa e não dou curtidas rápidas. O robô da Meta errou.
+
+SISTEMA DO APLICATIVO TRAVADO: O Instagram exigiu uma selfie de vídeo para apelação, mas o servidor da Meta entrou em looping técnico e apresenta erro na tela. Fui impedido de me defender pelas vias normais da empresa.
+
+ILEGALIDADE CONTRATUAL: Retirar meu acesso sem apontar o motivo exato e sem fornecer suporte humano viola o Artigo 6º, III do Código de Defesa do Consumidor. É uma quebra unilateral de contrato por parte da Meta.
+
+DADOS DO PERFIL AFETADO PARA AUDITORIA DA EMPRESA:
+
+USER (@): @${username}
+
+E-MAIL DA CONTA: ${email}
+
+TELEFONE: ${phone}`;
+
+            // Gerando o texto do Pedido
+            const orderText = `EXIJO REATIVAÇÃO IMEDIATA E REVISÃO MANUAL POR ATENDENTE REAL
+Diante do erro tecnológico evidente da plataforma e da total falta de suporte no aplicativo do Instagram, exijo que a empresa Meta tome as seguintes medidas:
+
+REVISÃO HUMANA: Que a Meta retire este caso do sistema automatizado e encaminhe para análise manual de um analista real da equipe de engenharia e compliance.
+DEVOLUÇÃO DO ACESSO: O desbloqueio total e imediato do usuário @${username} com a restituição de todos os meus dados.
+PROVA TÉCNICA (C.D.C): Caso a Meta recuse a devolução, exijo que anexe neste protocolo o relatório detalhado provando a suposta infração. Se eu precisar acionar o Juizado Especial Cível (JEC), utilizarei este protocolo como prova de que a empresa se recusou a resolver o problema amigavelmente.`;
+
+            // Atribuindo aos elementos HTML
+            document.getElementById('textComplaint').textContent = complaintText;
+            document.getElementById('textOrder').textContent = orderText;
+
+            // Mostrando a seção de resultados de maneira fluida
+            const resultsSection = document.getElementById('resultsSection');
+            resultsSection.classList.remove('hidden');
+            
+            // Rola suavemente até o início dos resultados
+            setTimeout(() => {
+                resultsSection.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+        }
+
+        // Função universal de cópia para a área de transferência com alta compatibilidade
+        function copyToClipboard(elementId, buttonElement) {
+            const preElement = document.getElementById(elementId);
+            const textToCopy = preElement.textContent;
+
+            // Cria um elemento temporário para garantir compatibilidade máxima (especialmente em frames/sandboxes)
+            const tempTextarea = document.createElement('textarea');
+            tempTextarea.value = textToCopy;
+            document.body.appendChild(tempTextarea);
+            tempTextarea.select();
+            tempTextarea.setSelectionRange(0, 99999); // Suporte para mobile
+
+            let successful = false;
+            try {
+                successful = document.execCommand('copy');
+            } catch (err) {
+                successful = false;
+            }
+            document.body.removeChild(tempTextarea);
+
+            // Se o método antigo falhar, tenta a API moderna
+            if (!successful && navigator.clipboard) {
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    handleSuccessFeedback(buttonElement);
+                });
+            } else if (successful) {
+                handleSuccessFeedback(buttonElement);
+            }
+        }
+
+        // Altera visualmente o botão clicado para dar feedback imediato de sucesso de cópia
+        function handleSuccessFeedback(button) {
+            showToast('toast');
+
+            const originalHTML = button.innerHTML;
+            button.classList.remove('bg-emerald-600', 'hover:bg-emerald-500');
+            button.classList.add('bg-indigo-600', 'hover:bg-indigo-500');
+            button.innerHTML = `
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>Copiado!</span>
+            `;
+
+            setTimeout(() => {
+                button.classList.remove('bg-indigo-600', 'hover:bg-indigo-500');
+                button.classList.add('bg-emerald-600', 'hover:bg-emerald-500');
+                button.innerHTML = originalHTML;
+            }, 2500);
+        }
+
+        // Função de controle do Toast de aviso/erro
+        function showToast(id) {
+            const toast = document.getElementById(id);
+            toast.classList.remove('hidden');
+            
+            // Delay pequeno para engajar a transição CSS de opacidade e movimento
+            setTimeout(() => {
+                toast.classList.remove('opacity-0', 'translate-y-2');
+                toast.classList.add('opacity-100', 'translate-y-0');
+            }, 50);
+
+            // Esconde automaticamente após 4 segundos
+            setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => {
+                    toast.classList.add('hidden');
+                }, 300);
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
