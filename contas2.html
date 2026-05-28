@@ -136,6 +136,27 @@
 
     <main class="py-10">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div id="info-banner" class="hidden mb-8 bg-gradient-to-r from-slate-900 via-[#151f2e] to-slate-900 border border-indigo-500/30 rounded-2xl p-5 md:p-6 relative card-shadow backdrop-blur-md overflow-hidden transition-all duration-500 scale-100 opacity-100">
+                <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-indigo-500 to-teal-500"></div>
+                <div class="flex items-start gap-4">
+                    <div class="p-3 bg-indigo-500/10 rounded-xl border border-indigo-500/20 text-indigo-400 flex-shrink-0">
+                        <i data-lucide="info" class="w-6 h-6"></i>
+                    </div>
+                    <div class="flex-1 pr-6">
+                        <h4 class="text-white font-bold text-base mb-1">
+                            Informação
+                        </h4>
+                        <p class="text-xs text-slate-300 leading-relaxed max-w-4xl">
+                            Contas que foram recuperadas, e contas que não foram possíveis recuperar são removidas do nosso painel para ficar mais limpo, ficando assim apenas as contas pendentes.
+                        </p>
+                    </div>
+                    <button onclick="dismissInfoBanner()" class="absolute top-4 right-4 text-slate-500 hover:text-slate-300 transition" title="Fechar permanentemente">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+
             <div class="mb-10">
                 <h1 class="text-3xl font-extrabold text-white tracking-tight">Status das Contas</h1>
                 <p class="text-slate-400 mt-1">Monitore o progresso da sua recuperação em tempo real.</p>
@@ -197,8 +218,11 @@
         </div>
     </div>
 
+    <!-- Container de Notificações Toast Modernas -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full px-4 sm:px-0 pointer-events-none"></div>
+
     <script>
-        const API_URL = 'https://script.google.com/macros/s/AKfycbzgeN6ujkof6OEbsnYSC1eg2knnduKk43V7LUYuOQZ8PAlRvC2z7vPwPQv4ywvWoz8vQg/exec';
+        const API_URL = 'https://script.google.com/macros/s/AKfycbwVhek-QNwJE5yxTiF3D8NOmNvRugQbtRPMcsojjBJPH97LTXbJ8fqZYkWunvNSGDOW0g/exec';
         
         let recoveryRequests = [];
         let currentDeleteId = null;
@@ -217,6 +241,67 @@
             { label: "Recuperando" }, 
             { label: "Finalizado" } 
         ];
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            toast.className = `pointer-events-auto flex items-center gap-3 p-4 rounded-xl border shadow-2xl transition-all duration-300 translate-y-10 opacity-0 ${
+                type === 'success' 
+                    ? 'bg-emerald-950/90 border-emerald-500/30 text-emerald-300' 
+                    : 'bg-red-950/90 border-red-500/30 text-red-300'
+            }`;
+
+            const iconName = type === 'success' ? 'check-circle' : 'alert-circle';
+            toast.innerHTML = `
+                <i data-lucide="${iconName}" class="w-5 h-5 flex-shrink-0"></i>
+                <div class="text-xs font-semibold flex-1">${message}</div>
+                <button class="text-slate-400 hover:text-white transition flex-shrink-0">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            `;
+
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-10', 'opacity-0');
+            }, 10);
+
+            const removeToast = () => {
+                toast.classList.add('translate-y-[-10px]', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            };
+
+            const autoClose = setTimeout(removeToast, 5000);
+
+            toast.querySelector('button').addEventListener('click', () => {
+                clearTimeout(autoClose);
+                removeToast();
+            });
+        }
+
+        function checkInfoBanner() {
+            const banner = document.getElementById('info-banner');
+            const hiddenForever = localStorage.getItem('lfa_hide_info_banner') === 'true';
+            
+            if (!hiddenForever && banner) {
+                banner.classList.remove('hidden');
+            }
+        }
+
+        function dismissInfoBanner() {
+            localStorage.setItem('lfa_hide_info_banner', 'true');
+            const banner = document.getElementById('info-banner');
+            if (banner) {
+                banner.classList.remove('scale-100', 'opacity-100');
+                banner.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    banner.classList.add('hidden');
+                }, 300);
+            }
+        }
 
         function maskEmail(email) {
             if (!email || !email.includes('@')) return '---';
@@ -351,6 +436,8 @@
             const now = new Date();
             document.getElementById('current-time').innerText = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
 
+            checkInfoBanner();
+
             const container = document.getElementById('requests-container');
             container.innerHTML = '<div class="col-span-full text-center py-20"><div class="animate-spin inline-block w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full mb-4"></div><p class="text-slate-400 animate-pulse">Consultando base de dados segura...</p></div>';
 
@@ -369,6 +456,8 @@
                 console.error(error);
                 container.innerHTML = '<div class="col-span-full text-center p-10 bg-red-900/10 rounded-2xl border border-red-500/20"><p class="text-red-400">Falha ao carregar as contas. Verifique se o Script foi implantado como "App da Web" e se o acesso está para "Qualquer pessoa".</p></div>';
             }
+            
+            lucide.createIcons();
         }
 
         function renderRequests(list) {
@@ -413,8 +502,6 @@
             initTracker(); 
         }
 
-        /* --- Funções de Exclusão com Validação de Telefone --- */
-
         function openDeleteModal(id) {
             currentDeleteId = id;
             document.getElementById('modal-protocol-id').innerText = '#' + id;
@@ -429,7 +516,6 @@
             currentDeleteId = null;
         }
 
-        // Aplica a máscara (XX) XXXXX-XXXX em tempo real enquanto digita
         document.getElementById('modal-phone-input').addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
             let masked = '';
@@ -451,51 +537,46 @@
             const errorMsg = document.getElementById('modal-error-msg');
             const confirmBtn = document.getElementById('confirm-delete-btn');
 
-            // 1. Localiza o registro atual
             const targetRequest = recoveryRequests.find(r => r.id.toString() === currentDeleteId.toString());
-            
-            // Log de segurança para debugar o que está vindo no console do navegador (F12)
-            console.log("Dados do registro selecionado:", targetRequest);
-
-            // 2. Captura o telefone testando chaves em Inglês e Português vindas da planilha
-            const serverPhone = targetRequest ? (targetRequest.phone || targetRequest.telefone || targetRequest.Telefone) : null;
+            const serverPhone = targetRequest ? targetRequest.phone : null;
 
             if (!serverPhone) {
-                alert(`Erro crítico: O campo de telefone não foi encontrado nos dados vindos da planilha para o protocolo #${currentDeleteId}. Verifique se a sua API retorna a coluna de telefone.`);
+                showToast(`Erro: O campo de telefone não foi mapeado no card local.`, 'error');
                 closeDeleteModal();
                 return;
             }
 
-            // 3. Limpa caracteres especiais para comparar apenas os números limpos
             const cleanInput = inputPhone.replace(/\D/g, '');
             const cleanTarget = serverPhone.toString().replace(/\D/g, '');
 
-            // 4. Validação direta dos valores puros
             if (cleanInput !== cleanTarget) {
                 errorMsg.innerText = `Telefone incorreto. Verifique o número digitado.`;
                 errorMsg.classList.remove('hidden');
                 return;
             }
 
-            // Se passou na validação, prossegue com o envio do POST
             errorMsg.classList.add('hidden');
             confirmBtn.disabled = true;
             confirmBtn.innerHTML = '<div class="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div>';
 
             try {
-                // Envia comando de exclusão para o Google Apps Script
-                const response = await fetch(`${API_URL}?action=delete&id=${currentDeleteId}`, {
+                const response = await fetch(`${API_URL}?action=delete&id=${currentDeleteId}&phone=${cleanInput}`, {
                     method: 'POST'
                 });
 
-                // Filtra localmente os registros da tela para dar feedback instantâneo
-                recoveryRequests = recoveryRequests.filter(r => r.id.toString() !== currentDeleteId.toString());
-                applyFilters();
-                closeDeleteModal();
-                alert('Registro removido com sucesso!');
+                const resData = await response.json();
+
+                if (resData.result === "success") {
+                    recoveryRequests = recoveryRequests.filter(r => r.id.toString() !== currentDeleteId.toString());
+                    applyFilters();
+                    closeDeleteModal();
+                    showToast('Registro removido com sucesso!', 'success');
+                } else {
+                    showToast('Erro retornado do servidor: ' + resData.message, 'error');
+                }
             } catch (error) {
                 console.error(error);
-                alert('O telefone está correto, mas houve um erro de comunicação com o servidor Apps Script ao tentar apagar.');
+                showToast('Erro na comunicação ao processar exclusão.', 'error');
             } finally {
                 confirmBtn.disabled = false;
                 confirmBtn.innerHTML = '<i data-lucide="trash-2" class="w-4 h-4 mr-1.5"></i> Confirmar Exclusão';
