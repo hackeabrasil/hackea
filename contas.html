@@ -439,7 +439,7 @@
             checkInfoBanner();
 
             const container = document.getElementById('requests-container');
-            container.innerHTML = '<div class="col-span-full text-center py-20"><div class="animate-spin inline-block w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full mb-4"></div><p class="text-slate-400 animate-pulse">Consultando base de dados segura...</p></div>';
+            container.innerHTML = '<div class="col-span-full text-center py-20"><div class="animate-spin inline-block w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full mb-4"></div><p class="text-slate-400 animate-pulse">Buscando contas...</p></div>';
 
             try {
                 const response = await fetch(API_URL);
