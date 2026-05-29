@@ -120,6 +120,24 @@
 </head>
 <body onload="initTracker()">
 
+    <div id="main-preloader" class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#070e17] transition-all duration-500 opacity-100 visible">
+        <div class="absolute w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none"></div>
+        
+        <div class="relative flex flex-col items-center p-8 rounded-2xl border border-slate-800/80 bg-slate-900/40 backdrop-blur-xl card-shadow max-w-xs w-full text-center">
+            <div class="mb-6 text-indigo-500 animate-bounce">
+                <i data-lucide="shield-check" class="w-12 h-12"></i>
+            </div>
+            
+            <div class="relative w-16 h-16 mb-4">
+                <div class="absolute inset-0 rounded-full border-4 border-slate-800"></div>
+                <div class="absolute inset-0 rounded-full border-4 border-t-indigo-500 border-r-teal-500 animate-spin"></div>
+            </div>
+            
+            <h3 class="text-white font-bold tracking-wide text-sm uppercase">LF<span class="text-indigo-500">Assessoria</span></h3>
+            <p class="text-xs text-slate-400 mt-2 animate-pulse">Buscando contas...</p>
+        </div>
+    </div>
+
     <header class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
@@ -193,7 +211,6 @@
         </div>
     </main>
 
-    <!-- Modal de Confirmação de Exclusão -->
     <div id="delete-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-md w-full shadow-2xl card-shadow">
             <div class="flex items-center space-x-3 text-red-400 mb-4">
@@ -218,11 +235,10 @@
         </div>
     </div>
 
-    <!-- Container de Notificações Toast Modernas -->
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full px-4 sm:px-0 pointer-events-none"></div>
 
     <script>
-        const API_URL = 'https://script.google.com/macros/s/AKfycbwVhek-QNwJE5yxTiF3D8NOmNvRugQbtRPMcsojjBJPH97LTXbJ8fqZYkWunvNSGDOW0g/exec';
+        const API_URL = 'https://script.google.com/macros/s/AKfycbyOwSJTt4GPDorOdQRDFazifkQtCfP0FmCpbktauaHjORnjXeS-bPbUXcXWZQr1n14giQ/exec';
         
         let recoveryRequests = [];
         let currentDeleteId = null;
@@ -432,6 +448,19 @@
                 </div>`;
         }
 
+        // FUNÇÃO QUE DETECTA E DETONA O PRELOADER COM EFEITO FADE-OUT
+        function hidePreloader() {
+            const preloader = document.getElementById('main-preloader');
+            if (preloader) {
+                preloader.classList.remove('opacity-100');
+                preloader.classList.add('opacity-0');
+                setTimeout(() => {
+                    preloader.classList.add('hidden');
+                    preloader.classList.remove('visible');
+                }, 500); // 500ms é o tempo da transição suave
+            }
+        }
+
         async function initTracker() {
             const now = new Date();
             document.getElementById('current-time').innerText = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
@@ -455,6 +484,9 @@
             } catch (error) {
                 console.error(error);
                 container.innerHTML = '<div class="col-span-full text-center p-10 bg-red-900/10 rounded-2xl border border-red-500/20"><p class="text-red-400">Falha ao carregar as contas. Verifique se o Script foi implantado como "App da Web" e se o acesso está para "Qualquer pessoa".</p></div>';
+            } finally {
+                // Remove a tela cheia de carregamento independente de ter dado erro ou sucesso
+                hidePreloader();
             }
             
             lucide.createIcons();
