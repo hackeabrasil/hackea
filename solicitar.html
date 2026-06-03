@@ -1,1222 +1,621 @@
 <!DOCTYPE html>
-<html lang="pt-pt" class="scroll-smooth">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LF Assessoria | Especialistas em Recuperação Digital</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
-        
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #030303;
-            color: #f4f4f5;
-        }
-
-        .font-mono {
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        /* Efeito de Vidro Fosco Avançado */
-        .glass {
-            background: rgba(9, 9, 11, 0.7);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .glass-hover {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .glass-hover:hover {
-            background: rgba(15, 15, 20, 0.85);
-            border-color: rgba(99, 102, 241, 0.3);
-            box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.15);
-        }
-
-        /* Gradientes e Textos Brilhantes */
-        .gradient-text {
-            background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 50%, #818cf8 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .gradient-accent {
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-        }
-
-        .gradient-accent-hover:hover {
-            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-            box-shadow: 0 0 25px rgba(99, 102, 241, 0.4);
-        }
-
-        /* Brilhos de Fundo */
-        .radial-glow {
-            background: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.12) 0%, rgba(3, 3, 3, 0) 70%);
-        }
-
-        /* Animação Suave de Flutuar */
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-8px); }
-        }
-        .floating-card {
-            animation: float 6s ease-in-out infinite;
-        }
-
-        /* Scrollbar customizada */
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #030303;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #27272a;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #3f3f46;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LFAssessoria | Recuperação Profissional</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    @keyframes slow-pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(0.95); }
+    }
+    .animate-slow-pulse { animation: slow-pulse 2s infinite ease-in-out; }
+    input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+    select { 
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); 
+      background-repeat: no-repeat; 
+      background-position: right 1rem center; 
+      background-size: 1.5em; 
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #4f46e5;
+      cursor: pointer;
+      border: 2px solid #ffffff;
+    }
+  </style>
 </head>
-<body class="overflow-x-hidden selection:bg-indigo-500/30 selection:text-white">
+<body class="bg-slate-950">
+  <div id="root"></div>
 
-    <div class="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-        <div class="absolute top-[10%] left-[5%] w-[40vw] h-[40vw] radial-glow rounded-full"></div>
-        <div class="absolute bottom-[20%] right-[-5%] w-[50vw] h-[50vw] radial-glow rounded-full"></div>
-    </div>
+  <script type="text/babel">
+    const { useState, useMemo, useEffect } = React;
 
-    <!-- Navegação com Ícones de Redes Sociais Atualizados -->
-    <nav class="fixed top-0 left-0 w-full z-50 glass border-b border-white/5 px-6 py-4">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <a href="#" class="flex items-center gap-2.5 group">
-                <div class="w-9 h-9 rounded-xl gradient-accent flex items-center justify-center text-white font-black shadow-lg shadow-indigo-500/20">
-                    <i class="fa-solid fa-shield-halved text-base"></i>
-                </div>
-                <div class="text-xl font-extrabold tracking-tight">
-                    LF<span class="text-indigo-400 group-hover:text-indigo-300 transition-colors">Assessoria</span>
-                </div>
-            </a>
-            
-            <div class="flex items-center gap-5">
-                <a href="https://instagram.com/lfassessoria.br" target="_blank" class="text-zinc-400 hover:text-white text-lg transition-colors" title="Instagram">
-                    <i class="fa-brands fa-instagram"></i>
-                </a>
-                <a href="https://tiktok.com/@lfassessoria.br" target="_blank" class="text-zinc-400 hover:text-white text-lg transition-colors" title="TikTok">
-                    <i class="fa-brands fa-tiktok"></i>
-                </a>
-                <a href="perfil.html" class="w-9 h-9 rounded-xl border border-white/10 hover:border-indigo-500/50 flex items-center justify-center text-zinc-400 hover:text-indigo-400 bg-zinc-900/40 hover:bg-indigo-500/10 transition-all ml-1" title="Área do Cliente">
-                    <i class="fa-solid fa-user-shield text-sm"></i>
-                </a>
-            </div>
-        </div>
-    </nav>
+    // --- ÍCONES ---
+    const ShieldCheck = ({className}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>;
+    const Instagram = ({className}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>;
+    const Facebook = ({className}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>;
+    const Mail = ({className}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>;
+    const Eye = ({className}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>;
+    const EyeOff = ({className}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>;
+    const Check = ({className}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>;
 
-    <!-- Header / Hero Section -->
-    <header class="relative pt-32 pb-12 md:pt-40 md:pb-16 px-6 z-10">
-        <div class="max-w-4xl mx-auto text-center">
-            
-            <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-tight mb-6">
-               Recupere sua conta com total segurança
-            </h1>
-            
-            <p class="text-zinc-400 text-base md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
-                Você no controle: só pague quando estiver com as contas em mãos! Escolha o valor que cabe no seu bolso, a partir de R$ 150.
-            </p>
-            
-            <!-- CTA 1: Botão Principal da Hero -->
-            <div class="flex flex-col sm:flex-row justify-center items-center gap-4 max-w-md mx-auto">
-                <a href="solicitar.html" class="w-full sm:w-auto px-8 py-4 rounded-xl font-bold text-center gradient-accent text-white hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-indigo-600/10 gradient-accent-hover">
-                   Fazer Orçamento
-                </a>
-                <a href="contas.html" class="w-full sm:w-auto px-8 py-4 rounded-xl font-bold text-center bg-zinc-900/80 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-800 hover:border-zinc-700 transition-colors">
-                  Acompanhamento
-                </a>
-            </div>
+    const App = () => {
+      const [formData, setFormData] = useState({
+        plataforma: '', usuario: '', emailVinculado: '', 
+        ultimaSenha: '', telefone: '', temAcessoTelefone: null,
+        dataNascimento: { dia: '', mes: '', ano: '' },
+        senhasAntigas: [''], nomeCliente: '', whatsapp: '',
+        instaReserva: '', qtdSeguidores: '', motivoQueda: '', dataPerda: '',
+        hackedEmailAlterado: null, suspendedReason: '',
+        juridicoChecked: false, juridicoOption: '100', 
+        customPriceChecked: false, customPriceValue: '',
+        blindagemOpcional: 'nao', // Corrigido valor inicial para 'nao'
+        payWithFollowers: false, payFollowersCount: '', 
+        fotoRostoPerfil: null, fotoRostoFeed: null,
+        indicadoPor: '' 
+      });
 
-            <div class="flex justify-center items-center gap-8 mt-14 pt-8 border-t border-zinc-900">
-                <div class="text-center">
-                    <div class="text-2xl font-black text-white">+300</div>
-                    <div class="text-[10px] text-zinc-500 uppercase tracking-widest font-bold">Contas Recuperadas</div>
-                </div>
-                <div class="w-px h-8 bg-zinc-800"></div>
-                <div class="text-center">
-                    <div class="text-2xl font-black text-white">72h</div>
-                    <div class="text-[10px] text-zinc-500 uppercase tracking-widest font-bold">Prazo Médio Análise</div>
-                </div>
-                <div class="w-px h-8 bg-zinc-800"></div>
-                <div class="text-center">
-                    <div class="text-2xl font-black text-emerald-400">82%</div>
-                    <div class="text-[10px] text-zinc-500 uppercase tracking-widest font-bold">Taxa de sucesso</div>
-                </div>
-            </div>
-        </div>
-    </header>
+      const [naoLembra, setNaoLembra] = useState({
+        usuario: false, emailVinculado: false, ultimaSenha: false, telefone: false
+      });
 
-    <!-- Seção: Como Funciona -->
-    <section id="como-funciona" class="py-16 px-6 relative z-10 scroll-mt-24 border-t border-zinc-900/60 bg-gradient-to-b from-transparent to-zinc-950/40">
-        <div class="max-w-6xl mx-auto">
-            <div class="text-center mb-12">
-                <span class="px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold tracking-wider uppercase inline-block mb-3">
-              saiba mais sobre a nossa equipe
-                </span>
-                <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
-                    Como recuperamos a sua conta?
-                </h2>
-                <p class="text-zinc-400 text-sm sm:text-base mt-2 max-w-xl mx-auto">
-                  Utilizamos métodos comuns a métodos avançados para recuperar a sua conta. Conheça as 4 etapas fundamentais.
-                </p>
-            </div>
+      const [showPass, setShowPass] = useState(false);
+      const [loading, setLoading] = useState(false);
+      const [isSubmitted, setIsSubmitted] = useState(false);
 
-            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 relative mb-12">
-                <!-- Linha de progresso no Desktop -->
-                <div class="hidden lg:block absolute top-1/2 left-4 right-4 h-0.5 bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-indigo-500/10 -translate-y-12 z-0"></div>
+      useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const ref = urlParams.get('ref');
+        if (ref) setFormData(prev => ({ ...prev, indicadoPor: ref }));
+      }, []);
 
-                <!-- Passo 1: Varredura Inicial com ícone militar/cyber de mira -->
-                <div class="glass glass-hover p-6 rounded-2xl relative z-10 flex flex-col justify-between min-h-[250px] overflow-hidden group">
-                    <div class="absolute -right-4 -top-4 w-24 h-24 bg-indigo-500/5 rounded-full blur-xl group-hover:bg-indigo-500/10 transition-all"></div>
-                    <div>
-                        <div class="flex justify-between items-center mb-6">
-                            <div class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 text-xl font-bold">
-                                <i class="fa-solid fa-crosshairs animate-pulse text-lg"></i>
-                            </div>
-                            <span class="font-mono text-3xl font-black text-indigo-500/20 group-hover:text-indigo-400/30 transition-colors">01</span>
-                        </div>
-                        <h4 class="text-white font-extrabold text-base mb-2 group-hover:text-indigo-300 transition-colors">1. Informe os Dados</h4>
-                        <p class="text-zinc-400 text-xs leading-relaxed">
-                            Você preenche nosso formulário com todas as informações necessárias para a recuperação, confirmando que apenas nós estamos recuperando a sua conta.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Passo 2 -->
-                <div class="glass glass-hover p-6 rounded-2xl relative z-10 flex flex-col justify-between min-h-[250px] overflow-hidden group">
-                    <div class="absolute -right-4 -top-4 w-24 h-24 bg-purple-500/5 rounded-full blur-xl group-hover:bg-purple-500/10 transition-all"></div>
-                    <div>
-                        <div class="flex justify-between items-center mb-6">
-                            <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 text-xl font-bold">
-                                <i class="fa-solid fa-clipboard-list"></i>
-                            </div>
-                            <span class="font-mono text-3xl font-black text-purple-500/20 group-hover:text-purple-400/30 transition-colors">02</span>
-                        </div>
-                        <h4 class="text-white font-extrabold text-base mb-2 group-hover:text-purple-300 transition-colors">2. Análise da Conta</h4>
-                        <p class="text-zinc-400 text-xs leading-relaxed">
-                            Nossa equipe técnica examina a gravidade do bloqueio ou invasão e projeta a melhor estratégia de contorno, do básico ao avançado.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Passo 3 -->
-                <div class="glass glass-hover p-6 rounded-2xl relative z-10 flex flex-col justify-between min-h-[250px] overflow-hidden group">
-                    <div class="absolute -right-4 -top-4 w-24 h-24 bg-blue-500/5 rounded-full blur-xl group-hover:bg-blue-500/10 transition-all"></div>
-                    <div>
-                        <div class="flex justify-between items-center mb-6">
-                            <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400 text-xl font-bold">
-                                <i class="fa-solid fa-gears"></i>
-                            </div>
-                            <span class="font-mono text-3xl font-black text-blue-500/20 group-hover:text-blue-400/30 transition-colors">03</span>
-                        </div>
-                        <h4 class="text-white font-extrabold text-base mb-2 group-hover:text-blue-300 transition-colors">3. Recuperação da Conta</h4>
-                        <p class="text-zinc-400 text-xs leading-relaxed">
-                            Com os dados fornecidos já conseguimos fazer a tentativa básica, caso não tenha êxito vamos pedir mais algumas informações da conta.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Passo 4 -->
-                <div class="glass glass-hover p-6 rounded-2xl relative z-10 flex flex-col justify-between min-h-[250px] overflow-hidden group">
-                    <div class="absolute -right-4 -top-4 w-24 h-24 bg-emerald-500/5 rounded-full blur-xl group-hover:bg-emerald-500/10 transition-all"></div>
-                    <div>
-                        <div class="flex justify-between items-center mb-6">
-                            <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-xl font-bold">
-                                <i class="fa-solid fa-handshake"></i>
-                            </div>
-                            <span class="font-mono text-3xl font-black text-emerald-500/20 group-hover:text-emerald-400/30 transition-colors">04</span>
-                        </div>
-                        <h4 class="text-white font-extrabold text-base mb-2 group-hover:text-emerald-300 transition-colors">4. Pagamento Final</h4>
-                        <p class="text-zinc-400 text-xs leading-relaxed">
-                            O valor total de recuperação da conta será feito quando estiver com a sua conta em mãos, voCê pode verificar o andamento em "Acompanhamento".
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- CTA 2: Botão de ação rápida abaixo das etapas -->
-            <div class="text-center pt-4">
-                <a href="solicitar.html" class="inline-flex items-center gap-3 px-8 py-4 rounded-xl font-bold bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 hover:bg-indigo-500 hover:text-white transition-all hover:shadow-[0_0_20px_rgba(99,102,241,0.2)]">
-                    <i class="fa-solid fa-shield-halved"></i>
-                    <span>Solicitar Agora Mesmo!</span>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Seção Exclusiva: Monitor de Contas Perdidas no Brasil -->
-    <section id="monitor-incidentes" class="py-12 px-6 relative z-10 scroll-mt-24 border-t border-zinc-900/60 bg-black/60">
-        <div class="max-w-5xl mx-auto">
-            <div class="glass rounded-3xl p-6 sm:p-10 border border-zinc-800 relative overflow-hidden bg-gradient-to-br from-zinc-950/80 to-zinc-900/40">
-                <div class="absolute top-0 right-0 w-96 h-96 bg-red-500/5 rounded-full blur-3xl pointer-events-none"></div>
-                
-                <div class="grid md:grid-cols-12 gap-8 items-center relative z-10">
-                    <div class="md:col-span-7 space-y-4 text-center md:text-left">
-                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold uppercase tracking-widest animate-pulse">
-                            <span class="w-2 h-2 rounded-full bg-red-500"></span>
-                            Brasil: suspensão em massa
-                        </div>
-                        <h3 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-tight">
-                            Monitor de Incidentes & <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-purple-400 to-indigo-400">Contas Suspensas</span>
-                        </h3>
-                        <p class="text-zinc-400 text-xs sm:text-sm leading-relaxed max-w-lg">
-                            Milhares de contas estão caindo no Brasil todos os dias injustamente por conta da atualização da Meta IA, todas têm probabilidades de voltar.
-                        </p>
-                    </div>
-
-                    <div class="md:col-span-5 flex flex-col justify-center items-center">
-                        <div class="w-full bg-zinc-950/90 p-6 rounded-2xl border border-zinc-800/80 shadow-2xl flex flex-col items-center justify-center text-center">
-                            <span class="text-[10px] text-zinc-500 font-mono tracking-widest uppercase font-bold mb-1">Contas derrubadas hoje</span>
-                            
-                            <!-- Contador Gigante Cripto com botão de Atualizar funcional -->
-                            <div class="flex items-baseline gap-1 font-mono text-red-500 text-4xl sm:text-5xl font-black tracking-wider py-4 transition-all duration-300" id="liveBreachedWrapper">
-                                <span id="liveDailyBreachedCounter" class="drop-shadow-[0_0_15px_rgba(239,68,68,0.3)]">0</span>
-                                <button onclick="manualCounterSync()" id="syncBtn" class="focus:outline-none" title="Atualizar dados de telemetria">
-                                    <i id="counterSyncIcon" class="fa-solid fa-arrows-rotate text-lg text-red-500/60 ml-2 cursor-pointer hover:text-red-400 hover:scale-110 active:scale-95 transition-all duration-500"></i>
-                                </button>
-                            </div>
-
-                            <div class="mt-2 p-3 rounded-xl bg-red-500/5 border border-red-500/10 text-[11px] text-red-300/90 flex items-center gap-2">
-                                <i class="fa-solid fa-triangle-exclamation text-xs animate-bounce"></i>
-                                <span>Número aproximado em tempo real conforme estatísticas.</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Seção: Análise (Seu e-mail está seguro?) -->
-    <section id="analise" class="py-16 px-6 relative z-10 scroll-mt-24">
-        <div class="max-w-6xl mx-auto">
-            
-            <div class="text-center mb-8 flex flex-col items-center">
-                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold mb-4">
-                    <i class="fa-solid fa-user-shield"></i>
-                    <span>VERIFIQUE O SEU-MAIL</span>
-                </div>
-                
-                <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-                    Seu e-mail está seguro?
-                </h2>
-                
-                <p class="text-sm sm:text-base text-zinc-400 mt-2 max-w-lg mx-auto">
-                   Verifique se seu e-mail possui senhas vazadas preenchendo os dados abaixo.
-                </p>
-            </div>
-
-            <div class="grid lg:grid-cols-12 gap-8 items-stretch">
-                
-                <div class="lg:col-span-5 flex flex-col justify-between glass p-6 sm:p-8 rounded-2xl relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl"></div>
-                    
-                    <div id="formContainer" class="relative z-10 space-y-6">
-                        <div class="flex items-center gap-3 pb-4 border-b border-zinc-800">
-                            <div class="w-10 h-10 rounded-xl bg-zinc-900 flex items-center justify-center text-indigo-400 border border-zinc-800">
-                                <i class="fa-solid fa-user-secret"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-bold text-white leading-none">Preencha Abaixo</h3>
-                                <span class="text-[11px] text-zinc-500">Seus dados são seguro conosco.</span>
-                            </div>
-                        </div>
-
-                        <form id="checkerForm" class="space-y-4">
-                            <div class="space-y-2">
-                                <label class="text-[11px] text-zinc-400 font-bold uppercase tracking-wider block">E-mail Alvo</label>
-                                <div class="relative">
-                                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-zinc-500">
-                                        <i class="fa-solid fa-envelope text-xs"></i>
-                                    </span>
-                                    <input type="email" id="checkEmail" placeholder="usuario@gmail.com" required
-                                        class="w-full bg-zinc-950 border border-zinc-800 hover:border-zinc-700 focus:border-indigo-500 p-4 pl-11 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all text-white">
-                                </div>
-                            </div>
-
-                            <div class="space-y-2">
-                                <label class="text-[11px] text-zinc-400 font-bold uppercase tracking-wider block">WhatsApp de Contato</label>
-                                <div class="relative">
-                                    <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-zinc-500">
-                                        <i class="fa-solid fa-comment-sms text-xs"></i>
-                                    </span>
-                                    <input type="text" id="checkWhatsapp" placeholder="(00) 00000-0000" required
-                                        class="w-full bg-zinc-950 border border-zinc-800 hover:border-zinc-700 focus:border-indigo-500 p-4 pl-11 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-all text-white phone-mask">
-                                </div>
-                            </div>
-
-                            <div class="pt-2">
-                                <button type="submit" id="submitBtn" class="w-full py-4 gradient-accent text-white rounded-xl font-bold hover:scale-[1.01] active:scale-95 transition-all flex items-center justify-center gap-3 text-sm shadow-lg shadow-indigo-600/10">
-                                    <i class="fa-solid fa-circle-notch animate-spin hidden" id="spinner"></i>
-                                    <span id="btnText"><i class="fa-solid fa-magnifying-glass-shield mr-1"></i> Analisar e-mail</span>
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <div id="successMessage" class="hidden relative z-10 flex flex-col justify-center h-full text-center py-6">
-                        <div class="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-2xl mx-auto mb-4">
-                            <i class="fa-solid fa-shield-check"></i>
-                        </div>
-                        <h4 class="font-extrabold text-white text-lg">Solicitação Registrada!</h4>
-                        <p class="text-xs text-zinc-400 mt-2 max-w-xs mx-auto leading-relaxed">
-                            O relatório preliminar e os detalhes técnicos de segurança da sua conta foram consolidados.
-                        </p>
-                        <div class="mt-6 p-3 bg-zinc-900/80 rounded-xl border border-zinc-800 text-[11px] text-zinc-400 max-w-xs mx-auto">
-                            <span class="text-white font-semibold">Próximo Passo:</span> Enviamos o diagnóstico detalhado com plano de ação agora no seu WhatsApp.
-                        </div>
-                        
-                        <!-- CTA 3 & 4: Links de Atendimento no Resultado do Scanner -->
-                        <div class="mt-6 flex flex-col gap-2">
-                            <a id="whatsappDirectLink" href="#" target="_blank" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-2">
-                                <i class="fa-brands fa-whatsapp text-sm"></i> Falar com Especialista No WhatsApp
-                            </a>
-                            <a href="solicitar.html" class="w-full py-3 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-file-invoice text-xs"></i> Abrir Chamado de Recuperação Formal
-                            </a>
-                            <button onclick="resetScanner()" class="text-xs text-zinc-500 hover:text-zinc-400 transition-colors mt-2">Fazer nova busca</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="lg:col-span-7 glass rounded-2xl p-6 flex flex-col justify-between border border-zinc-800 relative overflow-hidden bg-black/90 min-h-[460px]">
-                    
-                    <div class="absolute inset-0 pointer-events-none opacity-[0.03] bg-[linear-gradient(to_right,#808080_1px,transparent_1px),linear-gradient(to_bottom,#808080_1px,transparent_1px)] bg-[size:14px_24px]"></div>
-
-                    <div class="relative z-10 flex flex-col md:flex-row items-stretch gap-6 h-full flex-grow">
-                        
-                        <div class="flex-shrink-0 flex flex-col items-center justify-center md:w-52">
-                            <div class="relative w-44 h-44 rounded-full border border-zinc-800 flex items-center justify-center bg-zinc-950/60 shadow-inner overflow-hidden">
-                                
-                                <canvas id="radarCanvas" class="absolute inset-0 w-full h-full"></canvas>
-
-                                <div class="z-10 text-center font-mono bg-black/40 px-2 py-1 rounded-md pointer-events-none">
-                                    <span id="scanPercent" class="text-lg font-bold text-indigo-400">META</span>
-                                    <div class="text-[7px] text-zinc-500 tracking-wider">RADAR MONITOR</div>
-                                </div>
-                            </div>
-                            
-                            <div class="mt-4 flex flex-col items-center gap-1 text-center">
-                                <div class="flex items-center gap-1.5">
-                                    <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
-                                    <span class="text-[10px] font-mono text-zinc-400 tracking-widest uppercase">SYS: LF_SEC_V5</span>
-                                </div>
-                                <span class="text-[9px] text-zinc-600 font-mono" id="radarTargetCount">Vulnerabilidades: 0</span>
-                            </div>
-                        </div>
-
-                        <div class="w-full flex-grow flex flex-col justify-between font-mono text-[11px] text-zinc-400 bg-zinc-950/90 p-4 rounded-xl border border-zinc-900/80 min-h-[220px]">
-                            <div class="flex justify-between items-center pb-2 border-b border-zinc-900 text-[10px] text-zinc-500">
-                                <span class="flex items-center gap-1.5">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
-                                    SOC OPERACIONAL (BRASIL)
-                                </span>
-                                <span id="logStatus" class="text-indigo-400">PROCESSANDO...</span>
-                            </div>
-                            
-                            <div id="logContent" class="flex-grow overflow-y-auto space-y-1.5 py-3 h-[180px] max-h-[180px] pr-2 scroll-smooth">
-                            </div>
-                            
-                            <div class="flex justify-between items-center pt-2 border-t border-zinc-900 text-[9px] text-zinc-600">
-                                <div class="flex items-center gap-1">
-                                    <i class="fa-solid fa-server"></i>
-                                    <span>LF_DB_GLOBAL</span>
-                                </div>
-                                <span>v2.8.1-stable</span>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </section>
-
-    <!-- Seção: Indique e Ganhe -->
-    <section class="py-12 px-6 relative z-10">
-        <div class="max-w-5xl mx-auto">
-            <div class="relative rounded-3xl overflow-hidden glass border border-zinc-800 p-8 sm:p-12">
-                <div class="absolute -top-24 -right-24 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl"></div>
-                <div class="absolute -bottom-24 -left-24 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl"></div>
-
-                <div class="grid lg:grid-cols-12 gap-8 items-center relative z-10">
-                    <div class="lg:col-span-7 space-y-4 text-center lg:text-left">
-                        <span class="px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-wider inline-block">
-                            <i class="fa-solid fa-coins mr-1"></i> Indique e Ganhe
-                        </span>
-                        <h3 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white leading-tight">
-                            Indique clientes e seja pago no <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-indigo-400">Pix</span>
-                        </h3>
-                        <p class="text-zinc-400 text-sm sm:text-base leading-relaxed max-w-lg mx-auto lg:mx-0">
-                            Convide amigos para ter a sua conta recuperada com a gente, a cada conta com sucesso você recebe 25 reais no Pix!
-                        </p>
-                    </div>
-
-                    <div class="lg:col-span-5 flex flex-col justify-center">
-                        <div class="bg-zinc-950/80 p-3 rounded-2xl border border-white/5 shadow-2xl">
-                            <a href="indica.html" class="flex flex-col items-center justify-center gap-2 w-full py-8 px-4 rounded-xl gradient-accent hover:scale-[1.02] active:scale-95 transition-all group shadow-lg shadow-indigo-600/25">
-                                <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white text-xl mb-1 group-hover:scale-110 transition-transform">
-                                    <i class="fa-solid fa-wallet"></i>
-                                </div>
-                                <span class="font-extrabold text-base tracking-tight text-white text-center">OBTER LINK DE INDICAÇÃO</span>
-                            </a>
-                        </div>
-                    </div>
-                </div> 
-            </div>
-        </div>
-    </section>
-
-    <!-- Rodapé -->
-    <footer class="border-t border-zinc-900 py-8 px-6 text-center text-xs text-zinc-500 z-10 relative">
-        <p>© 2026 LF Assessoria de Recuperação Digital. Todos os direitos reservados.</p>
-    </footer>
-
-    <!-- POPUP DE PROVA SOCIAL -->
-    <div id="recoveryPopup" class="fixed bottom-6 left-6 z-50 glass max-w-sm p-4 rounded-2xl flex items-center gap-3 border border-indigo-500/20 shadow-2xl transition-all duration-500 translate-y-20 opacity-0">
-        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 text-lg flex-shrink-0">
-            <i class="fa-solid fa-circle-check"></i>
-        </div>
-        <div class="flex-grow">
-            <div class="flex items-center justify-between gap-4">
-                <span id="popupUser" class="text-xs font-bold text-white font-mono">@user***</span>
-                <span id="popupTime" class="text-[9px] text-zinc-500">há 10 min</span>
-            </div>
-            <p class="text-[11px] text-zinc-300 mt-0.5">Recuperou sua conta com sucesso em <span id="popupCity" class="text-indigo-400 font-semibold">Sobral - CE</span></p>
-        </div>
-        <button onclick="closePopup()" class="text-zinc-500 hover:text-zinc-300 transition-colors self-start p-1" title="Fechar">
-            <i class="fa-solid fa-xmark text-xs"></i>
-        </button>
-    </div>
-
-    <!-- Scripts de Interação -->
-    <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwVhek-QNwJE5yxTiF3D8NOmNvRugQbtRPMcsojjBJPH97LTXbJ8fqZYkWunvNSGDOW0g/exec"; 
-        const TOKEN_SECRETO = "RecoveryPro2024!@#SuperSeguro";
-
-        // Controle de logs ativos
-        let isUserScanning = false;
-
-        // Retornar o horário dinâmico formatado
-        function getFormattedTime() {
-            const now = new Date();
-            const hrs = String(now.getHours()).padStart(2, '0');
-            const mins = String(now.getMinutes()).padStart(2, '0');
-            const secs = String(now.getSeconds()).padStart(2, '0');
-            return `${hrs}:${mins}:${secs}`;
+      useEffect(() => {
+        if (isSubmitted) {
+          const timer = setTimeout(() => {
+            window.location.href = 'contas.html';
+          }, 4000);
+          return () => clearTimeout(timer);
         }
+      }, [isSubmitted]);
 
-        // Máscara dinâmica para o telefone do WhatsApp
-        document.querySelectorAll('.phone-mask').forEach(input => {
-            input.addEventListener('input', (e) => {
-                let x = e.target.value.replace(/\D/g, '').match(/(\d{0,2})(\d{0,5})(\d{0,4})/);
-                if (x) {
-                    e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
-                }
-            });
-        });
+      const applyPhoneMask = (v) => {
+        if (!v) return "";
+        v = v.replace(/\D/g, "");
+        if (v.length > 11) v = v.slice(0, 11);
+        if (v.length > 10) return v.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+        if (v.length > 5) return v.replace(/(\d{2})(\d{4})(\d{0,4})/, "($1) $2-$3");
+        if (v.length > 2) return v.replace(/(\d{2})(\d{0,5})/, "($1) $2");
+        if (v.length > 0) return v.replace(/(\d{0,2})/, "($1");
+        return v;
+      };
 
-        // Envio estruturado para o Google Sheets via WebApp
-        async function sendToSheet(payload) {
-            try {
-                await fetch(WEB_APP_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ token_secreto: TOKEN_SECRETO, ...payload })
-                });
-                return true;
-            } catch (err) { 
-                console.error("Erro na requisição externa:", err);
-                return false; 
-            }
+      const formatCurrency = (value) => {
+        let v = value.replace(/\D/g, "");
+        if (!v) return "";
+        let num = parseInt(v, 10) / 100;
+        if (num > 10000) num = 10000; 
+        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(num);
+      };
+
+      const parseCurrencyToInt = (formattedValue) => {
+        let v = formattedValue.replace(/\D/g, "");
+        if (!v) return 0;
+        return Math.floor(parseInt(v, 10) / 100);
+      };
+
+      const handleInstaUser = (val) => {
+        return val.toLowerCase().replace(/[^a-z0-9._]/g, '').slice(0, 30);
+      };
+
+      // --- VALOR NUMÉRICO FINAL DA OFERTA ATUAL ---
+      const currentOfferValue = useMemo(() => {
+        if (formData.customPriceChecked) {
+          const parsed = parseCurrencyToInt(formData.customPriceValue);
+          return parsed < 150 ? 150 : parsed;
         }
+        return parseInt(formData.juridicoOption, 10) || 100;
+      }, [formData.customPriceChecked, formData.customPriceValue, formData.juridicoOption]);
 
-        // ==========================================
-        //  SISTEMA DE RADAR CANVAS
-        // ==========================================
-        const canvas = document.getElementById('radarCanvas');
-        const ctx = canvas.getContext('2d');
-        const radarTargetCount = document.getElementById('radarTargetCount');
+      // --- TEXTOS E CORES DA BARRA DE OFERTA ---
+      const rangeStatus = useMemo(() => {
+        const val = currentOfferValue;
+        if (val < 150) return { label: 'INFERIOR A TODO MUNDO', color: 'text-red-500', barColor: 'bg-red-500' };
+        if (val < 400) return { label: 'MÉDIA DAS SOLICITAÇÕES', color: 'text-orange-500', barColor: 'bg-orange-500' };
+        if (val < 1000) return { label: 'Oferta acima da médiA', color: 'text-yellow-500', barColor: 'bg-yellow-500' };
+        if (val < 2500) return { label: 'Alta prioridade', color: 'text-emerald-400', barColor: 'bg-emerald-400' };
+        return { label: 'Prioridade Máxima', color: 'text-emerald-500 font-extrabold shadow-sm', barColor: 'bg-emerald-600' };
+      }, [currentOfferValue]);
+
+      const probabilidade = useMemo(() => {
+        if (!formData.plataforma) return 0;
+        let score = 0;
+
+        if (formData.motivoQueda === 'ERRO AO ENTRAR') score += 5;
+        if (formData.suspendedReason === 'Não segue nossas diretrizes') score += 5;
+        if (formData.suspendedReason === 'Propriedade Intelectual / Direitos Autorais') score += 5;
         
-        let width = canvas.offsetWidth;
-        let height = canvas.offsetHeight;
-        let scale = window.devicePixelRatio || 1;
-
-        function resizeCanvas() {
-            width = canvas.parentElement.clientWidth;
-            height = canvas.parentElement.clientHeight;
-            canvas.width = width * scale;
-            canvas.height = height * scale;
-            ctx.scale(scale, scale);
-        }
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
-
-        let sweepAngle = 0;
-        const sweepSpeed = 0.025; 
-        const dots = [];
-
-        function polarToCartesian(centerX, centerY, radius, angle) {
-            return {
-                x: centerX + radius * Math.cos(angle),
-                y: centerY + radius * Math.sin(angle)
-            };
+        if (formData.dataPerda) {
+          const dataMilli = new Date(formData.dataPerda).getTime();
+          const hojeMilli = new Date().getTime();
+          const diffDias = (hojeMilli - dataMilli) / (1000 * 60 * 60 * 24);
+          if (diffDias <= 7) score += 5;
         }
 
-        function spawnRadarDot() {
-            if (dots.length >= 4) return; 
-            
-            const centerX = width / 2;
-            const centerY = height / 2;
-            const maxRadius = Math.min(centerX, centerY) - 10;
-            
-            const radius = Math.random() * (maxRadius - 20) + 20;
-            const angle = Math.random() * Math.PI * 2;
-            const coords = polarToCartesian(centerX, centerY, radius, angle);
-            
-            dots.push({
-                x: coords.x,
-                y: coords.y,
-                radius: radius,
-                angle: angle,
-                size: Math.random() * 2 + 1.5,
-                opacity: 0,
-                targetOpacity: 0.7,
-                detected: false,
-                isDying: false,
-                sparkle: 0
-            });
-            updateRadarCount();
-        }
+        const senhasAntigasPreenchidas = formData.senhasAntigas.filter(s => s.length >= 4);
+        if (senhasAntigasPreenchidas.includes(formData.ultimaSenha) && formData.ultimaSenha.length > 0) score += 5;
 
-        function updateRadarCount() {
-            radarTargetCount.textContent = `Vulnerabilidades: ${dots.filter(d => !d.isDying).length}`;
-        }
-
-        function animateRadar() {
-            ctx.clearRect(0, 0, width, height);
-            
-            const centerX = width / 2;
-            const centerY = height / 2;
-            const maxRadius = Math.min(centerX, centerY) - 8;
-
-            ctx.strokeStyle = 'rgba(99, 102, 241, 0.08)';
-            ctx.lineWidth = 1;
-            for (let r = maxRadius; r > 0; r -= maxRadius / 4) {
-                ctx.beginPath();
-                ctx.arc(centerX, centerY, r, 0, Math.PI * 2);
-                ctx.stroke();
-            }
-
-            ctx.beginPath();
-            ctx.moveTo(centerX - maxRadius, centerY);
-            ctx.lineTo(centerX + maxRadius, centerY);
-            ctx.moveTo(centerX, centerY - maxRadius);
-            ctx.lineTo(centerX, centerY + maxRadius);
-            ctx.stroke();
-
-            sweepAngle = (sweepAngle + sweepSpeed) % (Math.PI * 2);
-
-            ctx.save();
-            ctx.translate(centerX, centerY);
-            ctx.rotate(sweepAngle);
-            
-            ctx.strokeStyle = 'rgba(99, 102, 241, 0.6)';
-            ctx.lineWidth = 1.5;
-            ctx.beginPath();
-            ctx.moveTo(0, 0);
-            ctx.lineTo(maxRadius, 0);
-            ctx.stroke();
-
-            const gradientSegments = 60;
-            for (let i = 0; i < gradientSegments; i++) {
-                const alpha = (1 - (i / gradientSegments)) * 0.12;
-                ctx.strokeStyle = `rgba(99, 102, 241, ${alpha})`;
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.moveTo(0, 0);
-                const segAngle = -i * (Math.PI / 180) * 0.8;
-                ctx.lineTo(maxRadius * Math.cos(segAngle), maxRadius * Math.sin(segAngle));
-                ctx.stroke();
-            }
-            ctx.restore();
-
-            for (let i = dots.length - 1; i >= 0; i--) {
-                const dot = dots[i];
-
-                if (dot.opacity < dot.targetOpacity && !dot.isDying) {
-                    dot.opacity += 0.05;
-                }
-
-                let angleDiff = sweepAngle - dot.angle;
-                while (angleDiff < 0) angleDiff += Math.PI * 2;
-                while (angleDiff > Math.PI * 2) angleDiff -= Math.PI * 2;
-
-                if (angleDiff < 0.08 && angleDiff > 0 && !dot.detected && !dot.isDying) {
-                    dot.detected = true;
-                    dot.isDying = true;
-                    dot.sparkle = 1.0; 
-                }
-
-                if (dot.isDying) {
-                    dot.sparkle -= 0.05;
-                    dot.opacity -= 0.03;
-                    
-                    if (dot.sparkle < 0) dot.sparkle = 0;
-                    
-                    if (dot.opacity <= 0) {
-                        dots.splice(i, 1);
-                        updateRadarCount();
-                        continue;
-                    }
-                }
-
-                const drawOpacity = Math.max(dot.opacity, 0);
-                ctx.shadowBlur = dot.isDying ? 15 : 6;
-                ctx.shadowColor = 'rgba(239, 68, 68, 0.8)';
-                
-                ctx.fillStyle = dot.isDying 
-                    ? `rgba(255, 100, 100, ${drawOpacity})` 
-                    : `rgba(239, 68, 68, ${drawOpacity})`;
-                ctx.beginPath();
-                ctx.arc(dot.x, dot.y, dot.size + (dot.sparkle * 4), 0, Math.PI * 2);
-                ctx.fill();
-
-                if (dot.isDying) {
-                    ctx.strokeStyle = `rgba(239, 68, 68, ${dot.sparkle * 0.7})`;
-                    ctx.lineWidth = 1;
-                    ctx.beginPath();
-                    ctx.arc(dot.x, dot.y, dot.size + ((1 - dot.sparkle) * 16), 0, Math.PI * 2);
-                    ctx.stroke();
-                }
-
-                ctx.shadowBlur = 0;
-            }
-
-            requestAnimationFrame(animateRadar);
-        }
-
-        setInterval(spawnRadarDot, 3200); 
-        spawnRadarDot();
-        animateRadar();
-
-
-        // ==========================================
-        //  SISTEMA TERMINAL DE LOGS DO BRASIL
-        // ==========================================
-        const logContent = document.getElementById('logContent');
-        const scanPercent = document.getElementById('scanPercent');
-        const logStatus = document.getElementById('logStatus');
-
-        const brazillianCities = [
-            "Sobral - CE", "Crato - CE", "Chapecó - SC", "Sinop - MT", "Iguatu - CE",
-            "Catalão - GO", "Ilhéus - BA", "Araguaína - TO", "Bagé - RS", "Itapipoca - CE",
-            "Cachoeiro de Itapemirim - ES", "Codó - MA", "Parnaíba - PI", "Rio Verde - GO", 
-            "Arapiraca - AL", "Garanhuns - PE", "Cabo Frio - RJ", "Ourinhos - SP", "Aquiraz - CE",
-            "Bragança Paulista - SP", "Ji-Paraná - RO", "Pato Branco - PR", "Rolândia - PR",
-            "Teófilo Otoni - MG", "Caruaru - PE", "Marabá - PA", "Passo Fundo - RS", "Limeira - SP"
-        ];
-
-        const maskedUsernames = [
-            "lup***", "car***", "fel***", "ana***", "mic***", "gus***", "loj***", 
-            "enc***", "pvd***", "rob***", "jul***", "bru***", "pat***", "gab***", 
-            "mar***", "sup***", "ale***", "ric***", "clo***", "ped***"
-        ];
-
-        const logTypes = {
-            secured: {
-                color: 'text-emerald-400',
-                label: 'SEC_RESTORED',
-                templates: [
-                    "Sessão do perfil @{user} reestabelecida e segura em {city}.",
-                    "Vínculo de segurança revalidado com sucesso para a conta de {city}.",
-                    "Engenharia de bypass contornada. Conta @{user} reabilitada em {city}."
-                ]
-            },
-            mitigated: {
-                color: 'text-red-400',
-                label: 'ATTEMPT_BLOCKED',
-                templates: [
-                    "Tentativa de login não autorizado bloqueada no e-mail de @{user} em {city}.",
-                    "Ataque de força bruta por dicionário mitigado no IP de {city}.",
-                    "Sessão de autenticação suspeita revogada preventivamente em {city}."
-                ]
-            },
-            system: {
-                color: 'text-indigo-400',
-                label: 'SYS_MAINTENANCE',
-                templates: [
-                    "Sincronização global concluída com novos relatórios estruturais de dados.",
-                    "Análise preditiva de segurança ativada no gateway principal da rede.",
-                    "Servidores proxy reconfigurados e blindados contra varreduras de terceiros."
-                ]
-            }
-        };
-
-        function persistTerminalState() {
-            const currentLogs = [];
-            logContent.querySelectorAll('div').forEach(line => {
-                currentLogs.push({
-                    html: line.innerHTML,
-                    class: line.className
-                });
-            });
-            localStorage.setItem('lf_saved_terminal_logs', JSON.stringify(currentLogs));
-        }
-
-        function loadTerminalState() {
-            const rawLogs = localStorage.getItem('lf_saved_terminal_logs');
-            if (rawLogs) {
-                try {
-                    const parsedLogs = JSON.parse(rawLogs);
-                    logContent.innerHTML = '';
-                    parsedLogs.forEach(log => {
-                        const line = document.createElement('div');
-                        line.className = log.class;
-                        line.innerHTML = log.html;
-                        logContent.appendChild(line);
-                    });
-                    logContent.scrollTop = logContent.scrollHeight;
-                    return true;
-                } catch (e) {
-                    console.error("Inconsistência nos logs recuperados.", e);
-                }
-            }
-            return false;
-        }
-
-        function addTerminalLine(text, cssClass = 'text-zinc-400', rawPrefix = '', save = true) {
-            const line = document.createElement('div');
-            line.className = `${cssClass} leading-relaxed transition-all duration-300 transform translate-y-2 opacity-0`;
-            
-            const prefix = `<span class="text-zinc-600 font-bold">[${getFormattedTime()}]</span> <span class="opacity-75">${rawPrefix}</span>`;
-            line.innerHTML = `${prefix}${text}`;
-            
-            logContent.appendChild(line);
-            
-            setTimeout(() => {
-                line.classList.remove('translate-y-2', 'opacity-0');
-            }, 10);
-
-            logContent.scrollTop = logContent.scrollHeight;
-
-            if (logContent.children.length > 30) {
-                logContent.removeChild(logContent.firstChild);
-            }
-
-            if (save) {
-                persistTerminalState();
-            }
-        }
-
-        function generateLiveLog() {
-            if (isUserScanning) return; 
-
-            const randomChance = Math.random();
-            let category;
-            
-            if (randomChance < 0.40) {
-                category = 'secured';
-            } else if (randomChance < 0.90) {
-                category = 'mitigated';
-            } else {
-                category = 'system';
-            }
-
-            const info = logTypes[category];
-            const city = brazillianCities[Math.floor(Math.random() * brazillianCities.length)];
-            const user = maskedUsernames[Math.floor(Math.random() * maskedUsernames.length)] + Math.floor(Math.random() * 90 + 10);
-            
-            const template = info.templates[Math.floor(Math.random() * info.templates.length)];
-            const message = template.replace('{city}', city).replace('{user}', user);
-
-            addTerminalLine(message, info.color, `${info.label} &gt; `);
-        }
-
-        function scheduleNextLog() {
-            const randomDelay = Math.floor(Math.random() * 11000) + 1000; 
-            setTimeout(() => {
-                generateLiveLog();
-                scheduleNextLog();
-            }, randomDelay);
-        }
-
-        const loadedPrevLogs = loadTerminalState();
-
-        if (!loadedPrevLogs) {
-            setTimeout(() => addTerminalLine("Kernel operacional iniciado.", "text-indigo-300", "SYS_STARTUP &gt; "), 100);
-            setTimeout(() => addTerminalLine("Monitoramento dinâmico ativo no território nacional.", "text-zinc-500", "SEC_ACTIVE &gt; "), 400);
-            setTimeout(() => generateLiveLog(), 800);
-            setTimeout(() => generateLiveLog(), 2000);
-        }
-
-        scheduleNextLog();
-
-
-        // ==========================================
-        //  MECÂNICA DE ANÁLISE DO FORMULÁRIO DO USUÁRIO
-        // ==========================================
-        function runUserSimulatedScanner(emailInput, whatsappInput, onComplete) {
-            isUserScanning = true;
-            logStatus.textContent = "ANALISANDO...";
-            logStatus.className = "text-yellow-400 animate-pulse";
-            scanPercent.textContent = "WAIT";
-            scanPercent.className = "text-yellow-400 font-bold";
-            
-            logContent.innerHTML = ''; 
-
-            const userSpecificLogs = [
-                { text: "INICIANDO VARREDURA EXCLUSIVA DE SEGURANÇA", type: "system", delay: 100 },
-                { text: `Alvo do Escaneamento estrutural: ${emailInput}`, type: "info", delay: 400 },
-                { text: "Cruzando logs de vazamentos cibernéticos registrados (2025-2026)...", type: "info", delay: 800 },
-                { text: "[ALERTA] Porta de segurança compromised ou credenciais expostas identificadas.", type: "warn", delay: 1400 },
-                { text: "Gerando diagnóstico preventivo criptografado...", type: "info", delay: 2000 },
-                { text: "Análise de integridade de identidade concluída.", type: "success", delay: 2600 }
-            ];
-
-            let progress = 0;
-            const progressInterval = setInterval(() => {
-                if (progress < 100) {
-                    progress += 2;
-                    scanPercent.textContent = `${progress}%`;
-                } else {
-                    clearInterval(progressInterval);
-                }
-            }, 50);
-
-            userSpecificLogs.forEach(log => {
-                setTimeout(() => {
-                    let textClass = 'text-zinc-400';
-                    let label = 'SEC_CHECK';
-                    
-                    if (log.type === 'system') {
-                        textClass = 'text-indigo-400 font-bold';
-                        label = 'USER_SCAN';
-                    } else if (log.type === 'warn') {
-                        textClass = 'text-red-400 font-bold';
-                        label = 'VULN_DETECTED';
-                        
-                        const centerX = width / 2;
-                        const centerY = height / 2;
-                        dots.push({
-                            x: centerX + (Math.random() * 40 - 20),
-                            y: centerY + (Math.random() * 40 - 20),
-                            radius: 30,
-                            angle: sweepAngle + 0.5,
-                            size: 5.5,
-                            opacity: 1,
-                            targetOpacity: 1,
-                            detected: false,
-                            isDying: false,
-                            sparkle: 0
-                        });
-                        updateRadarCount();
-                    } else if (log.type === 'success') {
-                        textClass = 'text-emerald-400';
-                        label = 'SYS_REPORT';
-                    }
-
-                    addTerminalLine(log.text, textClass, `${label} &gt; `);
-                }, log.delay);
-            });
-
-            setTimeout(() => {
-                logStatus.textContent = "CONCLUÍDO";
-                logStatus.className = "text-emerald-400";
-                scanPercent.textContent = "SAFE";
-                scanPercent.className = "text-emerald-400 font-bold";
-                onComplete();
-            }, 3000);
-        }
-
-        document.getElementById('checkerForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const btn = document.getElementById('submitBtn');
-            const spinner = document.getElementById('spinner');
-            const btnText = document.getElementById('btnText');
-            
-            const emailValue = document.getElementById('checkEmail').value;
-            const whatsappValue = document.getElementById('checkWhatsapp').value;
-
-            btn.disabled = true;
-            spinner.classList.remove('hidden');
-            btnText.textContent = "REQUISITANDO ESCANEAMENTO...";
-
-            await sendToSheet({
-                tipo: "lead",
-                identificador: emailValue,
-                whatsapp: whatsappValue
-            });
-
-            runUserSimulatedScanner(emailValue, whatsappValue, () => {
-                document.getElementById('formContainer').classList.add('hidden');
-                
-                const dddAndPhone = whatsappValue.replace(/\D/g, '');
-                const directWhatsappMsg = encodeURIComponent(
-                    `Olá LF Assessoria! Acabei de fazer a verificação de segurança no site para o e-mail (${emailValue}) e preciso de suporte com a reabilitação da minha conta.`
-                );
-                const wpLink = `https://wa.me/55${dddAndPhone}?text=${directWhatsappMsg}`;
-                document.getElementById('whatsappDirectLink').href = wpLink;
-                
-                document.getElementById('successMessage').classList.remove('hidden');
-            });
-        });
-
-        function resetScanner() {
-            document.getElementById('checkerForm').reset();
-            document.getElementById('formContainer').classList.remove('hidden');
-            document.getElementById('successMessage').classList.add('hidden');
-            
-            const btn = document.getElementById('submitBtn');
-            const spinner = document.getElementById('spinner');
-            const btnText = document.getElementById('btnText');
-            
-            btn.disabled = false;
-            spinner.classList.add('hidden');
-            btnText.innerHTML = `<i class="fa-solid fa-magnifying-glass-shield mr-1"></i> INICIAR ESCANEAMENTO`;
-            
-            isUserScanning = false;
-            scanPercent.textContent = "ATIVO";
-            scanPercent.className = "text-indigo-400 font-bold";
-            logStatus.textContent = "PROCESSANDO...";
-            logStatus.className = "text-indigo-400";
-            logContent.innerHTML = '';
-            
-            addTerminalLine("Conexão operacional normalizada em segundo plano.", "text-indigo-300", "SYS_RESET &gt; ");
-            generateLiveLog();
-        }
-
-        // ==========================================
-        //  SISTEMA DO POPUP DE PROVA SOCIAL DOURADA (LIMITADO - NÃO REPETE)
-        // ==========================================
-        const popupSuccessStories = [
-            { id: "cs_01", user: "emy***", city: "Campinas - SP", date: "2026-06-02T12:15:00-03:00" },
-            { id: "cs_02", user: "cla***", city: "Blumenau - SC", date: "2026-06-02T11:45:00-03:00" },
-            { id: "cs_03", user: "ama***", city: "Sobral - CE", date: "2026-05-29T08:30:00-03:00" },
- 
-        ];
-
-        function getRelativeTime(isoDateString) {
-            const past = new Date(isoDateString);
-            const now = new Date();
-            const differenceInMs = now - past;
-
-            if (differenceInMs < 0) {
-                return "agora mesmo";
-            }
-
-            const differenceInMins = Math.floor(differenceInMs / (1000 * 60));
-            const differenceInHrs = Math.floor(differenceInMs / (1000 * 60 * 60));
-            const differenceInDays = Math.floor(differenceInMs / (1000 * 60 * 60 * 24));
-
-            if (differenceInMins < 60) {
-                return `há ${differenceInMins} ${differenceInMins === 1 ? 'minuto' : 'minutos'}`;
-            } else if (differenceInHrs < 24) {
-                return `há ${differenceInHrs} ${differenceInHrs === 1 ? 'hora' : 'horas'}`;
-            } else {
-                return `há ${differenceInDays} ${differenceInDays === 1 ? 'dia' : 'dias'}`;
-            }
-        }
-
-        function getShownStoryIds() {
-            const stored = localStorage.getItem('lf_shown_popup_stories');
-            return stored ? JSON.parse(stored) : [];
-        }
-
-        function registerStoryAsShown(id) {
-            const current = getShownStoryIds();
-            if (!current.includes(id)) {
-                current.push(id);
-                localStorage.setItem('lf_shown_popup_stories', JSON.stringify(current));
-            }
-        }
-
-        function showNextStory() {
-            if (localStorage.getItem('lf_popup_dismissed') === 'true') {
-                return;
-            }
-
-            const popup = document.getElementById('recoveryPopup');
-            const shownIds = getShownStoryIds();
-            
-            const remainingStories = popupSuccessStories.filter(story => !shownIds.includes(story.id));
-            
-            // SE NÃO HOUVER MAIS HISTÓRIAS, FECHA O POPUP E CANCELA A REPETIÇÃO
-            if (remainingStories.length === 0) {
-                popup.classList.add('translate-y-20', 'opacity-0');
-                popup.style.pointerEvents = 'none';
-                return;
-            }
-
-            const targetStory = remainingStories[0];
-
-            popup.classList.add('translate-y-20', 'opacity-0');
-            
-            setTimeout(() => {
-                document.getElementById('popupUser').textContent = `@${targetStory.user}`;
-                document.getElementById('popupCity').textContent = targetStory.city;
-                document.getElementById('popupTime').textContent = getRelativeTime(targetStory.date);
-                
-                popup.classList.remove('translate-y-20', 'opacity-0');
-                registerStoryAsShown(targetStory.id);
-            }, 700);
-        }
-
-        function closePopup() {
-            const popup = document.getElementById('recoveryPopup');
-            popup.classList.add('translate-y-20', 'opacity-0');
-            popup.style.pointerEvents = 'none';
-            localStorage.setItem('lf_popup_dismissed', 'true');
-        }
-
-        setTimeout(() => {
-            showNextStory();
-            setInterval(showNextStory, 10000);
-        }, 3000);
-
-
-        // ==========================================
-        //  SISTEMA DO CONTADOR DIÁRIO DE CONTAS PERDIDAS
-        //  COMEÇA DO 0 ÀS 00:00 E SOBE ATÉ UM NÚMERO SELECIONADO ENTRE 1.355 E 2.751 ÀS 23:59
-        // ==========================================
+        if (formData.suspendedReason === 'Detectamos atividade suspeita em sua conta') score += 15;
+        if (formData.suspendedReason === 'Ajude-nos a confirmar que esta conta é sua') score += 15;
+        if (formData.suspendedReason === 'Suspensão por 180 dias') score += 15;
+        if (formData.motivoQueda === 'PERDEU A SENHA') score += 10;
+        if (formData.hackedEmailAlterado === 'nao') score += 10;
         
-        // Função semente de números pseudo-aleatórios estável para o dia
-        function getSeededRandom(seedStr) {
-            let hash = 0;
-            for (let i = 0; i < seedStr.length; i++) {
-                hash = seedStr.charCodeAt(i) + ((hash << 5) - hash);
-            }
-            const x = Math.sin(hash++) * 10000;
-            return x - Math.floor(x);
+        if (formData.dataPerda) {
+          const dataMilli = new Date(formData.dataPerda).getTime();
+          const hojeMilli = new Date().getTime();
+          const diffDias = (hojeMilli - dataMilli) / (1000 * 60 * 60 * 24);
+          if (diffDias <= 2) score += 15;
         }
 
-        // Definindo de forma consistente o limite operacional de hoje entre 1355 e 2751
-        const seedDateString = new Date().toDateString();
-        const dailySeededRand = getSeededRandom(seedDateString);
-        const MAX_DAILY_TARGET = Math.floor(dailySeededRand * (2751 - 1355 + 1)) + 1355;
-
-        const counterElement = document.getElementById('liveDailyBreachedCounter');
-        const counterWrapper = document.getElementById('liveBreachedWrapper');
-        const counterSyncIcon = document.getElementById('counterSyncIcon');
-        let isSyncing = false;
-
-        // Retorna a fração decimal do dia decorrida (0 a 1)
-        function getDayProgressFraction() {
-            const now = new Date();
-            const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
-            const secondsElapsed = (now.getTime() - midnight.getTime()) / 1000;
-            return Math.min(secondsElapsed / 86400, 1); // 86400s no dia
+        const email = formData.emailVinculado.toLowerCase();
+        if (email.length > 5) {
+          score += 10;
+          if (email.includes('@gmail.com') || email.includes('@hotmail.com')) score += 5;
         }
 
-        function calculateCurrentProgressCount() {
-            const dayFraction = getDayProgressFraction();
-            return Math.floor(dayFraction * MAX_DAILY_TARGET);
+        if (formData.ultimaSenha.length >= 4 && !naoLembra.ultimaSenha) score += 10;
+        if (formData.telefone.replace(/\D/g, '').length === 11) score += 10;
+        if (formData.temAcessoTelefone === 'sim') score += 15;
+        
+        // Peso dinâmico baseado na oferta financeira para resgatar
+        if (currentOfferValue >= 400) score += 10;
+        if (currentOfferValue >= 1000) score += 10;
+        if (currentOfferValue >= 2500) score += 10;
+
+        const senhasUnicas = [...new Set(senhasAntigasPreenchidas)];
+        if (senhasUnicas.length === 2 || senhasUnicas.length === 3) score += 10;
+
+        if (formData.fotoRostoPerfil === 'sim' || formData.fotoRostoFeed === 'sim') score += 10;
+
+        if (naoLembra.usuario) score -= 15;
+        if (formData.hackedEmailAlterado === 'sim') score -= 15;
+        
+        const motivosGraves = ['Exploração Infantil (CSE / NCMEC)', 'Organizações Perigosas ou Terrorismo', 'Uso de Automação ou Compra de Seguidores', 'Nudez ou Atividade Sexual', 'Decisão Final - Esta conta não pode ser revisada'];
+        if (motivosGraves.includes(formData.suspendedReason)) score -= 20;
+
+        if (formData.dataPerda) {
+          const anosAtras = new Date().getFullYear() - new Date(formData.dataPerda).getFullYear();
+          if (anosAtras >= 2) score -= 20;
         }
 
-        let lastCountValue = calculateCurrentProgressCount();
+        if (formData.fotoRostoPerfil === 'nao' && formData.fotoRostoFeed === 'nao') score -= 15;
 
-        // Atualização inicial do contador
-        if (counterElement) {
-            counterElement.textContent = lastCountValue.toLocaleString('pt-BR');
+        let total = Math.max(0, score);
+        return Math.min(total, 90);
+      }, [formData, naoLembra, currentOfferValue]);
+
+      const colorClass = useMemo(() => {
+        if (probabilidade < 30) return 'text-red-500';
+        if (probabilidade < 60) return 'text-yellow-500';
+        return 'text-emerald-500';
+      }, [probabilidade]);
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        const API_URL = "https://script.google.com/macros/s/AKfycbyOwSJTt4GPDorOdQRDFazifkQtCfP0FmCpbktauaHjORnjXeS-bPbUXcXWZQr1n14giQ/exec"; 
+        
+        try {
+          const finalPayload = { 
+            ...formData, 
+            juridicoOption: String(currentOfferValue),
+            probabilidade, 
+            dataEnvio: new Date().toLocaleString() 
+          };
+          await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(finalPayload) });
+          setLoading(false);
+          setIsSubmitted(true);
+        } catch (error) {
+          alert("Erro ao enviar. Verifique sua conexão.");
+          setLoading(false);
         }
+      };
 
-        // Função de Atualização Manual Clicável (Comportamento de sincronização real)
-        function manualCounterSync() {
-            if (isSyncing) return;
-            isSyncing = true;
+      if (isSubmitted) {
+        return (
+          <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6 text-slate-100 text-center">
+            <div className="max-w-md w-full bg-slate-900 border border-emerald-500/30 rounded-[3rem] p-10 shadow-2xl space-y-6">
+              <div className="relative mx-auto w-24 h-24">
+                <div className="absolute inset-0 bg-emerald-500/20 rounded-full animate-ping"></div>
+                <div className="relative w-24 h-24 bg-emerald-500/20 rounded-full flex items-center justify-center border border-emerald-500/50">
+                  <Check className="w-12 h-12 text-emerald-400" />
+                </div>
+              </div>
+              <h2 className="text-3xl font-bold">Concluído!</h2>
+              <div className="bg-slate-800/50 p-4 rounded-2xl flex items-center justify-center gap-3 border border-slate-700">
+                <div className="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                <p className="text-sm font-medium text-indigo-300">Estamos levando você ao painel, aguarde...</p>
+              </div>
+            </div>
+          </div>
+        );
+      }
 
-            // Ativa rotação infinita no ícone de atualização
-            if (counterSyncIcon) {
-                counterSyncIcon.classList.add('fa-spin', 'text-white');
-            }
+      return (
+        <div className="min-h-screen text-slate-100 p-4 md:p-8 font-sans max-w-4xl mx-auto">
+          <header className="flex items-center justify-between mb-12">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-indigo-600 rounded-2xl shadow-lg shadow-indigo-500/20">
+                <ShieldCheck className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold">LF<span className="text-indigo-400">Assessoria</span></h1>
+                <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest">RECUPERAÇÃO DIGITAL</p>
+              </div>
+            </div>
+          </header>
 
-            // Exibe estado de carregamento de dados
-            if (counterElement) {
-                counterElement.classList.add('opacity-40');
-                counterElement.textContent = "---";
-            }
+          {formData.plataforma && (
+            <div className="fixed bottom-6 right-6 z-50">
+              <div className="bg-slate-900/90 border border-slate-800 p-4 rounded-2xl shadow-2xl backdrop-blur-md flex items-center gap-4">
+                <div className="relative w-12 h-12">
+                  <svg className="w-full h-full transform -rotate-90">
+                    <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="4" fill="transparent" className="text-slate-800" />
+                    <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="4" fill="transparent" strokeDasharray={125.6} strokeDashoffset={125.6 - (125.6 * probabilidade) / 100} className={`${colorClass} transition-all duration-700`} />
+                  </svg>
+                  <span className={`absolute inset-0 flex items-center justify-center text-[10px] font-bold ${colorClass}`}>{probabilidade}%</span>
+                </div>
+                <p className="text-[10px] text-slate-500 uppercase font-bold">Chance de<br/>Sucesso</p>
+              </div>
+            </div>
+          )}
 
-            setTimeout(() => {
-                const freshValue = calculateCurrentProgressCount();
-                lastCountValue = freshValue;
+          <form onSubmit={handleSubmit} className="space-y-8 pb-32">
+            
+            <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
+              <h2 className="text-xl font-semibold mb-6">Selecione a plataforma:</h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[
+                  { id: 'insta', icon: Instagram, label: 'Instagram', color: 'hover:border-pink-500' },
+                  { id: 'face', icon: Facebook, label: 'Facebook', color: 'hover:border-blue-500' },
+                  { id: 'google', icon: Mail, label: 'Gmail / Google', color: 'hover:border-red-500' },
+                  { id: 'outros', icon: ShieldCheck, label: 'Outros', color: 'hover:border-indigo-500' }
+                ].map((plat) => (
+                  <button key={plat.id} type="button" onClick={() => setFormData({ ...formData, plataforma: plat.id })} className={`flex flex-col items-center justify-center p-6 rounded-3xl border-2 transition-all ${formData.plataforma === plat.id ? 'bg-indigo-600/10 border-indigo-500' : 'bg-slate-800/50 border-transparent ' + plat.color}`}>
+                    <plat.icon className={`w-8 h-8 mb-3 ${formData.plataforma === plat.id ? 'text-indigo-400' : 'text-slate-400'}`} />
+                    <span className="font-medium text-sm">{plat.label}</span>
+                  </button>
+                ))}
+              </div>
+            </section>
 
-                if (counterElement) {
-                    counterElement.textContent = lastCountValue.toLocaleString('pt-BR');
-                    counterElement.classList.remove('opacity-40');
-                }
+          {formData.plataforma && (
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                
+              {formData.plataforma === 'insta' && (
+                <>
+                  <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
+                    <h2 className="text-xl font-semibold mb-6">Nome de Usuário</h2>
+                    <div className="relative">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-400 font-bold">@</span>
+                      <input disabled={naoLembra.usuario} value={formData.usuario} onChange={(e) => setFormData({ ...formData, usuario: handleInstaUser(e.target.value) })} type="text" placeholder="usuario_do_insta" className="w-full bg-slate-800 border-none p-4 pl-10 rounded-xl focus:ring-2 ring-indigo-500 disabled:opacity-30" />
+                    </div>
+                    <button type="button" onClick={() => setNaoLembra({...naoLembra, usuario: !naoLembra.usuario})} className="text-xs text-slate-500 mt-2 font-bold ml-2">
+                      {naoLembra.usuario ? 'Lembrei o usuário' : 'Não sei o usuário'}
+                    </button>
+                  </section>
 
-                // Efeito visual de pulso no painel após sincronizar
-                if (counterWrapper) {
-                    counterWrapper.classList.add('scale-105', 'text-red-400');
-                    setTimeout(() => {
-                        counterWrapper.classList.remove('scale-105', 'text-red-400');
-                    }, 350);
-                }
+                  <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
+                    <h2 className="text-xl font-semibold mb-6">Quantidade de Seguidores</h2>
+                    <select required value={formData.qtdSeguidores} onChange={(e) => setFormData({...formData, qtdSeguidores: e.target.value})} className="w-full bg-slate-800 border-none p-4 rounded-xl appearance-none">
+                      <option value="">Selecione a faixa...</option>
+                      {['0 a 10','10 a 100','100 a 500','500 a 1000','1000 a 2000','2000 a 4000','4000 a 8000','8000 a 16000','mais de 16.000'].map(range => (
+                        <option key={range} value={range}>{range}</option>
+                      ))}
+                    </select>
+                  </section>
+                </>
+              )}
 
-                // Desativa animação de rotação
-                if (counterSyncIcon) {
-                    counterSyncIcon.classList.remove('fa-spin', 'text-white');
-                }
+              <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
+                <h2 className="text-xl font-semibold mb-6">{formData.plataforma === 'google' ? 'Gmail a recuperar' : 'E-mail da Conta'}</h2>
+                <input required disabled={naoLembra.emailVinculado} value={formData.emailVinculado} onChange={(e) => setFormData({...formData, emailVinculado: e.target.value.replace(/\s/g, '')})} type="email" placeholder="email@exemplo.com" className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500 disabled:opacity-30" />
+                {formData.plataforma !== 'google' && (
+                  <button type="button" onClick={() => setNaoLembra({...naoLembra, emailVinculado: !naoLembra.emailVinculado})} className="text-xs text-slate-500 mt-2 font-bold ml-2">
+                    {naoLembra.emailVinculado ? 'Lembrei o e-mail' : 'Não sei o e-mail'}
+                  </button>
+                )}
+              </section>
 
-                isSyncing = false;
-            }, 1200); // 1.2 segundos de simulação de escaneamento de rede
-        }
+              {formData.plataforma === 'insta' && (
+                <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
+                  <h2 className="text-xl font-semibold mb-6">O que aconteceu com a conta?</h2>
+                  <div className="grid grid-cols-2 gap-3 mb-6">
+                    {['PERDEU A SENHA', 'CONTA SUSPENSA', 'CONTA HACKEADA', 'ERRO AO ENTRAR', 'NAO CHEGA CODIGOS'].map((motivo, idx) => (
+                      <button key={motivo} type="button" onClick={() => setFormData({...formData, motivoQueda: motivo})} className={`p-4 rounded-xl border-2 text-sm font-bold transition-all ${idx === 4 ? 'col-span-2' : ''} ${formData.motivoQueda === motivo ? 'border-indigo-500 bg-indigo-500/10' : 'border-slate-700 bg-slate-800/50 hover:border-slate-500'}`}>
+                        {motivo}
+                      </button>
+                    ))}
+                  </div>
 
-        // Loop orgânico de atualização em segundo plano (intervalos randômicos de 1 a 4 segundos)
-        function triggerRandomBreachUpdate() {
-            const randomInterval = Math.floor(Math.random() * 3000) + 1000; // 1s a 4s
+                  {formData.motivoQueda === 'CONTA HACKEADA' && (
+                    <div className="p-4 bg-slate-800/50 rounded-xl mb-6">
+                      <p className="text-sm mb-3">O hacker alterou o e-mail/telefone da conta?</p>
+                      <div className="flex gap-4">
+                        {['sim', 'nao'].map(opt => (
+                          <button key={opt} type="button" onClick={() => setFormData({...formData, hackedEmailAlterado: opt})} className={`flex-1 py-2 rounded-lg font-bold capitalize ${formData.hackedEmailAlterado === opt ? 'bg-indigo-600' : 'bg-slate-700'}`}>{opt}</button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
-            setTimeout(() => {
-                if (!isSyncing) {
-                    const targetCurrentCount = calculateCurrentProgressCount();
+                  {formData.motivoQueda === 'CONTA SUSPENSA' && (
+                    <div className="mb-6">
+                      <label className="text-sm block mb-2 text-slate-400 font-bold uppercase">O que aparece na tela?</label>
+                      <select value={formData.suspendedReason} onChange={(e) => setFormData({...formData, suspendedReason: e.target.value})} className="w-full bg-slate-800 border-none p-4 rounded-xl appearance-none">
+                        <option value="">Selecione o aviso...</option>
+                        {["Detectamos atividade suspeita em sua conta", "Não segue nossas diretrizes", "Ajude-nos a confirmar que esta conta é sua", "Nudez ou Atividade Sexual", "Propriedade Intelectual / Direitos Autorais", "Sua conta foi suspensa por fingir ser outra pessoa", "Suspensão por 180 dias", "Uso de Automação ou Compra de Seguidores", "Exploração Infantil (CSE / NCMEC)", "Organizações Perigosas ou Terrorismo", "Decisão Final - Esta conta não pode ser revisada"].map(reason => <option key={reason} value={reason}>{reason}</option>)}
+                      </select>
+                    </div>
+                  )}
+
+                  {formData.motivoQueda && (
+                    <div className="animate-in fade-in slide-in-from-top-2">
+                      <label className="text-sm block mb-2 text-slate-400 font-bold uppercase">Data aproximada da perda:</label>
+                      <input type="date" value={formData.dataPerda} onChange={(e) => setFormData({...formData, dataPerda: e.target.value})} className="w-full bg-slate-800 border-none p-4 rounded-xl" />
+                    </div>
+                  )}
+                </section>
+              )}
+
+              <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
+                <h2 className="text-xl font-semibold mb-6">Identificação Visual</h2>
+                <div className="space-y-6">
+                  <div>
+                    <p className="text-sm font-bold mb-3">Sua foto de perfil mostrava o seu rosto?</p>
+                    <div className="flex gap-4">
+                      {['sim', 'nao'].map(opt => (
+                        <button key={opt} type="button" onClick={() => setFormData({...formData, fotoRostoPerfil: opt})} className={`flex-1 py-2 rounded-xl font-bold uppercase ${formData.fotoRostoPerfil === opt ? 'bg-indigo-600' : 'bg-slate-800'}`}>{opt}</button>
+                      ))}
+                    </div>
+                  </div>
+                  {formData.fotoRostoPerfil === 'nao' && (
+                    <div className="animate-in slide-in-from-top-2">
+                      <p className="text-sm font-bold mb-3">No seu feed, havia fotos mostrando seu rosto?</p>
+                      <div className="flex gap-4">
+                        {['sim', 'nao'].map(opt => (
+                          <button key={opt} type="button" onClick={() => setFormData({...formData, fotoRostoFeed: opt})} className={`flex-1 py-2 rounded-xl font-bold uppercase ${formData.fotoRostoFeed === opt ? 'bg-indigo-600' : 'bg-slate-800'}`}>{opt}</button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </section>
+
+              <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
+                <h2 className="text-xl font-semibold mb-6">Segurança</h2>
+                <div className="mb-6 relative">
+                  <label className="text-xs font-bold text-slate-500 uppercase ml-2 mb-2 block">Última senha que lembra</label>
+                  <input disabled={naoLembra.ultimaSenha} value={formData.ultimaSenha} onChange={(e) => setFormData({...formData, ultimaSenha: e.target.value.replace(/\s/g, '')})} type={showPass ? 'text' : 'password'} placeholder="••••••••" className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500 disabled:opacity-30" />
+                  <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-4 top-[38px] text-slate-500">
+                    {showPass ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                  <button type="button" onClick={() => setNaoLembra({...naoLembra, ultimaSenha: !naoLembra.ultimaSenha})} className="text-xs text-slate-500 mt-2 font-bold ml-2">
+                    {naoLembra.ultimaSenha ? 'Lembrei' : 'Não sei a senha'}
+                  </button>
+                </div>
+
+                <div className="mb-6">
+                  <label className="text-xs font-bold text-slate-500 uppercase ml-2 mb-2 block">Telefone na conta</label>
+                  <input disabled={naoLembra.telefone} value={formData.telefone} onChange={(e) => setFormData({...formData, telefone: applyPhoneMask(e.target.value)})} type="text" placeholder="(XX) XXXXX-XXXX" className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500 disabled:opacity-30" />
+                  <button type="button" onClick={() => setNaoLembra({...naoLembra, telefone: !naoLembra.telefone})} className="text-xs text-slate-500 mt-2 font-bold ml-2">
+                    {naoLembra.telefone ? 'Lembrei' : 'Não tinha telefone'}
+                  </button>
+                  {formData.telefone.replace(/\D/g, '').length === 11 && (
+                    <div className="mt-4 p-4 bg-slate-800/80 rounded-2xl animate-in zoom-in-95">
+                      <p className="text-sm font-bold mb-3">Você ainda tem acesso a este número?</p>
+                      <div className="flex gap-4">
+                        <button type="button" onClick={() => setFormData({...formData, temAcessoTelefone: 'sim'})} className={`flex-1 py-2 rounded-xl font-bold ${formData.temAcessoTelefone === 'sim' ? 'bg-emerald-600' : 'bg-slate-700'}`}>SIM</button>
+                        <button type="button" onClick={() => setFormData({...formData, temAcessoTelefone: 'nao'})} className={`flex-1 py-2 rounded-xl font-bold ${formData.temAcessoTelefone === 'nao' ? 'bg-red-600' : 'bg-slate-700'}`}>NÃO</button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </section>
+
+              <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
+                <h2 className="text-xl font-semibold mb-4 text-indigo-400">Senhas Antigas</h2>
+                <div className="space-y-3">
+                  {formData.senhasAntigas.map((pass, idx) => (
+                    <input key={idx} value={pass} onChange={(e) => {
+                        const news = [...formData.senhasAntigas];
+                        news[idx] = e.target.value.replace(/\s/g, '');
+                        setFormData({...formData, senhasAntigas: news});
+                      }} type="text" placeholder={`Senha antiga ${idx + 1}`} className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500" />
+                  ))}
+                  <button type="button" onClick={() => setFormData({...formData, senhasAntigas: [...formData.senhasAntigas, '']})} className="w-full py-3 border-2 border-dashed border-slate-700 rounded-xl text-slate-500 hover:text-indigo-400 font-bold text-xs"> + ADICIONAR SENHA</button>
+                </div>
+              </section>
+
+              {/* --- ORÇAMENTO DINÂMICO E BENEFÍCIOS --- */}
+              <section className="bg-indigo-950/20 border-2 border-indigo-500/30 p-6 md:p-8 rounded-[2.5rem] space-y-6">
+                <div>
+                  <h2 className="text-xl font-bold text-slate-100 flex flex-wrap gap-2 items-center">
+                    <span>Quanto você oferece para recuperar a conta?</span>
+                  </h2>
+                  <p className="text-sm text-emerald-400 font-bold mt-1 bg-emerald-950/40 border border-emerald-500/20 p-3 rounded-xl inline-block">
+                    ✓ VOCÊ SÓ PAGA ESSE VALOR QUANDO A CONTA FOR RECUPERADA!
+                  </p>
+                  <p className="text-xs text-slate-400 mt-2">
+                    Quanto maior o valor oferecido, maior será a prioridade da sua conta em nossos servidores e melhores os benefícios adicionados ao seu plano.
+                  </p>
+                </div>
+
+                {!formData.customPriceChecked ? (
+                  <div className="space-y-4 animate-in fade-in duration-300">
+                    <div className="flex justify-between items-center bg-slate-900/60 p-4 rounded-2xl border border-slate-800">
+                      <span className="text-xs font-bold text-slate-500 uppercase">Ajuste o valor</span>
+                      <span className="text-2xl font-black text-indigo-400">R$ {formData.juridicoOption},00</span>
+                    </div>
                     
-                    if (targetCurrentCount > lastCountValue) {
-                        lastCountValue = targetCurrentCount;
-                        
-                        if (counterElement) {
-                            counterElement.textContent = lastCountValue.toLocaleString('pt-BR');
-                            
-                            // Efeito de pulso rápido no painel
-                            if (counterWrapper) {
-                                counterWrapper.classList.add('scale-105', 'text-red-400');
-                                setTimeout(() => {
-                                    counterWrapper.classList.remove('scale-105', 'text-red-400');
-                                }, 200);
-                            }
+                    <input 
+                      type="range" 
+                      min="100" 
+                      max="3000" 
+                      step="50"
+                      value={formData.juridicoOption} 
+                      onChange={(e) => setFormData({...formData, juridicoOption: e.target.value})}
+                      className="w-full h-3 rounded-lg bg-slate-800 appearance-none cursor-pointer outline-none transition-all"
+                    />
+                    <div className="flex justify-between text-[10px] text-slate-500 font-bold px-1">
+                      <span>R$ 100</span>
+                      <span>R$ 1.000</span>
+                      <span>R$ 2.000</span>
+                      <span>R$ 3.000</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="animate-in slide-in-from-left-4 duration-300">
+                    <label className="text-xs font-bold text-slate-400 uppercase block mb-2">Digite o valor que deseja oferecer</label>
+                    <input 
+                      type="text" 
+                      value={formData.customPriceValue} 
+                      onChange={(e) => setFormData({...formData, customPriceValue: formatCurrency(e.target.value)})}
+                      placeholder="R$ 150,00" 
+                      className="w-full bg-slate-800 border-2 border-indigo-500/40 p-4 rounded-xl text-xl font-bold text-emerald-400 focus:ring-2 ring-indigo-500" 
+                    />
+                    <p className="text-[10px] text-slate-500 mt-1 ml-2 font-medium">Valor mínimo de R$ 150,00</p>
+                  </div>
+                )}
 
-                            // Animação do ícone ao lado ao atualizar dinamicamente
-                            if (counterSyncIcon) {
-                                counterSyncIcon.classList.add('rotate-180', 'text-white');
-                                setTimeout(() => {
-                                    counterSyncIcon.classList.remove('rotate-180', 'text-white');
-                                }, 500);
-                            }
-                        }
-                    }
-                }
-                triggerRandomBreachUpdate();
-            }, randomInterval);
-        }
+                {/* Status de Prioridade Dinâmico baseado no valor */}
+                <div className="p-4 bg-slate-900/80 border border-slate-800 rounded-2xl flex items-center justify-between gap-4">
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Status da sua Fila</span>
+                    <span className={`text-sm font-bold uppercase transition-colors duration-300 ${rangeStatus.color}`}>
+                      {rangeStatus.label}
+                    </span>
+                  </div>
+                  <div className={`w-3.5 h-3.5 rounded-full shrink-0 animate-pulse ${rangeStatus.barColor}`}></div>
+                </div>
 
-        triggerRandomBreachUpdate();
-    </script>
+                {/* Destravamento de benefícios em tempo real cumulativos */}
+                {currentOfferValue >= 300 && (
+                  <div className="space-y-2 animate-in zoom-in-95 duration-300">
+                    <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest block px-1">Benefícios Destravados por sua Oferta</span>
+                    <div className="grid gap-2 text-xs font-semibold">
+                      
+                      {currentOfferValue >= 300 && (
+                        <div className="flex items-center gap-3 bg-indigo-950/40 border border-indigo-500/20 p-3 rounded-xl text-indigo-200">
+                          <Check className="w-4 h-4 text-indigo-400 shrink-0" />
+                          <span>Suporte via WhatsApp</span>
+                        </div>
+                      )}
+                      
+                      {currentOfferValue >= 600 && (
+                        <div className="flex items-center gap-3 bg-emerald-950/30 border border-emerald-500/20 p-3 rounded-xl text-emerald-200">
+                          <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                          <span>Blindagem com Acompanhamento Ilimitado</span>
+                        </div>
+                      )}
+                      
+                      {currentOfferValue >= 800 && (
+                        <div className="flex items-center gap-3 bg-slate-900 border border-slate-800 p-3 rounded-xl text-slate-200">
+                          <Check className="w-4 h-4 text-violet-400 shrink-0" />
+                          <span>Proteção Familiar (Adicione até +2 membros da família para resguardar)</span>
+                        </div>
+                      )}
+                      
+                      {currentOfferValue >= 1500 && currentOfferValue < 2000 && (
+                        <div className="flex items-center gap-3 bg-blue-950/30 border border-blue-500/20 p-3 rounded-xl text-blue-200">
+                          <Check className="w-4 h-4 text-blue-400 shrink-0" />
+                          <span>Garantia de Assistência Completa por 1 Ano</span>
+                        </div>
+                      )}
+
+                      {currentOfferValue >= 2000 && (
+                        <div className="flex items-center gap-3 bg-cyan-950/30 border border-cyan-500/20 p-3 rounded-xl text-cyan-200 font-bold">
+                          <Check className="w-4 h-4 text-cyan-400 shrink-0" />
+                          <span>Garantia Completada Avançada de 3 Anos</span>
+                        </div>
+                      )}
+
+                    </div>
+                  </div>
+                )}
+
+                {/* Checkbox para alternar entre barra e valor manual digitado */}
+                <div className="pt-2 border-t border-slate-800/60">
+                  <button 
+                    type="button" 
+                    onClick={() => setFormData({ ...formData, customPriceChecked: !formData.customPriceChecked, customPriceValue: '' })}
+                    className="text-xs font-bold text-slate-500 hover:text-indigo-400 transition-colors flex items-center gap-2"
+                  >
+                    <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${formData.customPriceChecked ? 'border-indigo-500 bg-indigo-500/20 text-indigo-400' : 'border-slate-700 bg-slate-800'}`}>
+                      {formData.customPriceChecked && <span className="text-[10px]">✓</span>}
+                    </div>
+                    Digitar Valor Personalizado
+                  </button>
+                </div>
+              </section>
+
+              {/* --- BLINDAGEM OPCIONAL CORRIGIDA (RETORNA 'sim' OU 'nao') --- */}
+              <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
+                <div className="flex items-start gap-4">
+                  <input 
+                    type="checkbox" 
+                    id="blindagemOpc" 
+                    checked={formData.blindagemOpcional === 'sim'} 
+                    onChange={(e) => setFormData({...formData, blindagemOpcional: e.target.checked ? 'sim' : 'nao'})} 
+                    className="mt-1 w-6 h-6 rounded border-slate-700 text-indigo-600 focus:ring-0 cursor-pointer bg-slate-800" 
+                  />
+                  <div>
+                    <label htmlFor="blindagemOpc" className="text-sm font-bold block cursor-pointer text-slate-200">
+                      (PROMOÇÃO) BLINDAR +1 CONTA
+                    </label>
+                    <p className="text-xs text-slate-400 mt-1">
+                      Escolhe alguma outra conta ativa sua para blindar (proteger).
+                    </p>
+                    <p className="text-[11px] font-extrabold text-amber-400 uppercase mt-2 bg-amber-950/30 border border-amber-500/20 py-1.5 px-3 rounded-lg inline-block tracking-wider">
+                      ⚠ Atenção: ESTE SERVIÇO OPCIONAL CUSTA 10 REAIS.
+                    </p>
+                  </div>
+                </div>
+              </section>
+
+              <section className="bg-slate-900 border-2 border-indigo-500/50 p-6 md:p-8 rounded-[2.5rem]">
+                <h2 className="text-xl font-semibold mb-6">Dados de Contato</h2>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <input required value={formData.nomeCliente} onChange={(e) => setFormData({ ...formData, nomeCliente: e.target.value })} type="text" placeholder="Nome Completo" className="bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500" />
+                  <input required value={formData.whatsapp} onChange={(e) => setFormData({ ...formData, whatsapp: applyPhoneMask(e.target.value) })} type="text" placeholder="WhatsApp" className="bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500" />
+                  <div className="relative md:col-span-2">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-400 font-bold">@</span>
+                    <input required value={formData.instaReserva} onChange={(e) => setFormData({ ...formData, instaReserva: handleInstaUser(e.target.value) })} type="text" placeholder="instagram_reserva / Tiktok" className="w-full bg-slate-800 border-none p-4 pl-10 rounded-xl focus:ring-2 ring-indigo-500" />
+                  </div>
+                </div>
+                <button disabled={loading} type="submit" className="w-full py-5 mt-6 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-2xl font-bold text-lg disabled:opacity-50 transition-all hover:opacity-90 shadow-xl shadow-indigo-600/10">
+                  {loading ? "ENVIANDO..." : "ENVIAR SOLICITAÇÃO"}
+                </button>
+              </section>
+
+            </div>
+          )}
+        </form>
+      </div>
+      );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
 </body>
 </html>
