@@ -736,7 +736,8 @@
 
         const maskedUsernames = [
             "lup***", "car***", "fel***", "ana***", "mic***", "gus***", "loj***", 
-            "enc***", "pvd***", "rob***", "jul***", "bru***", "pat***", "gab***", 
+            "enc***", "pvd***", "rob***", "jul***", "bru***", "pat***", "gab***",
+            "f00***", "mar***", "bet***", "men***", "pau***", "cas***", "elh***", 
             "mar***", "sup***", "ale***", "ric***", "clo***", "ped***"
         ];
 
@@ -842,7 +843,7 @@
 
             const info = logTypes[category];
             const city = brazillianCities[Math.floor(Math.random() * brazillianCities.length)];
-            const user = maskedUsernames[Math.floor(Math.random() * maskedUsernames.length)] + Math.floor(Math.random() * 90 + 10);
+            const user = maskedUsernames[Math.floor(Math.random() * maskedUsernames.length)] 
             
             const template = info.templates[Math.floor(Math.random() * info.templates.length)];
             const message = template.replace('{city}', city).replace('{user}', user);
