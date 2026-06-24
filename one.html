@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acompanhamento | LFAssessoria</title>
     
+    <!-- CDNs Estáveis (Anti-Queda) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.400.0/umd/lucide.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght=100..900&display=swap" rel="stylesheet">
@@ -472,10 +473,8 @@
             container.innerHTML = '<div class="col-span-full text-center py-20"><div class="animate-spin inline-block w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full mb-4"></div><p class="text-slate-400 animate-pulse">Buscando contas...</p></div>';
 
             try {
-                // ADICIONADO ANTI-CACHE (Muda o link a cada milissegundo para forçar atualização em tempo real)
-                const antiCacheUrl = `${API_URL}?_=${new Date().getTime()}`;
-                
-                const response = await fetch(antiCacheUrl);
+                // Ajustado para o link direto original (evita erros CORS e bloqueios do Google)
+                const response = await fetch(API_URL);
                 if (!response.ok) throw new Error('Erro na rede');
                 
                 recoveryRequests = await response.json();
