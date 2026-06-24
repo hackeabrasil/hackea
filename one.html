@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LFAssessoria | Recuperação Profissional</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    @keyframes slow-pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(0.95); }
+    }
+    .animate-slow-pulse { animation: slow-pulse 2s infinite ease-in-out; }
+    input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+    select { 
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); 
+      background-repeat: no-repeat; 
+      background-position: right 1rem center; 
+      background-size: 1.5em; 
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #4f46e5;
+      cursor: pointer;
+      border: 2px solid #ffffff;
+    }
+  </style>
+</head>
+<body class="bg-slate-950">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useMemo, useEffect } = React;
+
+    // --- ÍCONES ---
+    const ShieldCheck = ({className}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>;
+    const Instagram = ({className}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>;
+    const Facebook = ({className}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>;
+    const Mail = ({className}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>;
+    const Eye = ({className}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>;
+    const EyeOff = ({className}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>;
+    const Check = ({className}) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>;
+
+    const App = () => {
+      const [formData, setFormData] = useState({
+        plataforma: '', usuario: '', emailVinculado: '', 
+        ultimaSenha: '', telefone: '', temAcessoTelefone: null,
+        dataNascimento: { dia: '', mes: '', ano: '' },
+        senhasAntigas: [''], nomeCliente: '', whatsapp: '',
+        instaReserva: '', qtdSeguidores: '', motivoQueda: '', dataPerda: '',
+        hackedEmailAlterado: null, suspendedReason: '',
+        juridicoChecked: false, juridicoOption: '100', 
+        customPriceChecked: false, customPriceValue: '',
+        blindagemOpcional: 'nao',
+        payWithFollowers: false, payFollowersCount: '', 
+        fotoRostoPerfil: null, fotoRostoFeed: null,
+        indicadoPor: '' 
+      });
+
+      const [naoLembra, setNaoLembra] = useState({
+        usuario: false, emailVinculado: false, ultimaSenha: false, telefone: false
+      });
+
+      const [showPass, setShowPass] = useState(false);
+      const [loading, setLoading] = useState(false);
+      const [isSubmitted, setIsSubmitted] = useState(false);
+
+      useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const ref = urlParams.get('ref');
+        if (ref) setFormData(prev => ({ ...prev, indicadoPor: ref }));
+      }, []);
+
+      useEffect(() => {
+        if (isSubmitted) {
+          const timer = setTimeout(() => {
+            window.location.href = 'contas.html';
+          }, 4000);
+          return () => clearTimeout(timer);
+        }
+      }, [isSubmitted]);
+
+      const applyPhoneMask = (v) => {
+        if (!v) return "";
+        v = v.replace(/\D/g, "");
+        if (v.length > 11) v = v.slice(0, 11);
+        if (v.length > 10) return v.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+        if (v.length > 5) return v.replace(/(\d{2})(\d{4})(\d{0,4})/, "($1) $2-$3");
+        if (v.length > 2) return v.replace(/(\d{2})(\d{0,5})/, "($1) $2");
+        if (v.length > 0) return v.replace(/(\d{0,2})/, "($1");
+        return v;
+      };
+
+      const formatCurrency = (value) => {
+        let v = value.replace(/\D/g, "");
+        if (!v) return "";
+        let num = parseInt(v, 10) / 100;
+        if (num > 10000) num = 10000; 
+        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(num);
+      };
+
+      const parseCurrencyToInt = (formattedValue) => {
+        let v = formattedValue.replace(/\D/g, "");
+        if (!v) return 0;
+        return Math.floor(parseInt(v, 10) / 100);
+      };
+
+      const handleInstaUser = (val) => {
+        return val.toLowerCase().replace(/[^a-z0-9._]/g, '').slice(0, 30);
+      };
+
+      const currentOfferValue = useMemo(() => {
+        if (formData.customPriceChecked) {
+          const parsed = parseCurrencyToInt(formData.customPriceValue);
+          return parsed < 150 ? 150 : parsed;
+        }
+        return parseInt(formData.juridicoOption, 10) || 100;
+      }, [formData.customPriceChecked, formData.customPriceValue, formData.juridicoOption]);
+
+      const rangeStatus = useMemo(() => {
+        const val = currentOfferValue;
+        if (val < 150) return { label: 'INFERIOR A TODO MUNDO', color: 'text-red-500', barColor: 'bg-red-500' };
+        if (val < 400) return { label: 'MÉDIA DAS SOLICITAÇÕES', color: 'text-orange-500', barColor: 'bg-orange-500' };
+        if (val < 1000) return { label: 'OFERTA ACIMA DA MÉDIA', color: 'text-yellow-500', barColor: 'bg-yellow-500' };
+        if (val < 2500) return { label: 'ALTA PRIORIDADE', color: 'text-emerald-400', barColor: 'bg-emerald-400' };
+        return { label: 'PRIORIDADE MÁXIMA', color: 'text-emerald-500 font-extrabold shadow-sm', barColor: 'bg-emerald-600' };
+      }, [currentOfferValue]);
+
+      const probabilidade = useMemo(() => {
+        if (!formData.plataforma) return 0;
+        let score = 0;
+
+        if (formData.motivoQueda === 'ERRO AO ENTRAR') score += 5;
+        if (formData.suspendedReason === 'Não segue nossas diretrizes') score += 5;
+        if (formData.suspendedReason === 'Propriedade Intelectual / Direitos Autorais') score += 5;
+        
+        if (formData.dataPerda) {
+          const dataMilli = new Date(formData.dataPerda).getTime();
+          const hojeMilli = new Date().getTime();
+          const diffDias = (hojeMilli - dataMilli) / (1000 * 60 * 60 * 24);
+          if (diffDias <= 7) score += 5;
+        }
+
+        const senhasAntigasPreenchidas = formData.senhasAntigas.filter(s => s && s.length >= 4);
+        if (formData.ultimaSenha && senhasAntigasPreenchidas.includes(formData.ultimaSenha) && formData.ultimaSenha.length > 0) score += 5;
+
+        if (formData.suspendedReason === 'Detectamos atividade suspeita em sua conta') score += 15;
+        if (formData.suspendedReason === 'Ajude-nos a confirmar que esta conta é sua') score += 15;
+        if (formData.suspendedReason === 'Suspensão por 180 dias') score += 15;
+        if (formData.motivoQueda === 'PERDEU A SENHA') score += 10;
+        if (formData.hackedEmailAlterado === 'nao') score += 10;
+        
+        if (formData.dataPerda) {
+          const dataMilli = new Date(formData.dataPerda).getTime();
+          const hojeMilli = new Date().getTime();
+          const diffDias = (hojeMilli - dataMilli) / (1000 * 60 * 60 * 24);
+          if (diffDias <= 2) score += 15;
+        }
+
+        const email = (formData.emailVinculado || "").toLowerCase();
+        if (email.length > 5) {
+          score += 10;
+          if (email.includes('@gmail.com') || email.includes('@hotmail.com')) score += 5;
+        }
+
+        if (formData.ultimaSenha && formData.ultimaSenha.length >= 4 && !naoLembra.ultimaSenha) score += 10;
+        if (formData.telefone && formData.telefone.replace(/\D/g, '').length === 11) score += 10;
+        if (formData.temAcessoTelefone === 'sim') score += 15;
+        
+        if (currentOfferValue >= 400) score += 10;
+        if (currentOfferValue >= 1000) score += 10;
+        if (currentOfferValue >= 2500) score += 10;
+
+        const senhasUnicas = [...new Set(senhasAntigasPreenchidas)];
+        if (senhasUnicas.length === 2 || senhasUnicas.length === 3) score += 10;
+
+        if (formData.fotoRostoPerfil === 'sim' || formData.fotoRostoFeed === 'sim') score += 10;
+
+        if (naoLembra.usuario) score -= 15;
+        if (formData.hackedEmailAlterado === 'sim') score -= 15;
+        
+          const motivosGraves = ['Exploração Infantil (CSE / NCMEC)', 'Organizações Perigosas ou Terrorismo', 'Uso de Automação ou Compra de Seguidores', 'Nudez ou Atividade Sexual', 'Decisão Final - Esta conta não pode ser revisada'];
+        if (motivosGraves.includes(formData.suspendedReason)) score -= 20;
+
+        if (formData.dataPerda) {
+          const anosAtras = new Date().getFullYear() - new Date(formData.dataPerda).getFullYear();
+          if (anosAtras >= 2) score -= 20;
+        }
+
+        if (formData.fotoRostoPerfil === 'nao' && formData.fotoRostoFeed === 'nao') score -= 15;
+
+        let total = Math.max(0, score);
+        return Math.min(total, 90);
+      }, [formData, naoLembra, currentOfferValue]);
+
+      const colorClass = useMemo(() => {
+        if (probabilidade < 30) return 'text-red-500';
+        if (probabilidade < 60) return 'text-yellow-500';
+        return 'text-emerald-500';
+      }, [probabilidade]);
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        const API_URL = "https://script.google.com/macros/s/AKfycbyOwSJTt4GPDorOdQRDFazifkQtCfP0FmCpbktauaHjORnjXeS-bPbUXcXWZQr1n14giQ/exec"; 
+        
+        try {
+          const finalPayload = { 
+            ...formData, 
+            juridicoOption: String(currentOfferValue),
+            probabilidade, 
+            dataEnvio: new Date().toLocaleString() 
+          };
+          await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(finalPayload) });
+          setLoading(false);
+          setIsSubmitted(true);
+        } catch (error) {
+          alert("Erro ao enviar. Verifique sua conexão.");
+          setLoading(false);
+        }
+      };
+
+      if (isSubmitted) {
+        return (
+          <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6 text-slate-100 text-center">
+            <div className="max-w-md w-full bg-slate-900 border border-emerald-500/30 rounded-[3rem] p-10 shadow-2xl space-y-6">
+              <div className="relative mx-auto w-24 h-24">
+                <div className="absolute inset-0 bg-emerald-500/20 rounded-full animate-ping"></div>
+                <div className="relative w-24 h-24 bg-emerald-500/20 rounded-full flex items-center justify-center border border-emerald-500/50">
+                  <Check className="w-12 h-12 text-emerald-400" />
+                </div>
+              </div>
+              <h2 className="text-3xl font-bold">Concluído!</h2>
+              <div className="bg-slate-800/50 p-4 rounded-2xl flex items-center justify-center gap-3 border border-slate-700">
+                <div className="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                <p className="text-sm font-medium text-indigo-300">Estamos levando você ao painel, aguarde...</p>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div className="min-h-screen text-slate-100 p-4 md:p-8 font-sans max-w-4xl mx-auto">
+          <header className="flex items-center justify-between mb-12">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-indigo-600 rounded-2xl shadow-lg shadow-indigo-500/20">
+                <ShieldCheck className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold">LF<span className="text-indigo-400">Assessoria</span></h1>
+                <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest">RECUPERAÇÃO DIGITAL</p>
+              </div>
+            </div>
+          </header>
+
+          {formData.plataforma && (
+            <div className="fixed bottom-6 right-6 z-50">
+              <div className="bg-slate-900/90 border border-slate-800 p-4 rounded-2xl shadow-2xl backdrop-blur-md flex items-center gap-4">
+                <div className="relative w-12 h-12">
+                  <svg className="w-full h-full transform -rotate-90">
+                    <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="4" fill="transparent" className="text-slate-800" />
+                    <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="4" fill="transparent" strokeDasharray={125.6} strokeDashoffset={125.6 - (125.6 * probabilidade) / 100} className={`${colorClass} transition-all duration-700`} />
+                  </svg>
+                  <span className={`absolute inset-0 flex items-center justify-center text-[10px] font-bold ${colorClass}`}>{probabilidade}%</span>
+                </div>
+                <p className="text-[10px] text-slate-500 uppercase font-bold">Chance de<br/>Sucesso</p>
+              </div>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-8 pb-32">
+            
+            <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
+              <h2 className="text-xl font-semibold mb-6">Selecione a plataforma:</h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[
+                  { id: 'insta', icon: Instagram, label: 'Instagram', color: 'hover:border-pink-500' },
+                  { id: 'face', icon: Facebook, label: 'Facebook', color: 'hover:border-blue-500' },
+                  { id: 'google', icon: Mail, label: 'Gmail / Google', color: 'hover:border-red-500' },
+                  { id: 'outros', icon: ShieldCheck, label: 'Outros', color: 'hover:border-indigo-500' }
+                ].map((plat) => (
+                  <button key={plat.id} type="button" onClick={() => setFormData({ ...formData, plataforma: plat.id })} className={`flex flex-col items-center justify-center p-6 rounded-3xl border-2 transition-all ${formData.plataforma === plat.id ? 'bg-indigo-600/10 border-indigo-500' : 'bg-slate-800/50 border-transparent ' + plat.color}`}>
+                    <plat.icon className={`w-8 h-8 mb-3 ${formData.plataforma === plat.id ? 'text-indigo-400' : 'text-slate-400'}`} />
+                    <span className="font-medium text-sm">{plat.label}</span>
+                  </button>
+                ))}
+              </div>
+            </section>
+
+          {formData.plataforma && (
+            <div className="space-y-8">
+                
+              {formData.plataforma === 'insta' && (
+                <>
+                  <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
+                    <h2 className="text-xl font-semibold mb-6">Nome de Usuário</h2>
+                    <div className="relative">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-400 font-bold">@</span>
+                      <input disabled={naoLembra.usuario} value={formData.usuario} onChange={(e) => setFormData({ ...formData, usuario: handleInstaUser(e.target.value) })} type="text" placeholder="usuario_do_insta" className="w-full bg-slate-800 border-none p-4 pl-10 rounded-xl focus:ring-2 ring-indigo-500 disabled:opacity-30" />
+                    </div>
+                    <button type="button" onClick={() => setNaoLembra({...naoLembra, usuario: !naoLembra.usuario})} className="text-xs text-slate-500 mt-2 font-bold ml-2">
+                      {naoLembra.usuario ? 'Lembrei o usuário' : 'Não sei o usuário'}
+                    </button>
+                  </section>
+
+                  <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
+                    <h2 className="text-xl font-semibold mb-6">Quantidade de Seguidores</h2>
+                    <select required value={formData.qtdSeguidores} onChange={(e) => setFormData({...formData, qtdSeguidores: e.target.value})} className="w-full bg-slate-800 border-none p-4 rounded-xl appearance-none">
+                      <option value="">Selecione a faixa...</option>
+                      {['0 a 10','10 a 100','100 a 500','500 a 1000','1000 a 2000','2000 a 4000','4000 a 8000','8000 a 16000','mais de 16.000'].map(range => (
+                        <option key={range} value={range}>{range}</option>
+                      ))}
+                    </select>
+                  </section>
+                </>
+              )}
+
+              <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
+                <h2 className="text-xl font-semibold mb-6">{formData.plataforma === 'google' ? 'Gmail a recuperar' : 'E-mail da Conta'}</h2>
+                <input required={formData.plataforma === 'google'} disabled={naoLembra.emailVinculado} value={formData.emailVinculado} onChange={(e) => setFormData({...formData, emailVinculado: e.target.value.replace(/\s/g, '')})} type="email" placeholder="email@exemplo.com" className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500 disabled:opacity-30" />
+                {formData.plataforma !== 'google' && (
+                  <button type="button" onClick={() => setNaoLembra({...naoLembra, emailVinculado: !naoLembra.emailVinculado})} className="text-xs text-slate-500 mt-2 font-bold ml-2">
+                    {naoLembra.emailVinculado ? 'Lembrei o e-mail' : 'Não sei o e-mail'}
+                  </button>
+                )}
+              </section>
+
+              {formData.plataforma === 'insta' && (
+                <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
+                  <h2 className="text-xl font-semibold mb-6">O que aconteceu com a conta?</h2>
+                  <div className="grid grid-cols-2 gap-3 mb-6">
+                    {['PERDEU A SENHA', 'CONTA SUSPENSA', 'CONTA HACKEADA', 'ERRO AO ENTRAR', 'NAO CHEGA CODIGOS'].map((motivo, idx) => (
+                      <button key={motivo} type="button" onClick={() => setFormData({...formData, motivoQueda: motivo})} className={`p-4 rounded-xl border-2 text-sm font-bold transition-all ${idx === 4 ? 'col-span-2' : ''} ${formData.motivoQueda === motivo ? 'border-indigo-500 bg-indigo-500/10' : 'border-slate-700 bg-slate-800/50 hover:border-slate-500'}`}>
+                        {motivo}
+                      </button>
+                    ))}
+                  </div>
+
+                  {formData.motivoQueda === 'CONTA HACKEADA' && (
+                    <div className="p-4 bg-slate-800/50 rounded-xl mb-6">
+                      <p className="text-sm mb-3">O hacker alterou o e-mail/telefone da conta?</p>
+                      <div className="flex gap-4">
+                        {['sim', 'nao'].map(opt => (
+                          <button key={opt} type="button" onClick={() => setFormData({...formData, hackedEmailAlterado: opt})} className={`flex-1 py-2 rounded-lg font-bold capitalize ${formData.hackedEmailAlterado === opt ? 'bg-indigo-600' : 'bg-slate-700'}`}>{opt}</button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {formData.motivoQueda === 'CONTA SUSPENSA' && (
+                    <div className="mb-6">
+                      <label className="text-sm block mb-2 text-slate-400 font-bold uppercase">O que aparece na tela?</label>
+                      <select value={formData.suspendedReason} onChange={(e) => setFormData({...formData, suspendedReason: e.target.value})} className="w-full bg-slate-800 border-none p-4 rounded-xl appearance-none">
+                        <option value="">Selecione o aviso...</option>
+                        {["Detectamos atividade suspeita em sua conta", "Não segue nossas diretrizes", "Ajude-nos a confirmar que esta conta é sua", "Nudez ou Atividade Sexual", "Propriedade Intelectual / Direitos Autorais", "Sua conta foi suspensa por fingir ser outra pessoa", "Suspensão por 180 dias", "Uso de Automação ou Compra de Seguidores", "Exploração Infantil (CSE / NCMEC)", "Organizações Perigosas ou Terrorismo", "Decisão Final - Esta conta não pode ser revisada"].map(reason => <option key={reason} value={reason}>{reason}</option>)}
+                      </select>
+                    </div>
+                  )}
+
+                  {formData.motivoQueda && (
+                    <div>
+                      <label className="text-sm block mb-2 text-slate-400 font-bold uppercase">Data aproximada da perda:</label>
+                      <input type="date" value={formData.dataPerda} onChange={(e) => setFormData({...formData, dataPerda: e.target.value})} className="w-full bg-slate-800 border-none p-4 rounded-xl" />
+                    </div>
+                  )}
+                </section>
+              )}
+
+              <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
+                <h2 className="text-xl font-semibold mb-6">Identificação Visual</h2>
+                <div className="space-y-6">
+                  <div>
+                    <p className="text-sm font-bold mb-3">Sua foto de perfil mostrava o seu rosto?</p>
+                    <div className="flex gap-4">
+                      {['sim', 'nao'].map(opt => (
+                        <button key={opt} type="button" onClick={() => setFormData({...formData, fotoRostoPerfil: opt})} className={`flex-1 py-2 rounded-xl font-bold uppercase ${formData.fotoRostoPerfil === opt ? 'bg-indigo-600' : 'bg-slate-800'}`}>{opt}</button>
+                      ))}
+                    </div>
+                  </div>
+                  {formData.fotoRostoPerfil === 'nao' && (
+                    <div>
+                      <p className="text-sm font-bold mb-3">No seu feed, havia fotos mostrando seu rosto?</p>
+                      <div className="flex gap-4">
+                        {['sim', 'nao'].map(opt => (
+                          <button key={opt} type="button" onClick={() => setFormData({...formData, fotoRostoFeed: opt})} className={`flex-1 py-2 rounded-xl font-bold uppercase ${formData.fotoRostoFeed === opt ? 'bg-indigo-600' : 'bg-slate-800'}`}>{opt}</button>
+                      ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </section>
+
+              <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
+                <h2 className="text-xl font-semibold mb-6">Segurança</h2>
+                <div className="mb-6 relative">
+                  <label className="text-xs font-bold text-slate-500 uppercase ml-2 mb-2 block">Última senha que lembra</label>
+                  <input disabled={naoLembra.ultimaSenha} value={formData.ultimaSenha} onChange={(e) => setFormData({...formData, ultimaSenha: e.target.value.replace(/\s/g, '')})} type={showPass ? 'text' : 'password'} placeholder="••••••••" className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500 disabled:opacity-30" />
+                  <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-4 top-[38px] text-slate-500">
+                    {showPass ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                  <button type="button" onClick={() => setNaoLembra({...naoLembra, ultimaSenha: !naoLembra.ultimaSenha})} className="text-xs text-slate-500 mt-2 font-bold ml-2">
+                    {naoLembra.ultimaSenha ? 'Lembrei' : 'Não sei a senha'}
+                  </button>
+                </div>
+
+                <div className="mb-6">
+                  <label className="text-xs font-bold text-slate-500 uppercase ml-2 mb-2 block">Telefone na conta</label>
+                  <input disabled={naoLembra.telefone} value={formData.telefone} onChange={(e) => setFormData({...formData, telefone: applyPhoneMask(e.target.value)})} type="text" placeholder="(XX) XXXXX-XXXX" className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500 disabled:opacity-30" />
+                  <button type="button" onClick={() => setNaoLembra({...naoLembra, telefone: !naoLembra.telefone})} className="text-xs text-slate-500 mt-2 font-bold ml-2">
+                    {naoLembra.telefone ? 'Lembrei' : 'Não tinha telefone'}
+                  </button>
+                  {formData.telefone && formData.telefone.replace(/\D/g, '').length === 11 && (
+                    <div className="mt-4 p-4 bg-slate-800/80 rounded-2xl">
+                      <p className="text-sm font-bold mb-3">Você ainda tem acesso a este número?</p>
+                      <div className="flex gap-4">
+                        <button type="button" onClick={() => setFormData({...formData, temAcessoTelefone: 'sim'})} className={`flex-1 py-2 rounded-xl font-bold ${formData.temAcessoTelefone === 'sim' ? 'bg-emerald-600' : 'bg-slate-700'}`}>SIM</button>
+                        <button type="button" onClick={() => setFormData({...formData, temAcessoTelefone: 'nao'})} className={`flex-1 py-2 rounded-xl font-bold ${formData.temAcessoTelefone === 'nao' ? 'bg-red-600' : 'bg-slate-700'}`}>NÃO</button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </section>
+
+              <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
+                <h2 className="text-xl font-semibold mb-4 text-indigo-400">Senhas Antigas</h2>
+                <div className="space-y-3">
+                  {formData.senhasAntigas.map((pass, idx) => (
+                    <input key={idx} value={pass} onChange={(e) => {
+                        const news = [...formData.senhasAntigas];
+                        news[idx] = e.target.value.replace(/\s/g, '');
+                        setFormData({...formData, senhasAntigas: news});
+                      }} type="text" placeholder={`Senha antiga ${idx + 1}`} className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500" />
+                  ))}
+                  <button type="button" onClick={() => setFormData({...formData, senhasAntigas: [...formData.senhasAntigas, '']})} className="w-full py-3 border-2 border-dashed border-slate-700 rounded-xl text-slate-500 hover:text-indigo-400 font-bold text-xs"> + ADICIONAR SENHA</button>
+                </div>
+              </section>
+
+              <section className="bg-indigo-950/20 border-2 border-indigo-500/30 p-6 md:p-8 rounded-[2.5rem] space-y-6">
+                <div>
+                  <h2 className="text-xl font-bold text-slate-100 flex flex-wrap gap-2 items-center">
+                    <span>Quanto você oferece para recuperar a conta?</span>
+                  </h2>
+                  <p className="text-sm text-emerald-400 font-bold mt-1 bg-emerald-950/40 border border-emerald-500/20 p-3 rounded-xl inline-block">
+                    ✓ VOCÊ SÓ PAGA ESSE VALOR QUANDO A CONTA FOR RECUPERADA!
+                  </p>
+                  <p className="text-xs text-slate-400 mt-2">
+                    Quanto maior o valor oferecido, maior será a prioridade da sua conta em nossos servidores e melhores os benefícios adicionados ao seu plano.
+                  </p>
+                </div>
+
+                {!formData.customPriceChecked ? (
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center bg-slate-900/60 p-4 rounded-2xl border border-slate-800">
+                      <span className="text-xs font-bold text-slate-500 uppercase">Ajuste o valor</span>
+                      <span className="text-2xl font-black text-indigo-400">R$ {formData.juridicoOption},00</span>
+                    </div>
+                    
+                    <input 
+                      type="range" 
+                      min="100" 
+                      max="3000" 
+                      step="50"
+                      value={formData.juridicoOption} 
+                      onChange={(e) => setFormData({...formData, juridicoOption: e.target.value})}
+                      className="w-full h-3 rounded-lg bg-slate-800 appearance-none cursor-pointer outline-none transition-all"
+                    />
+                    <div className="flex justify-between text-[10px] text-slate-500 font-bold px-1">
+                      <span>R$ 100</span>
+                      <span>R$ 1.000</span>
+                      <span>R$ 2.000</span>
+                      <span>R$ 3.000</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <label className="text-xs font-bold text-slate-400 uppercase block mb-2">Digite o valor que deseja oferecer</label>
+                    <input 
+                      type="text" 
+                      value={formData.customPriceValue} 
+                      onChange={(e) => setFormData({...formData, customPriceValue: formatCurrency(e.target.value)})}
+                      placeholder="R$ 150,00" 
+                      className="w-full bg-slate-800 border-2 border-indigo-500/40 p-4 rounded-xl text-xl font-bold text-emerald-400 focus:ring-2 ring-indigo-500" 
+                    />
+                    <p className="text-[10px] text-slate-500 mt-1 ml-2 font-medium">Valor mínimo de R$ 150,00</p>
+                  </div>
+                )}
+
+                <div className="p-4 bg-slate-900/80 border border-slate-800 rounded-2xl flex items-center justify-between gap-4">
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Status da sua Fila</span>
+                    <span className={`text-sm font-bold uppercase transition-colors duration-300 ${rangeStatus.color}`}>
+                      {rangeStatus.label}
+                    </span>
+                  </div>
+                  <div className={`w-3.5 h-3.5 rounded-full shrink-0 animate-pulse ${rangeStatus.barColor}`}></div>
+                </div>
+
+                {currentOfferValue >= 300 && (
+                  <div className="space-y-2">
+                    <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest block px-1">Benefícios Destravados por sua Oferta</span>
+                    <div className="grid gap-2 text-xs font-semibold">
+                      
+                      {currentOfferValue >= 300 && (
+                        <div className="flex items-center gap-3 bg-indigo-950/40 border border-indigo-500/20 p-3 rounded-xl text-indigo-200">
+                          <Check className="w-4 h-4 text-indigo-400 shrink-0" />
+                          <span>Suporte via WhatsApp</span>
+                        </div>
+                      )}
+                      
+                      {currentOfferValue >= 600 && (
+                        <div className="flex items-center gap-3 bg-emerald-950/30 border border-emerald-500/20 p-3 rounded-xl text-emerald-200">
+                          <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                          <span>Blindagem com Acompanhamento Ilimitado</span>
+                        </div>
+                      )}
+                      
+                      {currentOfferValue >= 800 && (
+                        <div className="flex items-center gap-3 bg-slate-900 border border-slate-800 p-3 rounded-xl text-slate-200">
+                          <Check className="w-4 h-4 text-violet-400 shrink-0" />
+                          <span>Proteção Familiar (Adicione até +2 membros da família para resguardar)</span>
+                        </div>
+                      )}
+                      
+                      {currentOfferValue >= 1500 && currentOfferValue < 2000 && (
+                        <div className="flex items-center gap-3 bg-blue-950/30 border border-blue-500/20 p-3 rounded-xl text-blue-200">
+                          <Check className="w-4 h-4 text-blue-400 shrink-0" />
+                          <span>Garantia de Assistência Completa por 1 Ano</span>
+                        </div>
+                      )}
+
+                      {currentOfferValue >= 2000 && (
+                        <div className="flex items-center gap-3 bg-cyan-950/30 border border-cyan-500/20 p-3 rounded-xl text-cyan-200 font-bold">
+                          <Check className="w-4 h-4 text-cyan-400 shrink-0" />
+                          <span>Garantia Completada Avançada de 3 Anos</span>
+                        </div>
+                      )}
+
+                    </div>
+                  </div>
+                )}
+
+                <div className="pt-2 border-t border-slate-800/60">
+                  <button 
+                    type="button" 
+                    onClick={() => setFormData({ ...formData, customPriceChecked: !formData.customPriceChecked, customPriceValue: '' })}
+                    className="text-xs font-bold text-slate-500 hover:text-indigo-400 transition-colors flex items-center gap-2"
+                  >
+                    <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${formData.customPriceChecked ? 'border-indigo-500 bg-indigo-500/20 text-indigo-400' : 'border-slate-700 bg-slate-800'}`}>
+                      {formData.customPriceChecked && <span className="text-[10px]">✓</span>}
+                    </div>
+                    Digitar Valor Personalizado
+                  </button>
+                </div>
+              </section>
+
+              <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
+                <div className="flex items-start gap-4">
+                  <input 
+                    type="checkbox" 
+                    id="blindagemOpc" 
+                    checked={formData.blindagemOpcional === 'sim'} 
+                    onChange={(e) => setFormData({...formData, blindagemOpcional: e.target.checked ? 'sim' : 'nao'})} 
+                    className="mt-1 w-6 h-6 rounded border-slate-700 text-indigo-600 focus:ring-0 cursor-pointer bg-slate-800" 
+                  />
+                  <div>
+                    <label htmlFor="blindagemOpc" className="text-sm font-bold block cursor-pointer text-slate-200">
+                      (PROMOÇÃO) BLINDAR +1 CONTA
+                    </label>
+                    <p className="text-xs text-slate-400 mt-1">
+                      Escolhe alguma outra conta ativa sua para blindar (proteger).
+                    </p>
+                    <p className="text-[11px] font-extrabold text-amber-400 uppercase mt-2 bg-amber-950/30 border border-amber-500/20 py-1.5 px-3 rounded-lg inline-block tracking-wider">
+                      ⚠ Atenção: ESTE SERVIÇO OPCIONAL CUSTA 10 REAIS.
+                    </p>
+                  </div>
+                </div>
+              </section>
+
+              <section className="bg-slate-900 border-2 border-indigo-500/50 p-6 md:p-8 rounded-[2.5rem]">
+                <h2 className="text-xl font-semibold mb-6">Dados de Contato</h2>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <input required value={formData.nomeCliente} onChange={(e) => setFormData({ ...formData, nomeCliente: e.target.value })} type="text" placeholder="Nome Completo" className="bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500" />
+                  <input required value={formData.whatsapp} onChange={(e) => setFormData({ ...formData, whatsapp: applyPhoneMask(e.target.value) })} type="text" placeholder="WhatsApp" className="bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500" />
+                  <div className="relative md:col-span-2">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-400 font-bold">@</span>
+                    <input required value={formData.instaReserva} onChange={(e) => setFormData({ ...formData, instaReserva: handleInstaUser(e.target.value) })} type="text" placeholder="instagram_reserva / Tiktok" className="w-full bg-slate-800 border-none p-4 pl-10 rounded-xl focus:ring-2 ring-indigo-500" />
+                  </div>
+                </div>
+                <button disabled={loading} type="submit" className="w-full py-5 mt-6 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-2xl font-bold text-lg disabled:opacity-50 transition-all hover:opacity-90 shadow-xl shadow-indigo-600/10">
+                  {loading ? "ENVIANDO..." : "ENVIAR SOLICITAÇÃO"}
+                </button>
+              </section>
+
+            </div>
+          )}
+        </form>
+      </div>
+      );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
