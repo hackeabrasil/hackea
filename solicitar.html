@@ -4,10 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LFAssessoria | Recuperação Profissional</title>
+  
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js" crossorigin></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.7/babel.min.js" crossorigin></script>
+  
   <style>
     @keyframes slow-pulse {
       0%, 100% { opacity: 1; transform: scale(1); }
@@ -58,7 +60,7 @@
         hackedEmailAlterado: null, suspendedReason: '',
         juridicoChecked: false, juridicoOption: '100', 
         customPriceChecked: false, customPriceValue: '',
-        blindagemOpcional: 'nao', // Corrigido valor inicial para 'nao'
+        blindagemOpcional: 'nao',
         payWithFollowers: false, payFollowersCount: '', 
         fotoRostoPerfil: null, fotoRostoFeed: null,
         indicadoPor: '' 
@@ -116,7 +118,6 @@
         return val.toLowerCase().replace(/[^a-z0-9._]/g, '').slice(0, 30);
       };
 
-      // --- VALOR NUMÉRICO FINAL DA OFERTA ATUAL ---
       const currentOfferValue = useMemo(() => {
         if (formData.customPriceChecked) {
           const parsed = parseCurrencyToInt(formData.customPriceValue);
@@ -125,14 +126,13 @@
         return parseInt(formData.juridicoOption, 10) || 100;
       }, [formData.customPriceChecked, formData.customPriceValue, formData.juridicoOption]);
 
-      // --- TEXTOS E CORES DA BARRA DE OFERTA ---
       const rangeStatus = useMemo(() => {
         const val = currentOfferValue;
         if (val < 150) return { label: 'INFERIOR A TODO MUNDO', color: 'text-red-500', barColor: 'bg-red-500' };
         if (val < 400) return { label: 'MÉDIA DAS SOLICITAÇÕES', color: 'text-orange-500', barColor: 'bg-orange-500' };
-        if (val < 1000) return { label: 'Oferta acima da médiA', color: 'text-yellow-500', barColor: 'bg-yellow-500' };
-        if (val < 2500) return { label: 'Alta prioridade', color: 'text-emerald-400', barColor: 'bg-emerald-400' };
-        return { label: 'Prioridade Máxima', color: 'text-emerald-500 font-extrabold shadow-sm', barColor: 'bg-emerald-600' };
+        if (val < 1000) return { label: 'OFERTA ACIMA DA MÉDIA', color: 'text-yellow-500', barColor: 'bg-yellow-500' };
+        if (val < 2500) return { label: 'ALTA PRIORIDADE', color: 'text-emerald-400', barColor: 'bg-emerald-400' };
+        return { label: 'PRIORIDADE MÁXIMA', color: 'text-emerald-500 font-extrabold shadow-sm', barColor: 'bg-emerald-600' };
       }, [currentOfferValue]);
 
       const probabilidade = useMemo(() => {
@@ -150,8 +150,8 @@
           if (diffDias <= 7) score += 5;
         }
 
-        const senhasAntigasPreenchidas = formData.senhasAntigas.filter(s => s.length >= 4);
-        if (senhasAntigasPreenchidas.includes(formData.ultimaSenha) && formData.ultimaSenha.length > 0) score += 5;
+        const senhasAntigasPreenchidas = formData.senhasAntigas.filter(s => s && s.length >= 4);
+        if (formData.ultimaSenha && senhasAntigasPreenchidas.includes(formData.ultimaSenha) && formData.ultimaSenha.length > 0) score += 5;
 
         if (formData.suspendedReason === 'Detectamos atividade suspeita em sua conta') score += 15;
         if (formData.suspendedReason === 'Ajude-nos a confirmar que esta conta é sua') score += 15;
@@ -166,17 +166,16 @@
           if (diffDias <= 2) score += 15;
         }
 
-        const email = formData.emailVinculado.toLowerCase();
+        const email = (formData.emailVinculado || "").toLowerCase();
         if (email.length > 5) {
           score += 10;
           if (email.includes('@gmail.com') || email.includes('@hotmail.com')) score += 5;
         }
 
-        if (formData.ultimaSenha.length >= 4 && !naoLembra.ultimaSenha) score += 10;
-        if (formData.telefone.replace(/\D/g, '').length === 11) score += 10;
+        if (formData.ultimaSenha && formData.ultimaSenha.length >= 4 && !naoLembra.ultimaSenha) score += 10;
+        if (formData.telefone && formData.telefone.replace(/\D/g, '').length === 11) score += 10;
         if (formData.temAcessoTelefone === 'sim') score += 15;
         
-        // Peso dinâmico baseado na oferta financeira para resgatar
         if (currentOfferValue >= 400) score += 10;
         if (currentOfferValue >= 1000) score += 10;
         if (currentOfferValue >= 2500) score += 10;
@@ -299,7 +298,7 @@
             </section>
 
           {formData.plataforma && (
-            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="space-y-8">
                 
               {formData.plataforma === 'insta' && (
                 <>
@@ -328,7 +327,7 @@
 
               <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
                 <h2 className="text-xl font-semibold mb-6">{formData.plataforma === 'google' ? 'Gmail a recuperar' : 'E-mail da Conta'}</h2>
-                <input required disabled={naoLembra.emailVinculado} value={formData.emailVinculado} onChange={(e) => setFormData({...formData, emailVinculado: e.target.value.replace(/\s/g, '')})} type="email" placeholder="email@exemplo.com" className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500 disabled:opacity-30" />
+                <input required={formData.plataforma === 'google'} disabled={naoLembra.emailVinculado} value={formData.emailVinculado} onChange={(e) => setFormData({...formData, emailVinculado: e.target.value.replace(/\s/g, '')})} type="email" placeholder="email@exemplo.com" className="w-full bg-slate-800 border-none p-4 rounded-xl focus:ring-2 ring-indigo-500 disabled:opacity-30" />
                 {formData.plataforma !== 'google' && (
                   <button type="button" onClick={() => setNaoLembra({...naoLembra, emailVinculado: !naoLembra.emailVinculado})} className="text-xs text-slate-500 mt-2 font-bold ml-2">
                     {naoLembra.emailVinculado ? 'Lembrei o e-mail' : 'Não sei o e-mail'}
@@ -369,7 +368,7 @@
                   )}
 
                   {formData.motivoQueda && (
-                    <div className="animate-in fade-in slide-in-from-top-2">
+                    <div>
                       <label className="text-sm block mb-2 text-slate-400 font-bold uppercase">Data aproximada da perda:</label>
                       <input type="date" value={formData.dataPerda} onChange={(e) => setFormData({...formData, dataPerda: e.target.value})} className="w-full bg-slate-800 border-none p-4 rounded-xl" />
                     </div>
@@ -389,12 +388,12 @@
                     </div>
                   </div>
                   {formData.fotoRostoPerfil === 'nao' && (
-                    <div className="animate-in slide-in-from-top-2">
+                    <div>
                       <p className="text-sm font-bold mb-3">No seu feed, havia fotos mostrando seu rosto?</p>
                       <div className="flex gap-4">
                         {['sim', 'nao'].map(opt => (
                           <button key={opt} type="button" onClick={() => setFormData({...formData, fotoRostoFeed: opt})} className={`flex-1 py-2 rounded-xl font-bold uppercase ${formData.fotoRostoFeed === opt ? 'bg-indigo-600' : 'bg-slate-800'}`}>{opt}</button>
-                        ))}
+                      ))}
                       </div>
                     </div>
                   )}
@@ -420,8 +419,8 @@
                   <button type="button" onClick={() => setNaoLembra({...naoLembra, telefone: !naoLembra.telefone})} className="text-xs text-slate-500 mt-2 font-bold ml-2">
                     {naoLembra.telefone ? 'Lembrei' : 'Não tinha telefone'}
                   </button>
-                  {formData.telefone.replace(/\D/g, '').length === 11 && (
-                    <div className="mt-4 p-4 bg-slate-800/80 rounded-2xl animate-in zoom-in-95">
+                  {formData.telefone && formData.telefone.replace(/\D/g, '').length === 11 && (
+                    <div className="mt-4 p-4 bg-slate-800/80 rounded-2xl">
                       <p className="text-sm font-bold mb-3">Você ainda tem acesso a este número?</p>
                       <div className="flex gap-4">
                         <button type="button" onClick={() => setFormData({...formData, temAcessoTelefone: 'sim'})} className={`flex-1 py-2 rounded-xl font-bold ${formData.temAcessoTelefone === 'sim' ? 'bg-emerald-600' : 'bg-slate-700'}`}>SIM</button>
@@ -446,7 +445,6 @@
                 </div>
               </section>
 
-              {/* --- ORÇAMENTO DINÂMICO E BENEFÍCIOS --- */}
               <section className="bg-indigo-950/20 border-2 border-indigo-500/30 p-6 md:p-8 rounded-[2.5rem] space-y-6">
                 <div>
                   <h2 className="text-xl font-bold text-slate-100 flex flex-wrap gap-2 items-center">
@@ -461,7 +459,7 @@
                 </div>
 
                 {!formData.customPriceChecked ? (
-                  <div className="space-y-4 animate-in fade-in duration-300">
+                  <div className="space-y-4">
                     <div className="flex justify-between items-center bg-slate-900/60 p-4 rounded-2xl border border-slate-800">
                       <span className="text-xs font-bold text-slate-500 uppercase">Ajuste o valor</span>
                       <span className="text-2xl font-black text-indigo-400">R$ {formData.juridicoOption},00</span>
@@ -484,7 +482,7 @@
                     </div>
                   </div>
                 ) : (
-                  <div className="animate-in slide-in-from-left-4 duration-300">
+                  <div>
                     <label className="text-xs font-bold text-slate-400 uppercase block mb-2">Digite o valor que deseja oferecer</label>
                     <input 
                       type="text" 
@@ -497,7 +495,6 @@
                   </div>
                 )}
 
-                {/* Status de Prioridade Dinâmico baseado no valor */}
                 <div className="p-4 bg-slate-900/80 border border-slate-800 rounded-2xl flex items-center justify-between gap-4">
                   <div className="flex flex-col">
                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Status da sua Fila</span>
@@ -508,9 +505,8 @@
                   <div className={`w-3.5 h-3.5 rounded-full shrink-0 animate-pulse ${rangeStatus.barColor}`}></div>
                 </div>
 
-                {/* Destravamento de benefícios em tempo real cumulativos */}
                 {currentOfferValue >= 300 && (
-                  <div className="space-y-2 animate-in zoom-in-95 duration-300">
+                  <div className="space-y-2">
                     <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest block px-1">Benefícios Destravados por sua Oferta</span>
                     <div className="grid gap-2 text-xs font-semibold">
                       
@@ -553,7 +549,6 @@
                   </div>
                 )}
 
-                {/* Checkbox para alternar entre barra e valor manual digitado */}
                 <div className="pt-2 border-t border-slate-800/60">
                   <button 
                     type="button" 
@@ -568,7 +563,6 @@
                 </div>
               </section>
 
-              {/* --- BLINDAGEM OPCIONAL CORRIGIDA (RETORNA 'sim' OU 'nao') --- */}
               <section className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-[2.5rem]">
                 <div className="flex items-start gap-4">
                   <input 
